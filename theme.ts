@@ -3,5 +3,8 @@
 import { createTheme } from "@mantine/core";
 
 export const theme = createTheme({
-  /* Put your mantine theme override here */
+  fontFamily: 'Vazirmatn, sans-serif',
+  headings: { fontFamily: 'Vazirmatn, sans-serif' },
+  fontFamilyMonospace: 'Vazirmatn, Vazirmatn, Vazirmatn',
+
 });

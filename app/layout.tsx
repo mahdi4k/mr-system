@@ -1,16 +1,25 @@
 import "@mantine/core/styles.css";
 import React from "react";
-import { MantineProvider, ColorSchemeScript } from "@mantine/core";
+import { MantineProvider, ColorSchemeScript, DirectionProvider } from "@mantine/core";
 import { theme } from "../theme";
+import { Vazirmatn } from 'next/font/google'
+import './global.css'
+
+const vazirmatn = Vazirmatn({
+  weight: ['100', '200','300','400','500','600','700','800','900'],
+  subsets: ['arabic'],
+  variable: '--font-vazirmatn',
+  display: 'swap',
+})
 
 export const metadata = {
-  title: "Mantine Next.js template",
-  description: "I am using Mantine with Next.js!",
+  title: "mr-system",
+  description: "mr-system pc building",
 };
 
 export default function RootLayout({ children }: { children: any }) {
   return (
-    <html lang="en">
+    <html dir="rtl" lang="en" className={vazirmatn.className}>
       <head>
         <ColorSchemeScript />
         <link rel="shortcut icon" href="/favicon.svg" />
@@ -20,7 +29,9 @@ export default function RootLayout({ children }: { children: any }) {
         />
       </head>
       <body>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
+        <DirectionProvider>
+          <MantineProvider theme={theme}>{children}</MantineProvider>
+        </DirectionProvider>
       </body>
     </html>
   );

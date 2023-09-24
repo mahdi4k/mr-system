@@ -1,0 +1,91 @@
+@property --rotate {
+    syntax: "<angle>";
+    initial-value: 132deg;
+    inherits: false;
+}
+
+.card {
+    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
+}
+
+.title {
+    font-family: Greycliff CF, var(--mantine-font-family);
+    font-weight: 700;
+}
+
+.cardIcon {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 100%;
+    flex-wrap: wrap;
+    margin: auto;
+}
+
+.cardMain {
+    position: relative;
+    overflow: unset;
+    border: unset;
+}
+
+.cardMain::before {
+    content: "";
+    border-radius: 8px;
+    background-image: linear-gradient(var(--rotate), #5ddcff, #3c67e3 43%, #4e00c2);
+    position: absolute;
+    z-index: -1;
+    top: -1%;
+    left: -2%;
+    animation: spin 7.5s linear infinite;
+}
+
+.cardMain::after {
+    position: absolute;
+    content: "";
+    top: calc(65vh / 6);
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: -1;
+    height: 100%;
+    width: 100%;
+    margin: 0 auto;
+    transform: scale(0.75);
+    filter: blur(calc(65vh / 6));
+    background-image: linear-gradient(var(--rotate), #5ddcff, #3c67e3 43%, #4e00c2);
+    opacity: 1;
+    transition: opacity .5s;
+    animation: spin 7.5s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        --rotate: 0deg;
+    }
+
+    100% {
+        --rotate: 360deg;
+    }
+}
+
+.item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: var(--mantine-radius-md);
+    height: rem(90px);
+    /*///// background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-7)); ///////*/
+    background-color: transparent;
+    transition: box-shadow 150ms ease, transform 100ms ease;
+
+    @mixin hover {
+        box-shadow: var(--mantine-shadows-md);
+        transform: scale(1.05);
+    }
+}
+
+.systemBtn .label {
+    font-size: 13px;
+}
