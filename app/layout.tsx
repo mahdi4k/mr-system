@@ -4,9 +4,11 @@ import { MantineProvider, ColorSchemeScript, DirectionProvider } from "@mantine/
 import { theme } from "../theme";
 import { Vazirmatn } from 'next/font/google'
 import './global.css'
+import '@mantine/notifications/styles.css';
+import Providers from "./dashboard/Provider";
 
 const vazirmatn = Vazirmatn({
-  weight: ['100', '200','300','400','500','600','700','800','900'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
   subsets: ['arabic'],
   variable: '--font-vazirmatn',
   display: 'swap',
@@ -30,7 +32,11 @@ export default function RootLayout({ children }: { children: any }) {
       </head>
       <body>
         <DirectionProvider>
-          <MantineProvider theme={theme}>{children}</MantineProvider>
+          <MantineProvider theme={theme}>
+            <Providers>
+              {children}
+            </Providers>
+          </MantineProvider>
         </DirectionProvider>
       </body>
     </html>
