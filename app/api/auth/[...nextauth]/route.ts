@@ -1,5 +1,9 @@
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
+
+type SessionToken ={
+    token: string
+}
 const handler = NextAuth({
     providers: [
         CredentialsProvider({
@@ -15,7 +19,7 @@ const handler = NextAuth({
             },
             async authorize(credentials: Record<"username" | "password", string> | undefined, req) {
                 // Add logic here to look up the user from the credentials supplied
-                try {
+
                     const res = await fetch("http://127.0.0.1:8000/api/auth/login", {
                         method: "POST",
                         headers: {
@@ -37,18 +41,19 @@ const handler = NextAuth({
 
                         // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
                     }
-                } catch (err) {
-                    console.log(err, 'err');
-                }
+
 
             },
         }),
     ],
     callbacks: {
         async jwt({ token, user, account }) {
-            return { token, ...user };
+             if(user){
+                return { token, ...user };
+            }
+            return token
         },
-        async session({ session, token, user, newSession }) {
+        async session({ session, token }) {
             session.user = token.token as any
             return session;
         },

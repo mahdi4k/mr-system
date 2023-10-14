@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect } from 'react'
+import React, {useEffect} from 'react'
 import {
     Paper,
     TextInput,
@@ -8,11 +8,12 @@ import {
     Title,
 } from '@mantine/core';
 import classes from './login.module.css';
-import { isNotEmpty, useForm } from '@mantine/form';
-import { signIn, useSession, signOut } from "next-auth/react";
-import { notifications } from '@mantine/notifications';
+import {isNotEmpty, useForm} from '@mantine/form';
+import {signIn, useSession} from "next-auth/react";
+import {notifications} from '@mantine/notifications';
 import notifCalsses from '../cssModules/notification.module.css'
-import { redirect } from 'next/navigation'
+import {redirect} from 'next/navigation'
+import {useDisclosure} from "@mantine/hooks";
 
 const Page = () => {
     const data = useSession()
@@ -27,6 +28,7 @@ const Page = () => {
             password: isNotEmpty()
         },
     });
+    const [visible, handlers] = useDisclosure(false);
 
     useEffect(() => {
         if (data.status === 'authenticated') {
@@ -35,41 +37,41 @@ const Page = () => {
     }, [data.status])
 
     const submitHandle = async (event: React.MouseEvent) => {
+        handlers.open()
         event.preventDefault()
         const result = await signIn("credentials", {
             username: form.values.username,
             password: form.values.password,
             redirect: false,
-        }).then(val => {
-            notifications.show({
-                color: 'red',
-                title: 'نام کاربری یا رمز عبور اشتباه است',
-                message: '',
-                classNames: notifCalsses
-            })
+        }).then((val) => {
+            if (!val?.url) {
+                notifications.show({
+                    color: 'red',
+                    title: 'نام کاربری یا رمز عبور اشتباه است',
+                    message: '',
+                    classNames: notifCalsses
+                })
+            }
+            handlers.close()
         })
+    }
 
-    }
-    const logout = () => {
-        signOut()
-    }
     return (
         <div className={classes.wrapper}>
             <Paper className={classes.form} radius={0} p={30}>
-                <Button onClick={logout}>logout</Button>
                 <Title order={2} className={classes.title} ta="center" mt="md" mb={50}>
                     mr-system login
                 </Title>
                 <form>
                     <TextInput  {...form.getInputProps('username')}
-                        label="username" placeholder="" size="md" />
+                                label="username" placeholder="" size="md"/>
                     <PasswordInput {...form.getInputProps('password')}
-                        label="Password" placeholder="Your password" mt="md" size="md" />
-                    <Button onClick={submitHandle} type='submit' fullWidth mt="xl" size="md">
+                                   label="Password" placeholder="Your password" mt="md" size="md"/>
+                    <Button loading={visible} disabled={!form.isValid()} onClick={submitHandle} type='submit' fullWidth
+                            mt="xl" size="md">
                         Login
                     </Button>
                 </form>
-
             </Paper>
         </div>
     )
