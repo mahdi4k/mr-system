@@ -6,6 +6,7 @@ import { Vazirmatn } from 'next/font/google'
 import './global.css'
 import '@mantine/notifications/styles.css';
 import Providers from "./dashboard/Provider";
+import {ReduxProviders} from "./redux/provider";
 
 const vazirmatn = Vazirmatn({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
@@ -33,9 +34,11 @@ export default function RootLayout({ children }: { children: any }) {
       <body>
         <DirectionProvider>
           <MantineProvider theme={theme}>
+            <ReduxProviders>
             <Providers>
               {children}
             </Providers>
+            </ReduxProviders>
           </MantineProvider>
         </DirectionProvider>
       </body>
