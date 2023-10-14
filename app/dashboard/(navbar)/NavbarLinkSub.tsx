@@ -22,8 +22,8 @@ const NavbarLinkSub = ({activeLink}: { activeLink: activeLink }) => {
                 label: 'motherboard',
                 initiallyOpened: true,
                 links: [
-                    { label: 'مشاهده', link: '/' },
-                    { label: 'افزودن', link: '/dashboard/motherboard' },
+                    { label: 'مشاهده', link: '/dashboard/motherboard' },
+                    { label: 'افزودن', link: '/dashboard/motherboard/add' },
                 ],
             },
             {
