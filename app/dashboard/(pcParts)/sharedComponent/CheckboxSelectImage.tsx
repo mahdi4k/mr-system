@@ -43,7 +43,7 @@ export function ImageCheckbox({
 
             <Checkbox
                 checked={value}
-                onChange={() => {}}
+                onChange={(event) => handleChange(event.currentTarget.checked)}
                 tabIndex={-1}
                 styles={{ input: { cursor: 'pointer' } }}
             />
