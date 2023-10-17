@@ -121,10 +121,10 @@ const ImageUpload = ({onSubmit, currentImage, cropperRef, handlers, opened}: IPr
             )}
             {opened ? (
                 <Flex>
-                    <ActionIcon>
+                    <ActionIcon m={"sm"} variant={'light'} radius={'xl'}>
                         <IconTrash onClick={removeSelectedImage} size="1.125rem"/>
                     </ActionIcon>
-                    <ActionIcon>
+                    <ActionIcon m={"sm"} variant={'light'} radius={'xl'}>
                         <IconCheck onClick={onSubmit} size="1.125rem"/>
                     </ActionIcon>
                 </Flex>
