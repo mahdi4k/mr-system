@@ -18,6 +18,7 @@ type authTokenDTO = {
 export const motherboardApi = createApi({
     reducerPath: "motherboardApi",
     refetchOnFocus: true,
+    tagTypes:['motherboards'],
     baseQuery: fetchBaseQuery({
         baseUrl: "http://127.0.0.1:8000/api",
         prepareHeaders: (headers, {getState}) => {
@@ -30,15 +31,35 @@ export const motherboardApi = createApi({
     endpoints: (builder) => ({
         getMotherboards: builder.query<Motherboard[], void>({
             query: () => "/motherboards",
+            providesTags:['motherboards']
         }),
         createMotherboard: builder.mutation({
             query: (payload) => ({
                 url: `/motherboards`,
                 method: 'POST',
                 body: payload,
-            })
+            }),
+            invalidatesTags:['motherboards']
+        }),
+        addMotherboardImage: builder.mutation({
+            query: (payload) => {
+                return {
+                    url: `/motherboards/${payload.id}/image`,
+                    method: 'POST',
+                    body: payload.logo,
+                }
+            }
+        }),
+        removeMotherboard: builder.mutation({
+            query: (payload) => {
+                return {
+                    url: `/motherboards/${payload}`,
+                    method: 'DELETE',
+                }
+            },
+            invalidatesTags:['motherboards']
         })
     }),
 });
 
-export const {useGetMotherboardsQuery, useCreateMotherboardMutation} = motherboardApi;
+export const {useGetMotherboardsQuery, useCreateMotherboardMutation, useAddMotherboardImageMutation,useRemoveMotherboardMutation} = motherboardApi;
