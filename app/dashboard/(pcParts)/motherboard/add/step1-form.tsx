@@ -1,14 +1,37 @@
 "use client"
 
 import React from 'react';
-import {Button, Flex, Grid, Group, MultiSelect, Radio, Select, SimpleGrid, Stack, Text, TextInput} from "@mantine/core";
+import {
+    Button,
+    Flex,
+    Grid,
+    Group,
+    MultiSelect,
+    Radio,
+    Select,
+    SimpleGrid,
+    Stack,
+    TagsInput,
+    Text,
+    TextInput
+} from "@mantine/core";
 import {useCreateMotherboardMutation} from "../../../../redux/services/motherboardApi";
-import {useForm} from "@mantine/form";
+import {isNotEmpty, useForm} from "@mantine/form";
 import {ImageCheckbox} from "../../sharedComponent/CheckboxSelectImage";
 import {toFormData} from "../../../../utils/utils";
+import {notifications} from "@mantine/notifications";
+import notifCalsses from "../../../../cssModules/notification.module.css";
+import {currentMotherboardOnSave} from "../../../../redux/features/motherboard";
+import {useDispatch} from "react-redux";
+import {ActiveStepDTO} from "./page";
 
-const Step1Form = () => {
-    const [createMotherboard, response] = useCreateMotherboardMutation()
+type Iprops = {
+    setActiveStep: React.Dispatch<React.SetStateAction<ActiveStepDTO>>
+    setActive: React.Dispatch<React.SetStateAction<number>>
+}
+const Step1Form = (props: Iprops) => {
+    const [createMotherboard, response] = useCreateMotherboardMutation();
+    const dispatch = useDispatch()
     const form = useForm({
         initialValues: {
             name: '',
@@ -24,10 +47,15 @@ const Step1Form = () => {
             sli_support: false,
             wifi_support: false,
             rgb_support: false,
-            image: ''
+            attributes: []
         },
 
-        validate: {},
+        validate: {
+            name: isNotEmpty(),
+            brand: isNotEmpty(),
+            size: isNotEmpty(),
+            manufacturer: isNotEmpty(),
+        },
     });
     const checkBoxes = [
         {title: 'ddr3', inputname: 'ddr3'},
@@ -43,18 +71,33 @@ const Step1Form = () => {
 
     const submitHandleForm = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault();
-
-
-        const values = toFormData(form.values)
-        createMotherboard(values)
+        createMotherboard(form.values)
             .unwrap()
-            .then(() => {
-
+            .then((val) => {
+                console.log(val)
+                dispatch(currentMotherboardOnSave({id: val.data.id, name: val.data.name}))
+                form.onReset
+                notifications.show({
+                    color: 'green',
+                    title: 'مادربورد با موفقیت ثبت شد',
+                    message: '',
+                    classNames: notifCalsses
+                })
+                props.setActiveStep('step-2')
+                props.setActive(1)
             })
             .then((error) => {
                 console.log(error)
-            })
 
+            })
+        if (response.isError) {
+            notifications.show({
+                color: 'red',
+                title: 'خطای سرور!',
+                message: '',
+                classNames: notifCalsses
+            })
+        }
     }
     return (
         <Stack>
@@ -89,7 +132,7 @@ const Step1Form = () => {
                         <Select
                             label="سایز مادربرد"
                             placeholder=""
-                            data={['micro', 'mini', 'standard']}
+                            data={['micro', 'mini', 'normal']}
                             {...form.getInputProps('size')}
 
                         />
@@ -109,11 +152,7 @@ const Step1Form = () => {
                     </Grid.Col>
 
                     <Grid.Col span={{base: 12, md: 6}}>
-                        <MultiSelect
-                            data={['2100', '2300', '3200', '4000']}
-                            label="ram frequency support"
-                            searchable
-                        />
+                        <TagsInput {...form.getInputProps('attributes')} label="ram frequency support" placeholder=""/>
                     </Grid.Col>
                     <Grid.Col span={{base: 12, md: 6}}>
 
@@ -126,7 +165,8 @@ const Step1Form = () => {
                 </Grid>
                 <SimpleGrid mt={'xl'} cols={{base: 1, sm: 2, md: 4}}>{items}</SimpleGrid>
                 <Group justify="flex-end" mt="md">
-                    <Button onClick={(event) => submitHandleForm(event)} type="submit">ثبت</Button>
+                    <Button disabled={!form.isValid()} onClick={(event) => submitHandleForm(event)}
+                            type="submit">ثبت</Button>
                 </Group>
             </form>
         </Stack>
