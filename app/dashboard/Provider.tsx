@@ -9,7 +9,7 @@ interface Props {
 }
 
 const Providers = ({ children }: Props) => {
-    return <SessionProvider>
+    return <SessionProvider refetchInterval={24 * 60 * 60} refetchOnWindowFocus={false}  >
         <Notifications />
         {children}
     </SessionProvider>;
