@@ -30,7 +30,8 @@ const NavbarLinkSub = ({activeLink}: { activeLink: activeLink }) => {
                 label: 'cpu',
                 initiallyOpened: false,
                 links: [
-                    { label: 'افزودن', link: '/' },
+                    { label: 'مشاهده', link: '/dashboard/cpu' },
+                    { label: 'افزودن', link: '/dashboard/cpu/add' },
                 ],
             }
         ]
