@@ -25,11 +25,11 @@ import {currentMotherboardOnSave} from "../../../../redux/features/motherboard";
 import {useDispatch} from "react-redux";
 import {ActiveStepDTO} from "./page";
 
-type Iprops = {
+export type StepProps = {
     setActiveStep: React.Dispatch<React.SetStateAction<ActiveStepDTO>>
     setActive: React.Dispatch<React.SetStateAction<number>>
 }
-const Step1Form = (props: Iprops) => {
+const Step1Form = (props: StepProps) => {
     const [createMotherboard, response] = useCreateMotherboardMutation();
     const dispatch = useDispatch()
     const form = useForm({
