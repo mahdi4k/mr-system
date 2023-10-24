@@ -1,16 +1,16 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from './features/auth'
-import {motherboardApi} from "./services/motherboardApi";
 import motherboardReducer from "./features/motherboard";
+import { api } from './services/api'
 
 export const store = configureStore({
     reducer: {
         auth: authReducer,
         motherboard: motherboardReducer,
-        [motherboardApi.reducerPath]: motherboardApi.reducer,
+        [api.reducerPath]: api.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(motherboardApi.middleware),
+        getDefaultMiddleware().concat(api.middleware),
     devTools: process.env.NODE_ENV !== "production",
 
 });
