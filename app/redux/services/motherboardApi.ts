@@ -1,4 +1,4 @@
-import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
+import { api } from './api'
 
 type Motherboard = {
     id: number;
@@ -15,19 +15,8 @@ type authTokenDTO = {
         }
     }
 }
-export const motherboardApi = createApi({
-    reducerPath: "motherboardApi",
-    refetchOnFocus: true,
-    tagTypes:['motherboards'],
-    baseQuery: fetchBaseQuery({
-        baseUrl: "http://127.0.0.1:8000/api",
-        prepareHeaders: (headers, {getState}) => {
-            const token = getState() as authTokenDTO
-            headers.set('Accept', `application/json`)
-            headers.set('Authorization', `Bearer ${token.auth.userToken}`)
-            return headers
-        },
-    }),
+export const motherboardApi = api.injectEndpoints({
+
     endpoints: (builder) => ({
         getMotherboards: builder.query<Motherboard[], void>({
             query: () => "/motherboards",
