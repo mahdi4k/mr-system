@@ -1,9 +1,5 @@
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
-
-type SessionToken ={
-    token: string
-}
 const handler = NextAuth({
     providers: [
         CredentialsProvider({
@@ -47,13 +43,13 @@ const handler = NextAuth({
         }),
     ],
     session:{
-      maxAge:  2 * 24 * 60 * 60
+      maxAge: 24 * 60 * 60
     },
     callbacks: {
         async jwt({ token, user, account }) {
              if(user){
                 return { token, ...user };
-            }
+             }
             return token
         },
         async session({ session, token }) {
