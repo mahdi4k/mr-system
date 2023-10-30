@@ -1,16 +1,17 @@
 import React from 'react'
-import { Header } from './components/Header/Header'
 import { HeroHeader } from './components/HeroHome/HeroHeader'
 import CardService from './components/cardService/CardService'
-import { Footer } from './components/Footer/Footer'
+import CpuGraphic from "./components/cpuGraphic/CpuGraphic";
+import CpuMotherboard from "./components/cpuMotherboard/CpuMotherboard";
 
 const page = () => {
   return (
     <div>
-      <Header />
+
       <HeroHeader />
+      <CpuGraphic/>
+      <CpuMotherboard/>
       <CardService />
-      <Footer/>
     </div>
   )
 }
