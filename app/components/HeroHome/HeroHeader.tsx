@@ -9,7 +9,7 @@ export function HeroHeader() {
     <Container size="lg">
       <div className={classes.inner}>
         <Image
-          src="/hero.svg"
+          src="/svg/hero.svg"
           width={500}
           height={400}
           alt="Picture of the author"

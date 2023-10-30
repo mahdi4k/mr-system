@@ -1,7 +1,7 @@
 "use client"
 import React from 'react';
 import {Text, Title, TextInput, Button, Group, Flex, Container} from '@mantine/core';
-import classes from './cpuGraphic.module.css';
+import classes from '../../cssModules/PcSection.module.css';
 import Image from 'next/image'
 import {IconArrowsExchange} from "@tabler/icons-react";
 
@@ -9,7 +9,7 @@ const CpuGraphic = () => {
     return (
         <Container my={'xl'} size="xl">
             <Flex className={classes.wrapper}>
-                <div className={classes.body}>
+                <div className={classes.bodyLeft}>
                     <Group mb={'md'} align={'center'}>
                         <Title fs={'italic'} className={classes.title}>CPU</Title>
                         <IconArrowsExchange/>
@@ -26,7 +26,7 @@ const CpuGraphic = () => {
                 </div>
                 <Image width={500}
                        height={500} alt="graphic card vs cpu"
-                       src={'/cpu-graphic.svg'} className={classes.image}/>
+                       src={'/svg/cpu-graphic.svg'} className={classes.image}/>
             </Flex>
         </Container>
     );
