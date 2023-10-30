@@ -1,0 +1,22 @@
+.pieces{
+    display: flex;
+    position: relative;
+    width: 400px;
+    height: 300px;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed light-dark(var(--mantine-color-gray-5), var(--mantine-color-gray-8));
+    border-radius: 20px;
+    transition: all .3s;
+    cursor: pointer;
+    background-color: light-dark(var(--mantine-color-white), var(--mantine-color-gray-9));
+    color: light-dark(var(--mantine-color-gray-5), var(--mantine-color-gray-3));
+    &:hover {
+         border: 1px dashed light-dark(var(--mantine-color-gray-8), var(--mantine-color-gray-1));
+         color: light-dark(var(--mantine-color-gray-8), var(--mantine-color-gray-1));
+    }
+}
+.piecesImg{
+    position: absolute;
+    bottom: 20px;
+}
