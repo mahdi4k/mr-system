@@ -5,14 +5,14 @@
     height: 300px;
     align-items: center;
     justify-content: center;
-    border: 1px dashed light-dark(var(--mantine-color-gray-5), var(--mantine-color-gray-8));
+    border: 1px dashed light-dark(var(--mantine-color-gray-5), var(--mantine-color-gray-8)) ;
     border-radius: 20px;
     transition: all .3s;
     cursor: pointer;
     background-color: light-dark(var(--mantine-color-white), var(--mantine-color-gray-9));
     color: light-dark(var(--mantine-color-gray-5), var(--mantine-color-gray-3));
     &:hover {
-         border: 1px dashed light-dark(var(--mantine-color-gray-8), var(--mantine-color-gray-1));
+         border: 1px dashed light-dark(var(--mantine-color-gray-4), var(--mantine-color-gray-1));
          color: light-dark(var(--mantine-color-gray-8), var(--mantine-color-gray-1));
     }
 }
