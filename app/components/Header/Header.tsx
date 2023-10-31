@@ -4,27 +4,23 @@ import {useDisclosure} from '@mantine/hooks';
 import classes from './Header.module.css';
 import {IconSun, IconMoon} from '@tabler/icons-react';
 import Link from "next/link";
-import {useEffect, useState} from "react";
+import UseLoading from "../../utils/customHook/useLoading";
 
 export function Header() {
     const [opened, {toggle}] = useDisclosure(false);
     const {setColorScheme} = useMantineColorScheme();
     const computedColorScheme = useComputedColorScheme('light', {getInitialValueInEffect: true});
-    const [isClient, setIsClient] = useState(false)
-
-    useEffect(() => {
-        setIsClient(true)
-    }, [])
+    const isLoading = UseLoading()
     return (
 
         <header className={classes.header}>
             <Container size="lg" className={classes.inner}>
-                <Link href={'/'}>
+                <Link className={'text-decoration-none'} href={'/'}>
                     mr-system
                 </Link>
                 <Group gap={5} visibleFrom="xs">
                     <Group justify="center">
-                        {isClient ? (<ActionIcon
+                        {isLoading ? (<ActionIcon
                             onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
                             variant="subtle"
                             size="xl"
