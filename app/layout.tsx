@@ -7,6 +7,8 @@ import './global.css'
 import '@mantine/notifications/styles.css';
 import Providers from "./dashboard/Provider";
 import {ReduxProviders} from "./redux/provider";
+import {Header} from "./components/Header/Header";
+import {Footer} from "./components/Footer/Footer";
 
 const vazirmatn = Vazirmatn({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
@@ -36,7 +38,9 @@ export default function RootLayout({ children }: { children: any }) {
           <MantineProvider theme={theme}>
             <ReduxProviders>
             <Providers>
-              {children}
+              <Header />
+                {children}
+              <Footer/>
             </Providers>
             </ReduxProviders>
           </MantineProvider>
