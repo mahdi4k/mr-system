@@ -1,4 +1,6 @@
 body,html h1{
     font-family: var(--font-vazirmatn) !important;
 }
- 
+.text-decoration-none{
+    text-decoration: none;
+}
