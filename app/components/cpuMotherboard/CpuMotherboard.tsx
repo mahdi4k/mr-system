@@ -4,6 +4,7 @@ import {Text, Title, TextInput, Button, Group, Flex, Container} from '@mantine/c
 import classes from '../../cssModules/PcSection.module.css';
 import Image from 'next/image'
 import {IconArrowsExchange} from "@tabler/icons-react";
+import Link from "next/link";
 
 const CpuMotherboard = () => {
     return (
@@ -16,7 +17,7 @@ const CpuMotherboard = () => {
                     <Group mb={'md'} align={'center'}>
                         <Title fs={'italic'} className={classes.title}>CPU</Title>
                         <IconArrowsExchange/>
-                        <Title fs={'italic'}>Motherboard</Title>
+                        <Title className={classes.title} fs={'italic'}>Motherboard</Title>
                     </Group>
 
                     <Text fz="md" c="dimmed">
@@ -24,7 +25,11 @@ const CpuMotherboard = () => {
                         کنید
                     </Text>
                     <div className={`${classes.controls} ${classes.flexStart}`}>
-                        <Button className={classes.control}>انتخاب</Button>
+                        <Link href={'/pieces/motherboard/cpu'}>
+                            <Button px={'xl'} variant="gradient"
+                                    gradient={{from: 'indigo', to: 'cyan', deg: 90}}
+                            >انتخاب</Button>
+                        </Link>
                     </div>
                 </div>
 
