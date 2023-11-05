@@ -86,10 +86,6 @@ const Step1Form = (props: StepProps) => {
                 props.setActiveStep('step-2')
                 props.setActive(1)
             })
-            .then((error) => {
-                console.log(error)
-
-            })
         if (response.isError) {
             notifications.show({
                 color: 'red',
