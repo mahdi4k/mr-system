@@ -6,6 +6,7 @@ type Motherboard = {
     size: string
     total_slot_ram: number;
     brand: string
+    image:string
 };
 
 type authTokenDTO = {
