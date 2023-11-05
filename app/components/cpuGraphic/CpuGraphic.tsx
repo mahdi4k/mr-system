@@ -4,6 +4,7 @@ import {Text, Title, TextInput, Button, Group, Flex, Container} from '@mantine/c
 import classes from '../../cssModules/PcSection.module.css';
 import Image from 'next/image'
 import {IconArrowsExchange} from "@tabler/icons-react";
+import Link from "next/link";
 
 const CpuGraphic = () => {
     return (
@@ -13,7 +14,7 @@ const CpuGraphic = () => {
                     <Group mb={'md'} align={'center'}>
                         <Title fs={'italic'} className={classes.title}>CPU</Title>
                         <IconArrowsExchange/>
-                        <Title fs={'italic'}>Graphic</Title>
+                        <Title className={classes.title} fs={'italic'}>Graphic</Title>
                     </Group>
 
                     <Text fz="md" c="dimmed">
@@ -21,7 +22,11 @@ const CpuGraphic = () => {
                         کنید
                     </Text>
                     <div className={classes.controls}>
-                        <Button className={classes.control}>انتخاب</Button>
+                        <Link href={'/'}>
+                            <Button px={'xl'} variant="gradient"
+                                    gradient={{from: 'indigo', to: 'cyan', deg: 90}}
+                            >انتخاب</Button>
+                        </Link>
                     </div>
                 </div>
                 <Image width={500}
