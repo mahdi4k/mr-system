@@ -1,6 +1,14 @@
+:root[data-mantine-color-scheme='dark']{
+    --mantine-color-body: #222831 !important
+}
 body,html h1{
     font-family: var(--font-vazirmatn) !important;
 }
 .text-decoration-none{
     text-decoration: none;
+}
+
+body{
+    display: flex;
+    flex-direction: column;
 }
