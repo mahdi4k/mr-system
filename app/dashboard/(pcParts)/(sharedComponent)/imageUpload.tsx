@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react'
-import {CircleStencil, Cropper, CropperRef} from "react-advanced-cropper"
+import {Cropper, CropperRef, RectangleStencil} from "react-advanced-cropper"
 import {Dropzone, FileWithPath, IMAGE_MIME_TYPE} from "@mantine/dropzone"
 import {ActionIcon, Avatar, Flex, Group} from "@mantine/core"
 import {notifications} from "@mantine/notifications"
@@ -43,7 +43,7 @@ const ImageUpload = ({onSubmit, currentImage, cropperRef, handlers, opened}: IPr
     return (
         <>
             {opened ? (
-                <div style={{maxWidth: '285px', maxHeight: '350px'}}>
+                <div style={{maxWidth: '210px', maxHeight: '210px'}}>
                     <Cropper
                         ref={cropperRef}
                         src={image}
@@ -51,7 +51,7 @@ const ImageUpload = ({onSubmit, currentImage, cropperRef, handlers, opened}: IPr
                             width: 200,
                             height: 200
                         }}
-                        stencilComponent={CircleStencil}
+                        stencilComponent={RectangleStencil}
                     />
                 </div>
             ) : (
@@ -66,7 +66,7 @@ const ImageUpload = ({onSubmit, currentImage, cropperRef, handlers, opened}: IPr
                         h={200}
                         styles={() => ({
                             root: {
-                                borderRadius: '100%',
+                                borderRadius: '5%',
                                 margin: 'auto',
                                 padding: '5px',
                                 [`&:hover`]: {
@@ -103,7 +103,7 @@ const ImageUpload = ({onSubmit, currentImage, cropperRef, handlers, opened}: IPr
                                     <Avatar
                                         styles={() => ({
                                             root: {
-                                                borderRadius: '100%'
+                                                borderRadius: '10%'
                                             }
                                         })}
                                         size="100%"
