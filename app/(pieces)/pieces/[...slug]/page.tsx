@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {Container, Flex, Group, Skeleton, Space} from "@mantine/core";
 import usePiecePc from "../../../utils/customHook/usePiecePc";
 import useLoading from "../../../utils/customHook/useLoading";
+import { useAuth } from '../../../utils/customHook/useAuth';
 
 type SlugType = 'motherboard' | 'cpu' | 'graphic'
 
@@ -14,15 +15,16 @@ interface Props {
 }
 
 const Page: React.FC<Props> = ({params}) => {
+    useAuth();
 
     const firstPiece = usePiecePc(params.slug[0])
     const secondPiece = usePiecePc(params.slug[1])
     console.log(firstPiece, 'firstPiece')
-    const isLoading  = useLoading()
+    const loadingEnd  = useLoading()
     return (
             <Container size={'md'}>
                 <Group mt={'100px'} justify={'space-between'} align={'center'}>
-                    {isLoading &&
+                    {!loadingEnd &&
                         (
                             <>
                                 <Skeleton radius={'xl'} width={400} height={300} mb="xl" />
