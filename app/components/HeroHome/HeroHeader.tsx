@@ -9,6 +9,7 @@ export function HeroHeader() {
     <Container size="lg">
       <div className={classes.inner}>
         <Image
+          className={classes.responiveImage}
           src="/svg/hero.svg"
           width={500}
           height={400}
@@ -19,13 +20,8 @@ export function HeroHeader() {
             سیستمی <span className={classes.highlight}> که دوست داری</span> خیلی راحت  رو هم کن
             <IconMoodSmile className={classes.IconSmile} size={50}  color='var(--mantine-color-blue-5)' />
           </Title>
-          
-
           <ListItem />
-
-
         </div>
-
       </div>
     </Container>
   );
