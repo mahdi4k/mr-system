@@ -1,24 +1,24 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type CounterState = {
-    currentMotherBoard: {id:number,name:string};
+    currentCpu: {id:number,name:string};
 };
 
-type currentCpuBoard = {
+type currentCpu = {
     id:number,
     name:string
 }
 
 const initialState = {
-    currentMotherBoard: {},
+    currentCpu: {},
 } as CounterState;
 
 export const cpuSlice = createSlice({
-    name: "motherboard",
+    name: "cpu",
     initialState,
     reducers: {
-        currentCpuOnSave: (state, action: PayloadAction<currentCpuBoard>) => {
-            state.currentMotherBoard  = action.payload;
+        currentCpuOnSave: (state, action: PayloadAction<currentCpu>) => {
+            state.currentCpu  = action.payload;
         },
     },
 });

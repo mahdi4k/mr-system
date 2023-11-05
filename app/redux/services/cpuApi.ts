@@ -7,6 +7,7 @@ type CPU = {
     integrated_graphic: string
     manufacturer: string;
     attributes: string
+    image:string
 };
 
 

@@ -1,12 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from './features/auth'
 import motherboardReducer from "./features/motherboard";
+import cpuReducer from "./features/cpu";
 import { api } from './services/api'
 
 export const store = configureStore({
     reducer: {
         auth: authReducer,
         motherboard: motherboardReducer,
+        cpu: cpuReducer,
         [api.reducerPath]: api.reducer,
     },
     middleware: (getDefaultMiddleware) =>
