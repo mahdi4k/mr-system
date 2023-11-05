@@ -6,10 +6,10 @@ import {useDisclosure} from "@mantine/hooks";
 import {Button, Flex, Text} from "@mantine/core";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../redux/store";
-import {useAddMotherboardImageMutation} from "../../../../redux/services/motherboardApi";
 import {notifications} from "@mantine/notifications";
 import notifClasses from "../../../../cssModules/notification.module.css";
 import {ActiveStepDTO} from "./page";
+import { useAddCpuImageMutation } from '../../../../redux/services/cpuApi';
 
 type Iprops = {
     setActiveStep: React.Dispatch<React.SetStateAction<ActiveStepDTO>>
@@ -20,9 +20,9 @@ const Step2Image = (props: Iprops) => {
     const cropperRef = useRef<CropperRef>(null)
     const [opened, handlers] = useDisclosure(false)
     const [logo, setLogo] = useState<File | undefined>()
-    const [addMotherboardImage, response] = useAddMotherboardImageMutation();
+    const [addCpuImage, response] = useAddCpuImageMutation();
 
-    const currentMotherboard = useSelector((state: RootState) => state.motherboard.currentMotherBoard)
+    const currentCpu = useSelector((state: RootState) => state.cpu.currentCpu)
     const onSubmitAvatar = async () => {
         setPreviewLogo(cropperRef.current ? cropperRef.current.getCanvas()?.toDataURL() : undefined)
         if (cropperRef.current) {
@@ -37,8 +37,8 @@ const Step2Image = (props: Iprops) => {
     }
     useEffect(() => {
         if (logo) {
-            addMotherboardImage({
-                id: currentMotherboard.id,
+            addCpuImage({
+                id: currentCpu.id,
                 logo: toFormData({
                     image: logo,
                 })
@@ -53,10 +53,10 @@ const Step2Image = (props: Iprops) => {
                     })
                 })
         }
-    }, [addMotherboardImage, currentMotherboard.id, logo])
+    }, [addCpuImage, currentCpu.id, logo])
     return (
         <>
-            <Text mt={"lg"} fz={"lg"} fw={"bold"} mr={"lg"}>افزودن تصویر برای مانیتور {currentMotherboard.name}  </Text>
+            <Text mt={"lg"} fz={"lg"} fw={"bold"} mr={"lg"}>افزودن تصویر برای cpu {currentCpu.name}  </Text>
             <Flex direction={'column'} align={'center'} justify={'center'}>
                 <ImageUpload currentImage={previewLogo} handlers={handlers} opened={opened}
                              cropperRef={cropperRef}
