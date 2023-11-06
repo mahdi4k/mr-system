@@ -13,6 +13,7 @@ import {IconEdit, IconTrash} from "@tabler/icons-react";
 import {useDisclosure} from "@mantine/hooks";
 import {notifications} from "@mantine/notifications";
 import notifClasses from "../../../cssModules/notification.module.css";
+import Image from 'next/image';
 
 
 const ClientMotherBoard = () => {
@@ -45,7 +46,10 @@ const ClientMotherBoard = () => {
 
     const rows = data?.map((element) => (
         <Table.Tr key={element.name}>
-            <Table.Td>{element.name}</Table.Td>
+            <Table.Td>
+            {element.image && <Image alt={element.name} width={30} height={30} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${element.image}`} />}
+                {element.name}
+                </Table.Td>
             <Table.Td>{element.brand}</Table.Td>
             <Table.Td>{element.total_slot_ram}</Table.Td>
             <Table.Td>{element.size}</Table.Td>
@@ -68,7 +72,7 @@ const ClientMotherBoard = () => {
         <>
             <Stack>
                 <Flex justify={'space-between'} align={'center'}>
-                    <Text mt={"sm"} mb={"md"} fw={"bold"} fz={"lg"}>لیست مادبرد</Text>
+                    <Text mt={"sm"} mb={"md"} fw={"bold"} fz={"lg"}>لیست مادربرد</Text>
                     <Link href="/dashboard/motherboard/add">
                         <Button variant={'outline'}>افزودن</Button>
                     </Link>
