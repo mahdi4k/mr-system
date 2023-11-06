@@ -22,7 +22,7 @@ const NavbarLinkSub = ({activeLink}: { activeLink: activeLink }) => {
                 label: 'motherboard',
                 initiallyOpened: true,
                 links: [
-                    { label: 'مشاهده', link: '/dashboard/motherboard' },
+                    { label: 'لیست', link: '/dashboard/motherboard' },
                     { label: 'افزودن', link: '/dashboard/motherboard/add' },
                 ],
             },
@@ -30,7 +30,7 @@ const NavbarLinkSub = ({activeLink}: { activeLink: activeLink }) => {
                 label: 'cpu',
                 initiallyOpened: false,
                 links: [
-                    { label: 'مشاهده', link: '/dashboard/cpu' },
+                    { label: 'لیست', link: '/dashboard/cpu' },
                     { label: 'افزودن', link: '/dashboard/cpu/add' },
                 ],
             }
