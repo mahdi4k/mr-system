@@ -56,7 +56,7 @@ const Step2Image = (props: Iprops) => {
     }, [addMotherboardImage, currentMotherboard.id, logo])
     return (
         <>
-            <Text mt={"lg"} fz={"lg"} fw={"bold"} mr={"lg"}>افزودن تصویر برای مانیتور {currentMotherboard.name}  </Text>
+            <Text mt={"lg"} fz={"lg"} fw={"bold"} mr={"lg"}>افزودن تصویر برای مادربورد {currentMotherboard.name}  </Text>
             <Flex direction={'column'} align={'center'} justify={'center'}>
                 <ImageUpload currentImage={previewLogo} handlers={handlers} opened={opened}
                              cropperRef={cropperRef}
