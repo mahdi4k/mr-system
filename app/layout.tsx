@@ -5,10 +5,10 @@ import { theme } from "../theme";
 import { Vazirmatn } from 'next/font/google'
 import './global.css'
 import '@mantine/notifications/styles.css';
-import Providers from "./dashboard/Provider";
-import {ReduxProviders} from "./redux/provider";
-import {Header} from "./components/Header/Header";
-import {Footer} from "./components/Footer/Footer";
+import {ReduxProviders} from "@/_redux/provider";
+import {Header} from "@/_components/Header/Header";
+import {Footer} from "@/_components/Footer/Footer";
+import Providers from "./(routes)/dashboard/Provider";
 
 const vazirmatn = Vazirmatn({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],

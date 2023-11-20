@@ -6,6 +6,13 @@
       "dom.iterable",
       "esnext"
     ],
+    "baseUrl": "app/",
+    "paths": {
+      "@/_components/*": ["_components/*"],
+      "@/_redux/*": ["_redux/*"],
+      "@/_utils/*": ["_utils/*"],
+      "@/_cssModules/*": ["_cssModules/*"],
+    },
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,

@@ -1,8 +1,8 @@
 import React from 'react'
-import { HeroHeader } from './components/HeroHome/HeroHeader'
-import CardService from './components/cardService/CardService'
-import CpuGraphic from "./components/cpuGraphic/CpuGraphic";
-import CpuMotherboard from "./components/cpuMotherboard/CpuMotherboard";
+import { HeroHeader } from '@/_components/HeroHome/HeroHeader'
+import CardService from '@/_components/cardService/CardService'
+import CpuGraphic from "@/_components/cpuGraphic/CpuGraphic";
+import CpuMotherboard from "@/_components/cpuMotherboard/CpuMotherboard";
 
 const page = () => {
   return (
