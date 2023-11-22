@@ -1,18 +1,8 @@
 {
   "compilerOptions": {
+    "types": ["node", "jest", "@testing-library/jest-dom"],
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "baseUrl": "app/",
-    "paths": {
-      "@/_components/*": ["_components/*"],
-      "@/_redux/*": ["_redux/*"],
-      "@/_utils/*": ["_utils/*"],
-      "@/_cssModules/*": ["_cssModules/*"],
-    },
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -25,19 +15,15 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+    "baseUrl": "app/",
+    "paths": {
+      "@/_components/*": ["_components/*"],
+      "@/_redux/*": ["_redux/*"],
+      "@/_utils/*": ["_utils/*"],
+      "@/_cssModules/*": ["_cssModules/*"],
+    },
+    "plugins": [{ "name": "next" }]
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-, "app/components/HeroHome"  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

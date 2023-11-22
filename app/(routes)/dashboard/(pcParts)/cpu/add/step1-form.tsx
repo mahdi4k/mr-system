@@ -14,7 +14,7 @@ import {
 } from "@mantine/core";
 import {isNotEmpty, useForm} from "@mantine/form";
 import {notifications} from "@mantine/notifications";
-import notifCalsses from "@/cssModules/notification.module.css";
+import notifCalsses from "@/_cssModules/notification.module.css";
 import {currentCpuOnSave} from "@/_redux/features/cpu";
 import {useDispatch} from "react-redux";
 import {StepProps} from "../../motherboard/add/step1-form";
