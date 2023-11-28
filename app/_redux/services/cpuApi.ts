@@ -1,4 +1,5 @@
 import { api } from './api'
+import { Motherboard } from './motherboardApi';
 
 export type CPU = {
     id: number;
@@ -7,7 +8,9 @@ export type CPU = {
     integrated_graphic: string
     manufacturer: string;
     attributes: string
-    image:string
+    image: string,
+    motherboards: Motherboard[] 
+    brand?: string
 };
 
 
@@ -16,7 +19,7 @@ export const cpuApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getCpus: builder.query<CPU[], void>({
             query: () => "/cpus",
-            providesTags:['cpu']
+            providesTags: ['cpu']
         }),
         createCpus: builder.mutation({
             query: (payload) => ({
@@ -24,7 +27,7 @@ export const cpuApi = api.injectEndpoints({
                 method: 'POST',
                 body: payload,
             }),
-            invalidatesTags:['cpu']
+            invalidatesTags: ['cpu']
         }),
         addCpuImage: builder.mutation({
             query: (payload) => {
@@ -42,9 +45,9 @@ export const cpuApi = api.injectEndpoints({
                     method: 'DELETE',
                 }
             },
-            invalidatesTags:['cpu']
+            invalidatesTags: ['cpu']
         })
     }),
 });
 
-export const {useGetCpusQuery, useCreateCpusMutation, useAddCpuImageMutation,useRemoveCpuMutation} = cpuApi;
+export const { useGetCpusQuery, useCreateCpusMutation, useAddCpuImageMutation, useRemoveCpuMutation } = cpuApi;
