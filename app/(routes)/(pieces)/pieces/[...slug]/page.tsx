@@ -21,7 +21,7 @@ const Page: React.FC<Props> = ({params}) => {
     const secondPiece = usePiecePc(params.slug[1])
     const loadingEnd  = useLoading()
     return (
-            <Container size={'md'}>
+            <Container styles={{ root: { flex: '1 0 auto' } }} size={'md'}>
                 <Group mt={'100px'} justify={'space-between'} align={'center'}>
                     {!loadingEnd &&
                         (
