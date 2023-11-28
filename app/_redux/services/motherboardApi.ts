@@ -1,4 +1,5 @@
 import { api } from './api'
+import { CPU } from './cpuApi';
 
 export type Motherboard = {
     id: number;
@@ -7,6 +8,7 @@ export type Motherboard = {
     total_slot_ram: number;
     brand: string
     image:string
+    cpus:CPU[]
 };
 
 type authTokenDTO = {
