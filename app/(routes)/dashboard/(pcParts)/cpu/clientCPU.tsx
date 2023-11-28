@@ -44,8 +44,10 @@ const ClientCpu = () => {
     const rows = data?.map((element) => (
         <Table.Tr key={element.id}>
             <Table.Td>
-                {element.image && <Image alt={element.name} width={30} height={30} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${element.image}`} />}
-                <span>{element.name}</span>
+                <Flex align={'end'}>
+                    {element.image && <Image alt={element.name} width={30} height={30} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${element.image}`} />}
+                    <Text fz={'sm'} mr={'xs'}>{element.name}</Text>
+                </Flex>
             </Table.Td>
             <Table.Td>{element.manufacturer}</Table.Td>
             <Table.Td>{element.integrated_graphic}</Table.Td>
