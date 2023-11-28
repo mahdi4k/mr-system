@@ -14,5 +14,5 @@ export async function dataURItoBlob(dataURI: string | undefined) {
 
 
 export function ObjectIsEmpty(obj: Object) {
-    return Object.keys(obj).length === 0;
+    return obj === undefined || Object.keys(obj).length === 0;
 }
