@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import ImageUpload from "../../(sharedComponent)/imageUpload";
+import ImageUpload from "../../_sharedComponent/imageUpload";
 import {dataURItoBlob, toFormData} from "@/_utils/utils";
 import {CropperRef} from "react-advanced-cropper";
 import {useDisclosure} from "@mantine/hooks";

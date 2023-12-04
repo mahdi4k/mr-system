@@ -17,7 +17,7 @@ import {
 } from "@mantine/core";
 import {useCreateMotherboardMutation} from "@/_redux/services/motherboardApi";
 import {isNotEmpty, useForm} from "@mantine/form";
-import {ImageCheckbox} from "../../sharedComponent/CheckboxSelectImage";
+import {ImageCheckbox} from "../../_sharedComponent/CheckboxSelectImage";
 import {toFormData} from "@/_utils/utils";
 import {notifications} from "@mantine/notifications";
 import notifCalsses from "@/_cssModules/notification.module.css";
