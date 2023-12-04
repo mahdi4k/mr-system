@@ -10,6 +10,11 @@ export default withBundleAnalyzer({
     optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
   },
   images: {
-    domains: ['127.0.0.1'],
+    remotePatterns: [ 
+      {
+      protocol: 'http',
+      hostname: '127.0.0.1',
+      pathname: '**',
+    } ],
   },
 });
