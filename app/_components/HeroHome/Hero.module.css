@@ -3,7 +3,7 @@
     justify-content: space-between;
     padding-top: calc(var(--mantine-spacing-xl) * 4);
     padding-bottom: calc(var(--mantine-spacing-xl) * 4);
-
+    align-items: center;
     @media (max-width: $mantine-breakpoint-md) {
       flex-direction: column;
       padding-top: 20px;
@@ -12,7 +12,7 @@
   }
   .responiveImage{
     @media (max-width: $mantine-breakpoint-md) {
-      width: 100%;
+      width: 70%;
       height: auto;
     }
   }
@@ -56,9 +56,10 @@
   
   .highlight {
     position: relative;
-    background-color: var(--mantine-color-blue-light);
+    background-color: var(--mantine-color-kiwi-2);
     border-radius: var(--mantine-radius-sm);
     padding: rem(4px) rem(12px);
+    color: white;
   }
   .IconSmile{
     position: relative;

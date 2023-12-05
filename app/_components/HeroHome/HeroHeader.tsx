@@ -18,7 +18,7 @@ export function HeroHeader() {
         <div className={classes.content}>
           <Title className={classes.title}>
             سیستمی <span className={classes.highlight}> که دوست داری</span> خیلی راحت  رو هم کن
-            <IconMoodSmile className={classes.IconSmile} size={50}  color='var(--mantine-color-blue-5)' />
+            <IconMoodSmile className={classes.IconSmile} size={50}  color='var(--mantine-color-kiwi-8)' />
           </Title>
           <ListItem />
         </div>

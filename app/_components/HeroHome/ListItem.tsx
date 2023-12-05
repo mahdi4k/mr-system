@@ -11,7 +11,8 @@ const ListItem = () => {
             spacing="sm"
             size="sm"
             icon={
-                <ThemeIcon size={20} radius="xl">
+                <ThemeIcon             color='#A08556'
+                size={20} radius="xl">
                     <IconCheck />
                 </ThemeIcon>
             }
