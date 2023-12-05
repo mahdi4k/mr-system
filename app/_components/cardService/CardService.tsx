@@ -52,7 +52,7 @@ const CardService = () => {
                             ))}
                         </SimpleGrid>
 
-                        <Button styles={{ label: { fontSize: '14px' } }} size='xl' variant="light" color="blue" fullWidth radius="md">
+                        <Button styles={{ label: { fontSize: '14px' } }} size='xl' variant="light" color="green" fullWidth radius="md">
                             انتخاب سیستم
                         </Button>
                     </Card>

@@ -27,7 +27,7 @@ const CpuMotherboard = () => {
                     <div className={`${classes.controls} ${classes.flexStart}`}>
                         <Link href={'/pieces/motherboard/cpu'}>
                             <Button px={'xl'} variant="gradient"
-                                    gradient={{from: 'indigo', to: 'cyan', deg: 90}}
+                                    gradient={{from: 'cyan', to: 'green', deg: 90}}
                             >انتخاب</Button>
                         </Link>
                     </div>
