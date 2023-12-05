@@ -1,43 +1,23 @@
-"use client"
-import React, {useEffect, useState} from 'react';
-import {Container, Flex, Group, Skeleton, Space} from "@mantine/core";
-import useLoading from "../../../../_utils/customHook/useLoading";
-import { useAuth } from '../../../../_utils/customHook/useAuth';
-import usePiecePc from '../../../../_utils/customHook/usePiecePc';
+import React, { } from 'react';
+import PageClient from './page.client';
+import type { Metadata } from 'next'
 
-type SlugType = 'motherboard' | 'cpu' | 'graphic'
+export type SlugType = 'motherboard' | 'cpu' | 'graphic'
 
-interface Props {
+export interface PiecesProps {
     params: {
         slug: SlugType[]
     };
-    searchParams: Record<string, unknown>;
 }
 
-const Page: React.FC<Props> = ({params}) => {
-    useAuth();
+export const metadata: Metadata = {
+    title: 'انتخاب قطعات',
+    description: '',
+}
+const Page: React.FC<PiecesProps> = ({ params }) => {
 
-    const firstPiece = usePiecePc(params.slug[0])
-    const secondPiece = usePiecePc(params.slug[1])
-    const loadingEnd  = useLoading()
     return (
-            <Container styles={{ root: { flex: '1 0 auto' } }} size={'md'}>
-                <Group mt={'100px'} justify={'space-between'} align={'center'}>
-                    {!loadingEnd &&
-                        (
-                            <>
-                                <Skeleton radius={'xl'} width={400} height={300} mb="xl" />
-                                <Skeleton radius={'xl'} height={300} width={400} mb="xl" />
-                            </>
-                        )
-                    }
-
-                    {firstPiece}
-                    {secondPiece}
-                </Group>
-                <Space h="xl"/>
-                <Space h="xl"/>
-            </Container>
+        <PageClient params={params} />
     );
 };
 
