@@ -9,6 +9,7 @@ export type Motherboard = {
     brand: string
     image:string
     cpus:CPU[]
+    attributes?: string[]
 };
 
 type authTokenDTO = {

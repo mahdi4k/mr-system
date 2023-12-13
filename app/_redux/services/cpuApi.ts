@@ -7,7 +7,7 @@ export type CPU = {
     cpu_socket: string
     integrated_graphic: string
     manufacturer: string;
-    attributes: string
+    attributes?: string[]
     image: string,
     motherboards: Motherboard[] 
     brand?: string
