@@ -47,9 +47,11 @@ const ClientMotherBoard = () => {
     const rows = data?.map((element) => (
         <Table.Tr key={element.name}>
             <Table.Td>
-            {element.image && <Image alt={element.name} width={30} height={30} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${element.image}`} />}
-                {element.name}
-                </Table.Td>
+                <Flex align={'end'}>
+                    {element.image && <Image alt={element.name} width={30} height={30} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${element.image}`} />}
+                    <Text fz={'sm'} mr={'xs'}>{element.name}</Text>
+                </Flex>
+            </Table.Td>
             <Table.Td>{element.brand}</Table.Td>
             <Table.Td>{element.total_slot_ram}</Table.Td>
             <Table.Td>{element.size}</Table.Td>
