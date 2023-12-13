@@ -24,7 +24,7 @@ const CpuGraphic = () => {
                     <div className={classes.controls}>
                         <Link href={'/'}>
                             <Button px={'xl'} variant="gradient"
-                                    gradient={{from: 'cyan', to: 'green', deg: 90}}
+                                    gradient={{from: ' rgb(14,163,93)', to: ' rgb(12,119,115)', deg: 90}}
                             >انتخاب</Button>
                         </Link>
                     </div>
