@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Motherboard } from "../services/motherboardApi";
 import { CPU } from "../services/cpuApi";
+import { Graphic } from "../services/graphicApi";
 
 
 
@@ -13,12 +14,15 @@ type CpuType = {
     currentCpu: currentCpu; //this for add cpu in admin panel
     selectedCpu: Partial<CPU>  // selected motherboard for show in box
     relatedMotherboards: Motherboard[] //  related motherboard from selected cpu 
+    relatedGraphic:Graphic[]
 };
+
 
 const initialState = {
     currentCpu: {},
     selectedCpu: {},
-    relatedMotherboards: []
+    relatedMotherboards: [],
+    relatedGraphic:[]
 
 } as unknown as CpuType;
 
@@ -34,6 +38,9 @@ export const cpuSlice = createSlice({
         },
         relatedMotherboardList: (state, action: PayloadAction<Motherboard[]>) => {
             state.relatedMotherboards = action.payload
+        },
+        relatedGraphicList: (state, action: PayloadAction<Graphic[]>) => {
+            state.relatedGraphic = action.payload
         }
     },
 });
