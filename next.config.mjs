@@ -8,6 +8,7 @@ export default withBundleAnalyzer({
   reactStrictMode: false,
   experimental: {
     optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
+    webpackBuildWorker: true
   },
   images: {
     remotePatterns: [ 
