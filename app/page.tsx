@@ -9,8 +9,8 @@ const page = () => {
     <div>
 
       <HeroHeader />
-      <CpuGraphic/>
       <CpuMotherboard/>
+      <CpuGraphic/>
       <CardService />
     </div>
   )
