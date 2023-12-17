@@ -10,7 +10,10 @@ const CpuGraphic = () => {
     return (
         <Container my={'xl'} size="xl">
             <Flex className={classes.wrapper}>
-                <div className={classes.bodyLeft}>
+                <Image width={500}
+                        height={500} alt="graphic card vs cpu"
+                        src={'/svg/cpu-graphic.svg'} className={classes.image}/>
+                <div className={classes.bodyRight}>
                     <Group mb={'md'} align={'center'}>
                         <Title fs={'italic'} className={classes.title}>CPU</Title>
                         <IconArrowsExchange/>
@@ -22,16 +25,14 @@ const CpuGraphic = () => {
                         کنید
                     </Text>
                     <div className={classes.controls}>
-                        <Link href={'/'}>
+                        <Link href={'/pieces/graphic/cpu'}>
                             <Button px={'xl'} variant="gradient"
                                     gradient={{from: ' rgb(14,163,93)', to: ' rgb(12,119,115)', deg: 90}}
                             >انتخاب</Button>
                         </Link>
                     </div>
                 </div>
-                <Image width={500}
-                       height={500} alt="graphic card vs cpu"
-                       src={'/svg/cpu-graphic.svg'} className={classes.image}/>
+               
             </Flex>
         </Container>
     );
