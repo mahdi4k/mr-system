@@ -10,10 +10,8 @@ const CpuMotherboard = () => {
     return (
         <Container my={'xl'} size="xl">
             <Flex className={`${classes.wrapper} ${classes.flexColumn}`}>
-                <Image width={500}
-                       height={500} alt="graphic card vs cpu"
-                       src={'/svg/cpu-motherboard.svg'} className={classes.image}/>
-                <div className={classes.bodyRight}>
+                
+                <div className={classes.bodyLeft}>
                     <Group mb={'md'} align={'center'}>
                         <Title fs={'italic'} className={classes.title}>CPU</Title>
                         <IconArrowsExchange/>
@@ -24,7 +22,7 @@ const CpuMotherboard = () => {
                         در این قسمت میتوانید cpu مناسب برای مادربورد خود یا برعکس مادربورد مناسب cpu خود را انتخاب
                         کنید
                     </Text>
-                    <div className={`${classes.controls} ${classes.flexStart}`}>
+                    <div className={`${classes.controls} ${classes.flexEnd}`}>
                         <Link href={'/pieces/motherboard/cpu'}>
                             <Button px={'xl'} variant="gradient"
                                     gradient={{from: ' rgb(14,163,93)', to: ' rgb(12,119,115)', deg: 90}}
@@ -32,6 +30,9 @@ const CpuMotherboard = () => {
                         </Link>
                     </div>
                 </div>
+                <Image width={500}
+                       height={500} alt="graphic card vs cpu"
+                       src={'/svg/cpu-motherboard.svg'} className={classes.image}/>
 
             </Flex>
         </Container>
