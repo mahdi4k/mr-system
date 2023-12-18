@@ -60,7 +60,7 @@ const Page = () => {
         <div className={classes.wrapper}>
             <Paper className={classes.form} radius={0} p={30}>
                 <Title order={2} className={classes.title} ta="center" mt="md" mb={50}>
-                    mr-system login
+                    kiwi-part login
                 </Title>
                 <form>
                     <TextInput  {...form.getInputProps('username')}

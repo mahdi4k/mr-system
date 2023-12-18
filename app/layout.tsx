@@ -18,8 +18,8 @@ const vazirmatn = Vazirmatn({
 })
 
 export const metadata = {
-  title: "mr-system",
-  description: "mr-system pc building",
+  title: "kiwi-part",
+  description: "kiwi-part pc building",
 };
 
 export default function RootLayout({ children }: { children: any }) {
