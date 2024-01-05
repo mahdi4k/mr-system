@@ -14,6 +14,7 @@ import {notifications} from '@mantine/notifications';
 import notifCalsses from '@/_cssModules/notification.module.css'
 import {redirect} from 'next/navigation'
 import {useDisclosure} from "@mantine/hooks";
+import './login.css'
 
 const Page = () => {
     const data = useSession()

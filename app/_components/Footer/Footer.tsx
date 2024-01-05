@@ -5,7 +5,7 @@ import classes from './footer.module.css';
 
 export function Footer() {
     return (
-        <div className={classes.footer}>
+        <div className={`${classes.footer} main-footer`}>
             <Container size="lg" className={classes.inner}>
                 kiwi-part
                 <Group gap={0} className={classes.links} justify="flex-end" wrap="nowrap">
