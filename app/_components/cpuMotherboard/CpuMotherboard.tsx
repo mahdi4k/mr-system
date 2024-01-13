@@ -8,7 +8,7 @@ import Link from "next/link";
 
 const CpuMotherboard = () => {
     return (
-        <Container my={'xl'} size="xl">
+        <Container my={'xl'} size="lg">
             <Flex className={`${classes.wrapper} ${classes.flexColumn}`}>
                 
                 <div className={classes.bodyLeft}>
