@@ -11,6 +11,7 @@
     }
   }
   .responiveImage{
+    object-fit: cover;
     @media (max-width: $mantine-breakpoint-md) {
       width: 70%;
       height: auto;

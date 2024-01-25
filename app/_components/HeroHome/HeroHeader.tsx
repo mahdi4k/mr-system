@@ -11,8 +11,8 @@ export function HeroHeader() {
         <Image
           className={classes.responiveImage}
           src="/svg/hero.svg"
-          width={500}
-          height={400}
+          width={507}
+          height={478}
           alt="Picture of the author"
         />
         <div className={classes.content}>
