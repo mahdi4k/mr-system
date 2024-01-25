@@ -3,6 +3,8 @@ import Link from "next/link";
 import classes from "./navbar.module.css";
 import {LinksGroup} from "./NavbarLinksGroup";
 import {ScrollArea} from "@mantine/core";
+import { usePathname } from 'next/navigation'
+
 
 type linksDTO = {
     label: string
@@ -16,11 +18,15 @@ type linkDataDTO = {
 type activeLink = 'pcParts' | 'articles'
 
 const NavbarLinkSub = ({activeLink}: { activeLink: activeLink }) => {
+    const pathname = usePathname()
+    const activeTabBaseUrl = pathname.split('/')[2];
+    console.log(activeTabBaseUrl === 'motherboard' )
+
     const links: linkDataDTO[] =
         [
             {
                 label: 'motherboard',
-                initiallyOpened: true,
+                initiallyOpened: activeTabBaseUrl === 'motherboard',
                 links: [
                     { label: 'لیست', link: '/dashboard/motherboard' },
                     { label: 'افزودن', link: '/dashboard/motherboard/add' },
@@ -28,15 +34,33 @@ const NavbarLinkSub = ({activeLink}: { activeLink: activeLink }) => {
             },
             {
                 label: 'cpu',
-                initiallyOpened: false,
+                initiallyOpened: activeTabBaseUrl === 'cpu',
                 links: [
                     { label: 'لیست', link: '/dashboard/cpu' },
                     { label: 'افزودن', link: '/dashboard/cpu/add' },
+                ],
+            },
+            {
+                label: 'گرافیک',
+                initiallyOpened: activeTabBaseUrl === 'graphic',
+                links: [
+                    { label: 'لیست', link: '/dashboard/graphic' },
+                    { label: 'افزودن', link: '/dashboard/graphic/add' },
+                ],
+            },
+            {
+                label: 'پاور',
+                initiallyOpened: activeTabBaseUrl === 'power',
+                links: [
+                    { label: 'لیست', link: '/dashboard/power' },
+                    { label: 'افزودن', link: '/dashboard/power/add' },
                 ],
             }
         ]
     const linkGroup = links.map((item) => <LinksGroup {...item} key={item.label} />);
 
+    console.log('hi');
+    
     return (
         <div>
             <ScrollArea className={classes.links}>
