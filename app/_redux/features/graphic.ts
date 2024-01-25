@@ -10,7 +10,7 @@ type currentGraphic = {
     name: string
 }
 
-type CpuType = {
+type GraphicType = {
     currentGraphic: currentGraphic; //this for add cpu in admin panel
     selectedGraphic: Partial<Graphic>  // selected motherboard for show in box
     relatedCpus: CPU[] //  related motherboard from selected cpu 
@@ -21,13 +21,13 @@ const initialState = {
     selectedGraphic: {},
     relatedCpus: []
 
-} as unknown as CpuType;
+} as unknown as GraphicType;
 
-export const cpuSlice = createSlice({
+export const graphicSlice = createSlice({
     name: "cpu",
     initialState,
     reducers: {
-        currentCpuOnSave: (state, action: PayloadAction<currentGraphic>) => {
+        currentGraphicOnSave: (state, action: PayloadAction<currentGraphic>) => {
             state.currentGraphic = action.payload;
         },
         addselectedGraphic: (state, action: PayloadAction<Partial<Graphic>>) => {
@@ -40,8 +40,8 @@ export const cpuSlice = createSlice({
 });
 
 export const {
-    currentCpuOnSave,
+    currentGraphicOnSave,
     addselectedGraphic,
     relatedCpuList
-} = cpuSlice.actions;
-export default cpuSlice.reducer;
+} = graphicSlice.actions;
+export default graphicSlice.reducer;

@@ -1,3 +1,4 @@
+import { POWER } from './PowerApi';
 import { api } from './api'
 import { CPU } from './cpuApi';
 
@@ -10,6 +11,7 @@ export type Graphic = {
     cpus: CPU[] 
     brand?: string,
     psu:string
+    powers:POWER[]
 };
 
 
