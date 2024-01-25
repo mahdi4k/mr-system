@@ -8,7 +8,7 @@ import Link from "next/link";
 
 const CpuGraphic = () => {
     return (
-        <Container my={'xl'} size="xl">
+        <Container my={'xl'} size="lg">
             <Flex className={classes.wrapper}>
                 <Image width={500}
                         height={500} alt="graphic card vs cpu"
