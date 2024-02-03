@@ -9,7 +9,7 @@ import cardClasses from "../cardService/cardService.module.css";
 import { useDisclosure } from "@mantine/hooks";
 import { CPU, useGetCpusQuery } from "@/_redux/services/cpuApi";
 import { useDispatch, useSelector } from 'react-redux';
-import { addselectedCpu, relatedMotherboardList } from '@/_redux/features/cpu';
+import { addselectedCpu, relatedGraphicList, relatedMotherboardList } from '@/_redux/features/cpu';
 import { RootState } from '@/_redux/store';
 import { ObjectIsEmpty } from '@/_utils/utils';
 import { IconBuildingStore, IconExclamationCircle, IconListDetails, IconX } from '@tabler/icons-react';
@@ -28,15 +28,14 @@ const Cpu : FC<IcpuProps> = ({setActiveCpu,activeCpu}) => {
 
     
      
-    const cpuListFromSelectedMotherboard = useSelector((state: RootState) => state.motherboard.relatedCpu);
+    const cpuListFromSelectedMotherboard = useSelector((state: RootState) => state.motherboard.relatedCpus);
+    const cpuListFromSelectedGraphic = useSelector((state: RootState) => state.graphic.relatedCpus);
     const { isSuccess, data = [], error, } = useGetCpusQuery();
     const currentCpu = useSelector((state: RootState) => state.cpu.selectedCpu);
     const selectedMotherboard = useSelector((state: RootState) => state.motherboard.selectedMotherboard);
     useEffect(()=>{
         if(loadingEnd){
             setActiveCpu(currentCpu)
-            console.log('is run');
-            
         }
     },[loadingEnd,currentCpu])
     const selectedCpu = (id: number) => {
@@ -44,12 +43,16 @@ const Cpu : FC<IcpuProps> = ({setActiveCpu,activeCpu}) => {
         if (cpu) {
             dispatch(addselectedCpu(cpu))
             relatedMotherboard(cpu)
+            relatedGraphic(cpu)
         }
         close()
     }
 
     const relatedMotherboard = (cpu: CPU) => {
         dispatch(relatedMotherboardList(cpu.motherboards))
+    }
+    const relatedGraphic = (cpu: CPU) => {
+        dispatch(relatedGraphicList(cpu.graphics))
     }
 
     const removeSelected = (e: React.MouseEvent) => {
@@ -70,7 +73,9 @@ const Cpu : FC<IcpuProps> = ({setActiveCpu,activeCpu}) => {
         setSelectedCpu(cpuListFromSelectedMotherboard.length ? cpuListFromSelectedMotherboard : data);
     }, [cpuListFromSelectedMotherboard, isSuccess])
 
-
+    useEffect(() => {
+        setSelectedCpu(cpuListFromSelectedGraphic.length ? cpuListFromSelectedGraphic : data);
+    }, [cpuListFromSelectedGraphic, isSuccess])
     return (
         <>
             <div onClick={open} className={`${classes.pieces} ${cardClasses.cardMain}`}>

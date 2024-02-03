@@ -1,4 +1,5 @@
 import { api } from './api'
+import { Graphic } from './graphicApi';
 import { Motherboard } from './motherboardApi';
 
 export type CPU = {
@@ -10,6 +11,7 @@ export type CPU = {
     attributes?: string[]
     image: string,
     motherboards: Motherboard[] 
+    graphics: Graphic[] 
     brand?: string
 };
 

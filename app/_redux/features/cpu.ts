@@ -48,6 +48,7 @@ export const cpuSlice = createSlice({
 export const {
     currentCpuOnSave,
     addselectedCpu,
-    relatedMotherboardList
+    relatedMotherboardList,
+    relatedGraphicList
 } = cpuSlice.actions;
 export default cpuSlice.reducer;
