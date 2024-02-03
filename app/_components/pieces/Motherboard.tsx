@@ -12,7 +12,7 @@ import { Motherboard, useGetMotherboardsQuery } from '@/_redux/services/motherbo
 import { addselectedMotherboard, relatedCpuList } from '@/_redux/features/motherboard';
 import { ObjectIsEmpty } from '@/_utils/utils';
 import { Motherboard as MotherboardType } from '@/_redux/services/motherboardApi';
-import { IconBuildingStore, IconExclamationCircle, IconListDetails, IconMessageCircle, IconPhoto, IconSettings, IconX } from '@tabler/icons-react';
+import { IconBuildingStore, IconExclamationCircle, IconListDetails, IconX } from '@tabler/icons-react';
 import useLoading from '@/_utils/customHook/useLoading';
 
 export type ImotherboardProps = {
