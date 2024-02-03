@@ -17,7 +17,7 @@ const CpuGraphic = () => {
                     <Group mb={'md'} align={'center'}>
                         <Title fs={'italic'} className={classes.title}>CPU</Title>
                         <IconArrowsExchange/>
-                        <Title className={classes.title} fs={'italic'}>Graphic</Title>
+                        <Title className={classes.title} fs={'italic'}>کارت گرافیک</Title>
                     </Group>
 
                     <Text fz="md" c="dimmed">
