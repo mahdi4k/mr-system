@@ -21,11 +21,13 @@ import {useDispatch} from "react-redux";
 import {StepProps} from "../../motherboard/add/step1-form";
 import { useCreateGraphicMutation } from '@/_redux/services/graphicApi';
 import { useGetPowersQuery } from '@/_redux/services/PowerApi';
+import { useGetCpusQuery } from '@/_redux/services/cpuApi';
 
 
 const Step1Form = (props: StepProps) => {
     const [createGraphic, response] = useCreateGraphicMutation();
     const {isSuccess, data = [], error} = useGetPowersQuery();
+    const {isSuccess:isSuccessCpu, data : cpus = [], error:errorCpus} = useGetCpusQuery();
     const dispatch = useDispatch();
     const form = useForm({
         initialValues: {
@@ -33,6 +35,7 @@ const Step1Form = (props: StepProps) => {
             brand:'',
             manufacturer: '',
             powers: [],
+            cpus:[],
             attributes: [],
             psu:''
         },
@@ -42,6 +45,7 @@ const Step1Form = (props: StepProps) => {
             powers: isNotEmpty(),
             psu: isNotEmpty(),
             brand: isNotEmpty(),
+            cpus: isNotEmpty(),
         },
     });
 
@@ -80,7 +84,7 @@ const Step1Form = (props: StepProps) => {
                     <Grid.Col span={{base: 12, md: 6}}>
                         <TextInput
                             label="نام"
-                            placeholder="core i3"
+                            placeholder="gtx 1650"
                             {...form.getInputProps('name')}
                         />
                     </Grid.Col>
@@ -101,6 +105,17 @@ const Step1Form = (props: StepProps) => {
                             placeholder=""
                              {...form.getInputProps('powers')}
                             data={data.map(el => ({value:`${el.id}`,label:el.name}))}
+                        />
+                    </Grid.Col>
+                     <Grid.Col span={{base: 12, md: 6}}>
+                        <MultiSelect
+                            styles={{
+                                pill: {direction: 'ltr'}
+                            }}
+                            label="cpu مرتبط"
+                            placeholder=""
+                             {...form.getInputProps('cpus')}
+                            data={cpus.map(el => ({value:`${el.id}`,label:el.name}))}
                         />
                     </Grid.Col>
 

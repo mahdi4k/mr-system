@@ -9,7 +9,7 @@ import {RootState} from "@/_redux/store";
 import {notifications} from "@mantine/notifications";
 import notifClasses from "@/_cssModules/notification.module.css";
 import {ActiveStepDTO} from "./page";
-import { useAddCpuImageMutation } from '@/_redux/services/cpuApi';
+import { useAddGraphicImageMutation } from '@/_redux/services/graphicApi';
 
 type Iprops = {
     setActiveStep: React.Dispatch<React.SetStateAction<ActiveStepDTO>>
@@ -20,9 +20,9 @@ const Step2Image = (props: Iprops) => {
     const cropperRef = useRef<CropperRef>(null)
     const [opened, handlers] = useDisclosure(false)
     const [logo, setLogo] = useState<File | undefined>()
-    const [addCpuImage, response] = useAddCpuImageMutation();
+    const [addGraphicImage, response] = useAddGraphicImageMutation();
 
-    const currentCpu = useSelector((state: RootState) => state.cpu.currentCpu)
+    const currentGraphic = useSelector((state: RootState) => state.graphic.currentGraphic)
     const onSubmitAvatar = async () => {
         setPreviewLogo(cropperRef.current ? cropperRef.current.getCanvas()?.toDataURL() : undefined)
         if (cropperRef.current) {
@@ -37,8 +37,8 @@ const Step2Image = (props: Iprops) => {
     }
     useEffect(() => {
         if (logo) {
-            addCpuImage({
-                id: currentCpu.id,
+            addGraphicImage({
+                id: currentGraphic.id,
                 logo: toFormData({
                     image: logo,
                 })
@@ -47,16 +47,16 @@ const Step2Image = (props: Iprops) => {
                     console.log(val)
                     notifications.show({
                         color: 'green',
-                        title: 'تصویر مادربورد با موفقیت ثبت شد',
+                        title: 'تصویر گرافیک با موفقیت ثبت شد',
                         message: '',
                         classNames: notifClasses
                     })
                 })
         }
-    }, [addCpuImage, currentCpu.id, logo])
+    }, [addGraphicImage, currentGraphic.id, logo])
     return (
         <>
-            <Text mt={"lg"} fz={"lg"} fw={"bold"} mr={"lg"}>افزودن تصویر برای cpu {currentCpu.name}  </Text>
+            <Text mt={"lg"} fz={"lg"} fw={"bold"} mr={"lg"}>افزودن تصویر برای گرافیک {currentGraphic.name}  </Text>
             <Flex direction={'column'} align={'center'} justify={'center'}>
                 <ImageUpload currentImage={previewLogo} handlers={handlers} opened={opened}
                              cropperRef={cropperRef}
@@ -64,7 +64,7 @@ const Step2Image = (props: Iprops) => {
             </Flex>
 
            <Flex justify={'flex-end'} mt={'xl'}>
-               <Button onClick={backToLevelOne}>افزودن مادربودر جدید</Button>
+               <Button onClick={backToLevelOne}>افزودن گرافیک جدید</Button>
            </Flex>
         </>
     );
