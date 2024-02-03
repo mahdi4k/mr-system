@@ -8,7 +8,7 @@ import cardClasses from "../cardService/cardService.module.css";
 import { useDisclosure } from "@mantine/hooks";
 import { CPU } from "@/_redux/services/cpuApi";
 import { useDispatch, useSelector } from 'react-redux';
-import { addselectedCpu, relatedMotherboardList } from '@/_redux/features/cpu';
+import { addselectedCpu, relatedGraphicList, relatedMotherboardList } from '@/_redux/features/cpu';
 import { RootState } from '@/_redux/store';
 import { ObjectIsEmpty } from '@/_utils/utils';
 import { IconBuildingStore, IconExclamationCircle, IconListDetails, IconX } from '@tabler/icons-react';
@@ -17,8 +17,8 @@ import { Graphic, useGetGraphicsQuery } from '@/_redux/services/graphicApi';
 import { addselectedGraphic, relatedCpuList } from '@/_redux/features/graphic';
 
 export type IgraphicProps = {
-    setActiveGraphic:  React.Dispatch<React.SetStateAction<Partial<CPU> | undefined>>
-    activeGraphic: Partial<CPU> | undefined
+    setActiveGraphic:  React.Dispatch<React.SetStateAction<Partial<Graphic> | undefined>>
+    activeGraphic: Partial<Graphic> | undefined
 }
 const GraphicCard : FC<IgraphicProps> = ({setActiveGraphic,activeGraphic}) => {
     const [opened, { open, close }] = useDisclosure(false);
@@ -29,9 +29,10 @@ const GraphicCard : FC<IgraphicProps> = ({setActiveGraphic,activeGraphic}) => {
     
      
     const graphicListFromSelectedCpu = useSelector((state: RootState) => state.cpu.relatedGraphic);
+    const graphicListFromSelectedPower = useSelector((state: RootState) => state.power.relatedGraphic);
     const { isSuccess, data = [], error, } = useGetGraphicsQuery();
     const currentGraphic = useSelector((state: RootState) => state.graphic.selectedGraphic);
-    const selectedMotherboard = useSelector((state: RootState) => state.motherboard.selectedMotherboard);
+    const selectedPower = useSelector((state: RootState) => state.power.selectedPower);
     useEffect(()=>{
         if(loadingEnd){
             setActiveGraphic(currentGraphic)
@@ -40,7 +41,7 @@ const GraphicCard : FC<IgraphicProps> = ({setActiveGraphic,activeGraphic}) => {
     const selectedGraphic = (id: number) => {
         const graphic = data.find(el => el.id === id)
         if (graphic) {
-            dispatch(addselectedCpu(graphic))
+            dispatch(addselectedGraphic(graphic))
             relatedCpu(graphic)
         }
         close()
@@ -54,19 +55,25 @@ const GraphicCard : FC<IgraphicProps> = ({setActiveGraphic,activeGraphic}) => {
         e.stopPropagation();
         dispatch(addselectedGraphic({}))
         dispatch(relatedMotherboardList([]))
+        dispatch(relatedGraphicList([]))
+
     }
     const titleDrawer = () => {
         return (
-            ObjectIsEmpty(selectedMotherboard) ? 'لیست کارت گرافیک' :
+            ObjectIsEmpty(selectedPower) ? 'لیست کارت گرافیک' :
                 <Flex align={'center'} justify={'center'}>
                     لیست cpu سازگار با مادربورد
-                    <Text mr={'sm'} fw={'bolder'}> {selectedMotherboard.name}</Text>
+                    <Text mr={'sm'} fw={'bolder'}> {selectedPower.name}</Text>
                 </Flex>
         )
     }
     useEffect(() => {
         setSelectedGraphic(graphicListFromSelectedCpu.length ? graphicListFromSelectedCpu : data);
     }, [graphicListFromSelectedCpu, isSuccess])
+
+    useEffect(() => {
+        setSelectedGraphic(graphicListFromSelectedPower.length ? graphicListFromSelectedPower : data);
+    }, [graphicListFromSelectedPower, isSuccess])
 
 
     return (
