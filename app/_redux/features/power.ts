@@ -12,7 +12,7 @@ type currentPower = {
 
 type CpuType = {
     currentPower: currentPower; //this for add cpu in admin panel
-    selectedCpu: Partial<CPU>  // selected motherboard for show in box
+    selectedPower: Partial<CPU>  // selected motherboard for show in box
     relatedMotherboards: Motherboard[] //  related motherboard from selected cpu 
     relatedGraphic:Graphic[]
 };
@@ -33,7 +33,7 @@ export const powerSlice = createSlice({
             state.currentPower = action.payload;
         },
         addselectedPower: (state, action: PayloadAction<Partial<CPU>>) => {
-            state.selectedCpu = action.payload
+            state.selectedPower = action.payload
         },
         relatedMotherboardList: (state, action: PayloadAction<Motherboard[]>) => {
             state.relatedMotherboards = action.payload
@@ -47,6 +47,7 @@ export const powerSlice = createSlice({
 export const {
     currentPowerOnSave,
     addselectedPower,
-    relatedMotherboardList
+    relatedMotherboardList,
+    relatedGraphicList
 } = powerSlice.actions;
 export default powerSlice.reducer;

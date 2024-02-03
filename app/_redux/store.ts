@@ -3,6 +3,7 @@ import authReducer from './features/auth'
 import motherboardReducer from "./features/motherboard";
 import graphicReducer from "./features/graphic";
 import cpuReducer from "./features/cpu";
+import PowerReducer from "./features/power";
 import { api } from './services/api'
 
 export const store = configureStore({
@@ -10,6 +11,7 @@ export const store = configureStore({
         auth: authReducer,
         motherboard: motherboardReducer,
         cpu: cpuReducer,
+        power: PowerReducer,
         graphic:graphicReducer,
         [api.reducerPath]: api.reducer,
     },
