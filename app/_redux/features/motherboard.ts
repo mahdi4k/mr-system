@@ -12,13 +12,13 @@ type currentMotherBoard = {
 type MotherboardProp = {
     currentMotherBoard: currentMotherBoard;
     selectedMotherboard: Partial<Motherboard>;
-    relatedCpu: CPU[]
+    relatedCpus: CPU[]
 };
 
 const initialState = {
     selectedMotherboard: {},
     currentMotherBoard: {},
-    relatedCpu: []
+    relatedCpus: []
 } as unknown as MotherboardProp;
 
 export const motherboardSlice = createSlice({
@@ -32,7 +32,7 @@ export const motherboardSlice = createSlice({
             state.selectedMotherboard = action.payload
         },
         relatedCpuList: (state, action: PayloadAction<CPU[]>) => {
-            state.relatedCpu = action.payload
+            state.relatedCpus = action.payload
         }
     },
 });
