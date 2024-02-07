@@ -4,15 +4,17 @@ import CardService from '@/_components/cardService/CardService'
 import CpuGraphic from "@/_components/cpuGraphic/CpuGraphic"
 import CpuMotherboard from "@/_components/cpuMotherboard/CpuMotherboard"
 import GraphicPower from './_components/graphicPower/GraphicPower'
+import CardParts from './_components/cardParts/CardParts'
 
 const page = () => {
   return (
     <div>
 
       <HeroHeader />
-      <CpuMotherboard/>
-      <CpuGraphic/>
-      <GraphicPower/>
+      <CardParts />
+      <CpuMotherboard />
+      <CpuGraphic />
+      <GraphicPower />
       <CardService />
     </div>
   )

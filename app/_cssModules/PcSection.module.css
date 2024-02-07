@@ -6,7 +6,7 @@
     padding-bottom: calc(var(--mantine-spacing-xl) * 2);
 
 @media (max-width: $mantine-breakpoint-sm) {
-    flex-direction: column-reverse;
+    flex-direction: column;
     padding: var(--mantine-spacing-xl);
 }
 }
@@ -79,6 +79,8 @@
 
 @media (max-width: $mantine-breakpoint-sm) {
      .flexColumn{
-        flex-direction: column !important;
+        flex-direction: column-reverse !important;
+        align-items: center;
+        justify-content: center;
      }
 }
