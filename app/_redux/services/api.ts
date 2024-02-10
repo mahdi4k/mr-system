@@ -1,4 +1,6 @@
 import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react'
+import queryString from 'query-string'
+
 type authTokenDTO = {
     auth: {
         userToken: {
@@ -16,6 +18,8 @@ const baseQuery = fetchBaseQuery({
         headers.set('Authorization', `Bearer ${token.auth.userToken}`)
         return headers
     },
+    paramsSerializer: (params: Record<string, unknown>) =>
+        queryString.stringify(params, { arrayFormat: 'bracket' }),
 })
 
 const baseQueryWithRetry = retry(baseQuery, { maxRetries: 2 })
