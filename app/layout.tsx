@@ -11,7 +11,7 @@ import {Footer} from "@/_components/Footer/Footer";
 import Providers from "./(routes)/dashboard/Provider";
 
 const vazirmatn = Vazirmatn({
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  weight: ['100', '200', '300', '400', '500', '600', '700' ],
   subsets: ['arabic'],
   variable: '--font-vazirmatn',
   display: 'swap',
@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: any }) {
     <html dir="rtl" lang="en" className={vazirmatn.className}>
       <head>
         <ColorSchemeScript />
-        <link rel="shortcut icon" href="/favicon.svg" />
+        <link rel="shortcut icon" href="/favicon.ico" />
         <meta
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no"
