@@ -18,7 +18,7 @@ const vazirmatn = Vazirmatn({
 })
 
 export const metadata = {
-  title: "kiwi-part",
+  title: "کیوی پارت",
   description: "kiwi-part pc building",
 };
 
