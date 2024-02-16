@@ -19,12 +19,12 @@ export type CPU = {
 export const cpuApi = api.injectEndpoints({
 
     endpoints: (builder) => ({
-        getCpus: builder.query<CPU[], {manufacturer:string[]}>({
+        getCpus: builder.query<CPU[], {manufacturer?:string[] | never[]}>({
             query: ({manufacturer}) => {
                 return {
                     url: `/cpus`,
                     method: 'GET',
-                    params:{manufacturer}
+                    params:{manufacturer: manufacturer }
                 }
             },
 

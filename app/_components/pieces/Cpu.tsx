@@ -30,7 +30,7 @@ const Cpu : FC<IcpuProps> = ({setActiveCpu,activeCpu}) => {
      
     const cpuListFromSelectedMotherboard = useSelector((state: RootState) => state.motherboard.relatedCpus);
     const cpuListFromSelectedGraphic = useSelector((state: RootState) => state.graphic.relatedCpus);
-    const { isSuccess, data = [], error, } = useGetCpusQuery();
+    const { isSuccess, data = [], error, } = useGetCpusQuery({});
     const currentCpu = useSelector((state: RootState) => state.cpu.selectedCpu);
     const selectedMotherboard = useSelector((state: RootState) => state.motherboard.selectedMotherboard);
     useEffect(()=>{

@@ -16,7 +16,7 @@ import Image from 'next/image';
 const ClientCpu = () => {
     const [loadingSession, setLoadingSession] = useState(false)
     const session = useSession()
-    const { isSuccess, data = [], error } = useGetCpusQuery(undefined, { skip: !loadingSession })
+    const { isSuccess, data = [], error } = useGetCpusQuery({}, { skip: !loadingSession })
     const [opened, { open, close }] = useDisclosure(false);
     const [selectedCpuID, setSelectedCpuID] = useState<number>()
     const [removeCpu, response] = useRemoveCpuMutation();

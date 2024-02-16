@@ -18,7 +18,7 @@ import notifCalsses from "@/_cssModules/notification.module.css";
 import {currentCpuOnSave} from "@/_redux/features/cpu";
 import {useDispatch} from "react-redux";
 import {StepProps} from "../../motherboard/add/step1-form";
-import {useCreateCpusMutation, useGetCpusQuery} from "@/_redux/services/cpuApi";
+import {useCreateCpusMutation} from "@/_redux/services/cpuApi";
 import {useGetMotherboardsQuery} from "@/_redux/services/motherboardApi";
 
 
