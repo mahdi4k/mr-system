@@ -12,7 +12,7 @@ import { ObjectIsEmpty } from '@/_utils/utils';
 import { IconBuildingStore, IconExclamationCircle, IconListDetails, IconX } from '@tabler/icons-react';
 import useLoading from '@/_utils/customHook/useLoading';
 import { Graphic } from '@/_redux/services/graphicApi';
-import { POWER, useGetPowersQuery } from '@/_redux/services/PowerApi';
+import { POWER, useGetPowersQuery } from '@/_redux/services/powerApi';
 import { addselectedPower, relatedGraphicList } from '@/_redux/features/power';
 
 export type IPowerProps = {

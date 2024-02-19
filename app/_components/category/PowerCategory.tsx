@@ -6,7 +6,7 @@ import Image from 'next/image'
 import LoadingCategorySkeleton from './LoadingCategorySkeleton'
 import { useDisclosure } from '@mantine/hooks'
 import ModalItems from './modalItems'
-import { useGetPowersQuery } from '@/_redux/services/PowerApi'
+import { useGetPowersQuery } from '@/_redux/services/powerApi'
 import { Graphic } from '@/_redux/services/graphicApi'
 const PowerCategory = () => {
   const [value, setValue] = useState<string[]>([]);
@@ -37,7 +37,7 @@ const PowerCategory = () => {
       {isLoading ? <>
         <LoadingCategorySkeleton />
       </> : ''}
-      <Grid >
+      <Grid mb={'xl'} >
         {data && data.map((data) => (
           <Grid.Col key={data.id} span={{ base: 12, md: 6, lg: 3 }}>
             <Card miw={'250px'} mih={352} key={data.id} shadow="sm" padding="lg" radius="md" withBorder>

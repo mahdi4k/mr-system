@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Motherboard } from "../services/motherboardApi";
 import { CPU } from "../services/cpuApi";
 import { Graphic } from "../services/graphicApi";
-import { POWER } from "../services/PowerApi";
+import { POWER } from "../services/powerApi";
 
 
 

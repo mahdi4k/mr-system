@@ -9,7 +9,7 @@ import {RootState} from "@/_redux/store";
 import {notifications} from "@mantine/notifications";
 import notifClasses from "@/_cssModules/notification.module.css";
 import {ActiveStepDTO} from "./page";
-import { useAddPowerImageMutation } from '@/_redux/services/PowerApi';
+import { useAddPowerImageMutation } from '@/_redux/services/powerApi';
  
 type Iprops = {
     setActiveStep: React.Dispatch<React.SetStateAction<ActiveStepDTO>>

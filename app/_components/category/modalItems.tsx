@@ -1,4 +1,4 @@
-import { POWER } from '@/_redux/services/PowerApi'
+import { POWER } from '@/_redux/services/powerApi'
 import { CPU } from '@/_redux/services/cpuApi'
 import { Graphic } from '@/_redux/services/graphicApi'
 import { Motherboard } from '@/_redux/services/motherboardApi'

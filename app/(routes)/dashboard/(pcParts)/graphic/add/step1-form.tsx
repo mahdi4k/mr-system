@@ -20,7 +20,7 @@ import {currentGraphicOnSave} from "@/_redux/features/graphic";
 import {useDispatch} from "react-redux";
 import {StepProps} from "../../motherboard/add/step1-form";
 import { useCreateGraphicMutation } from '@/_redux/services/graphicApi';
-import { useGetPowersQuery } from '@/_redux/services/PowerApi';
+import { useGetPowersQuery } from '@/_redux/services/powerApi';
 import { useGetCpusQuery } from '@/_redux/services/cpuApi';
 
 

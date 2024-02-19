@@ -9,7 +9,7 @@ import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import notifClasses from "@/_cssModules/notification.module.css";
-import { useGetPowersQuery, useRemovePowerMutation } from '@/_redux/services/PowerApi';
+import { useGetPowersQuery, useRemovePowerMutation } from '@/_redux/services/powerApi';
 import Image from 'next/image';
 
 

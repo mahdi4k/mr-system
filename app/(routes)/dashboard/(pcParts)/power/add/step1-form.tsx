@@ -20,7 +20,7 @@ import notifCalsses from "@/_cssModules/notification.module.css";
 import { currentPowerOnSave } from "@/_redux/features/power";
 import { useDispatch } from "react-redux";
 import { StepProps } from "../../motherboard/add/step1-form";
-import { useCreatePowerMutation } from '@/_redux/services/PowerApi';
+import { useCreatePowerMutation } from '@/_redux/services/powerApi';
 
 
 const Step1Form = (props: StepProps) => {
