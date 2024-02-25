@@ -84,3 +84,6 @@
         justify-content: center;
      }
 }
+.tomanIcon {
+    filter: light-dark(invert(0), invert(1));
+}
