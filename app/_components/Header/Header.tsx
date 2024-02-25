@@ -1,5 +1,5 @@
 "use client"
-import { Container, Text, Group, Burger, ActionIcon, useComputedColorScheme, useMantineColorScheme, Box, Center, HoverCard, SimpleGrid, UnstyledButton, rem, ThemeIcon, useMantineTheme, Flex } from '@mantine/core';
+import { Container, Text, Group, Burger, ActionIcon, useComputedColorScheme, useMantineColorScheme, Box, Center, HoverCard, SimpleGrid, UnstyledButton, rem, ThemeIcon, Flex } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import classes from './Header.module.css';
 import { IconSun, IconMoon, IconChevronDown, IconChartPie3 } from '@tabler/icons-react';
@@ -9,7 +9,7 @@ import Image from 'next/image'
 
 export function Header() {
     const [opened, { toggle }] = useDisclosure(false);
-    const { setColorScheme } = useMantineColorScheme();
+    const { setColorScheme ,colorScheme} = useMantineColorScheme();
     const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
     const isLoading = UseLoading();
 
@@ -19,7 +19,7 @@ export function Header() {
             <Container size="lg" className={classes.inner}>
                 <Flex align={'center'}>
                     <Link style={{ height: 40 }} className={'text-decoration-none'} href={'/'}>
-                        <Image style={{ objectFit: 'contain' }} alt='kiwi part' src={'/logo.png'} width={80} height={40} />
+                        <Image style={{ objectFit: 'contain' }} alt='kiwi part' src={colorScheme === 'dark' ? '/logo-dark.png' : '/logo.png'} width={80} height={40} />
                     </Link>
 
 
