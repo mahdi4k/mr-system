@@ -1,8 +1,33 @@
-.card{
+.card {
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 14px;
     cursor: pointer;
     transition: all .3s;
-    &:hover{
+    flex: none;
+    width: 232px;
+    height: 209px;
+    border-radius: 100%;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
         box-shadow: rgba(0, 0, 0, 0.1) 0px 12px 27px;
     }
+}
+
+.cardTitle {
+    text-align: center;
+    height: 57px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 20px 0 rgba(0, 0, 0, .1);
+    border-radius: 38px;
+    position: relative;
+    bottom: 30px;
+    background: light-dark(white, #1c2c3d);
+    width: 80%;
+    margin: auto;
+    color: light-dark(black, white);
+    font-size: 15pt;
 }
