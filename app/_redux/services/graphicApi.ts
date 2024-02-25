@@ -1,18 +1,22 @@
-import { POWER } from './PowerApi';
+import { POWER } from './powerApi';
 import { api } from './api'
 import { CPU } from './cpuApi';
 
 export type Graphic = {
-    id: number;
-    name: string;
-    manufacturer: string;
+    id: number
+    name: string
+    manufacturer: string
     attributes?: string[]
-    image: string,
-    cpus: CPU[] 
-    brand?: string,
-    psu:string
-    powers:POWER[]
-};
+    links: string
+    type?: string,
+    ram?: number,
+    image: string
+    price?: string
+    cpus: CPU[]
+    brand?: string
+    psu: string
+    powers: POWER[]
+}
 
 
 export const graphicApi = api.injectEndpoints({

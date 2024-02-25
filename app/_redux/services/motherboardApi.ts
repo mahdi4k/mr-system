@@ -2,11 +2,13 @@ import { api } from './api'
 import { CPU } from './cpuApi';
 
 export type Motherboard = {
-    id: number;
-    name: string;
+    id: number
+    name: string
     size: string
-    total_slot_ram: number;
+    total_slot_ram: number
     brand: string
+    price?:string
+    links:string
     image:string
     cpus:CPU[]
     attributes?: string[]

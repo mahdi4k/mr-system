@@ -1,15 +1,16 @@
 import { api } from './api'
-import { CPU } from './cpuApi';
 import { Graphic } from './graphicApi';
 
 export type POWER = {
-    id: number;
-    name: string;
+    id: number
+    name: string
     attributes?: string[]
-    image: string,
-    graphics: Graphic[] 
-    brand?: string,
-    psu:string,
+    image: string
+    price?:string
+    links:string
+    graphics: Graphic[]
+    brand?: string
+    psu:string
     modular:boolean
 };
 

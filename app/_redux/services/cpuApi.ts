@@ -3,15 +3,17 @@ import { Graphic } from './graphicApi';
 import { Motherboard } from './motherboardApi';
 
 export type CPU = {
-    id: number;
-    name: string;
+    id: number
+    name: string
     cpu_socket: string
     integrated_graphic: string
-    manufacturer: string;
+    manufacturer: string
+    price?: string
     attributes?: string[]
-    image: string,
-    motherboards: Motherboard[] 
-    graphics: Graphic[] 
+    image: string
+    motherboards: Motherboard[]
+    graphics: Graphic[]
+    links:string
     brand?: string
 };
 
@@ -19,12 +21,12 @@ export type CPU = {
 export const cpuApi = api.injectEndpoints({
 
     endpoints: (builder) => ({
-        getCpus: builder.query<CPU[], {manufacturer?:string[] | never[]}>({
-            query: ({manufacturer}) => {
+        getCpus: builder.query<CPU[], { manufacturer?: string[] | never[] }>({
+            query: ({ manufacturer }) => {
                 return {
                     url: `/cpus`,
                     method: 'GET',
-                    params:{manufacturer: manufacturer }
+                    params: { manufacturer: manufacturer }
                 }
             },
 
