@@ -9,47 +9,47 @@ const CardParts = () => {
     return (
         <Container mb={'xl'} size="lg">
             <Grid justify='center' py={'xl'}>
-                <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
+                <Grid.Col style={{ display: 'flex', justifyContent: 'center' }} span={{ base: 12, md: 6, lg: 3 }}>
                     <Link style={{ textDecoration: 'none' }} href={'/category/cpu'} >
                         <Card className={classes.card} bg={'var(--mantine-color-indigo-outline-hover)'} mih={'160px'} radius={'md'}>
                             <Flex justify={'center'} direction={'column'} align={'center'}>
                                 <Image width={110} height={90} src={'/svg/cpu.svg'} alt={'cpu'} />
-                                <Text mt={'xs'}>cpu</Text>
                             </Flex>
                         </Card>
+                        <Text className={classes.cardTitle} mt={'xs'}>cpu</Text>
                     </Link>
                 </Grid.Col>
 
-                <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
+                <Grid.Col style={{ display: 'flex', justifyContent: 'center' }} span={{ base: 12, md: 6, lg: 3 }}>
                     <Link style={{ textDecoration: 'none' }} href={'/category/motherboard'} >
                         <Card className={classes.card} bg={'var(--mantine-color-cyan-outline-hover)'} mih={'160px'} radius={'md'}>
                             <Flex justify={'center'} direction={'column'} align={'center'}>
                                 <Image width={110} height={90} src={'/svg/motherboard.svg'} alt={'motherboard'} />
-                                <Text mt={'xs'}>motherboard</Text>
                             </Flex>
                         </Card>
+                        <Text className={classes.cardTitle} mt={'xs'}>مادربورد</Text>
                     </Link>
                 </Grid.Col>
 
-                <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
-                    <Link style={{ textDecoration: 'none' }} href={'/category/power'} >
+                <Grid.Col style={{ display: 'flex', justifyContent: 'center' }} span={{ base: 12, md: 6, lg: 3 }}>
+                    <Link style={{ textDecoration: 'none' }} href={'/category/power'}>
                         <Card className={classes.card} bg={'var(--mantine-color-green-outline-hover)'} mih={'160px'} radius={'md'}>
                             <Flex justify={'center'} direction={'column'} align={'center'}>
-                                <Image width={110} height={90} src={'/svg/power.svg'} alt={'power'} />
-                                <Text mt={'xs'}>power</Text>
+                                <Image width={110} height={120} src={'/svg/power.svg'} alt={'power'} />
                             </Flex>
                         </Card>
+                        <Text className={classes.cardTitle} mt={'xs'}>پاور</Text>
                     </Link>
                 </Grid.Col>
 
-                <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
+                <Grid.Col style={{ display: 'flex', justifyContent: 'center' }} span={{ base: 12, md: 6, lg: 3 }}>
                     <Link style={{ textDecoration: 'none' }} href={'/category/graphic'} >
                         <Card className={classes.card} bg={'var(--mantine-color-violet-outline-hover)'} mih={'160px'} radius={'md'}>
                             <Flex justify={'center'} direction={'column'} align={'center'}>
                                 <Image width={110} height={90} src={'/svg/graphic.svg'} alt={'graphic'} />
-                                <Text mt={'xs'}>graphic</Text>
                             </Flex>
                         </Card>
+                        <Text className={classes.cardTitle} mt={'xs'}>کارت گرافیک</Text>
                     </Link>
                 </Grid.Col>
             </Grid>
