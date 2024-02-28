@@ -93,7 +93,7 @@ const ClientMotherBoard = () => {
                 </Table>
             </Stack>
             <Modal opened={opened} onClose={close}>
-                <Alert variant="light" color="red" title="آیا از حذف این مادربورد مطمئن هستید"/>
+                <Alert variant="light" color="red" title="آیا از حذف این مادربرد مطمئن هستید"/>
                 <Flex mt={'lg'} justify={'flex-end'}>
                     <Button ml={'md'} variant={'light'} onClick={close}>خیر</Button>
                     <Button bg={'tomato'} color={'white'} variant={'light'}

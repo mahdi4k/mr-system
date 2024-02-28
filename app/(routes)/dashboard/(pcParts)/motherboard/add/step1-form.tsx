@@ -79,7 +79,7 @@ const Step1Form = (props: StepProps) => {
                 form.onReset
                 notifications.show({
                     color: 'green',
-                    title: 'مادربورد با موفقیت ثبت شد',
+                    title: 'مادربرد با موفقیت ثبت شد',
                     message: '',
                     classNames: notifCalsses
                 })
@@ -97,7 +97,7 @@ const Step1Form = (props: StepProps) => {
     }
     return (
         <Stack>
-            <Text my={"lg"} fz={"lg"} fw={'bolder'}>افزودن مادربورد</Text>
+            <Text my={"lg"} fz={"lg"} fw={'bolder'}>افزودن مادربرد</Text>
             <form onSubmit={form.onSubmit((values) => console.log(values))}>
                 <Grid>
                     <Grid.Col span={{base: 12, md: 6}}>

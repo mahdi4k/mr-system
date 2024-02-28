@@ -47,7 +47,7 @@ const Step2Image = (props: Iprops) => {
                     console.log(val)
                     notifications.show({
                         color: 'green',
-                        title: 'تصویر مادربورد با موفقیت ثبت شد',
+                        title: 'تصویر مادربرد با موفقیت ثبت شد',
                         message: '',
                         classNames: notifClasses
                     })
@@ -56,7 +56,7 @@ const Step2Image = (props: Iprops) => {
     }, [addMotherboardImage, currentMotherboard.id, logo])
     return (
         <>
-            <Text mt={"lg"} fz={"lg"} fw={"bold"} mr={"lg"}>افزودن تصویر برای مادربورد {currentMotherboard.name}  </Text>
+            <Text mt={"lg"} fz={"lg"} fw={"bold"} mr={"lg"}>افزودن تصویر برای مادربرد {currentMotherboard.name}  </Text>
             <Flex direction={'column'} align={'center'} justify={'center'}>
                 <ImageUpload currentImage={previewLogo} handlers={handlers} opened={opened}
                              cropperRef={cropperRef}

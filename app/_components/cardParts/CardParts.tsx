@@ -27,7 +27,7 @@ const CardParts = () => {
                                 <Image width={110} height={90} src={'/svg/motherboard.svg'} alt={'motherboard'} />
                             </Flex>
                         </Card>
-                        <Text className={classes.cardTitle} mt={'xs'}>مادربورد</Text>
+                        <Text className={classes.cardTitle} mt={'xs'}>مادربرد</Text>
                     </Link>
                 </Grid.Col>
 

@@ -57,7 +57,7 @@ export function Header() {
                                                 <Image width={20} height={20} src={'/svg/motherboard.svg'} alt={'cpu'} />
                                             </ThemeIcon>
                                             <Text size="sm" fw={500}>
-                                                مادربورد
+                                                مادربرد
                                             </Text>
                                         </Group>
                                     </UnstyledButton>

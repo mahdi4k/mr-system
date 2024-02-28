@@ -19,7 +19,7 @@ const CpuMotherboard = () => {
                     </Group>
 
                     <Text fz="md" c="dimmed">
-                        در این قسمت میتوانید cpu مناسب برای مادربورد خود یا برعکس مادربورد مناسب cpu خود را انتخاب
+                        در این قسمت میتوانید cpu مناسب برای مادربرد خود یا برعکس مادربرد مناسب cpu خود را انتخاب
                         کنید
                     </Text>
                     <div className={`${classes.controls} ${classes.flexEnd}`}>

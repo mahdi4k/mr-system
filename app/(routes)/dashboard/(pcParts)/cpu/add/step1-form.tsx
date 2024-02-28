@@ -88,7 +88,7 @@ const Step1Form = (props: StepProps) => {
                             styles={{
                                 pill: {direction: 'ltr'}
                             }}
-                            label="مادربوردهای مرتبط"
+                            label="مادربردهای مرتبط"
                             placeholder=""
                              {...form.getInputProps('motherboards')}
                             data={data.map(el => ({value:`${el.id}`,label:el.name}))}

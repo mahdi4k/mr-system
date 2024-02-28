@@ -23,7 +23,7 @@ const page = () => {
             <Image width={110} height={60} src={'/svg/motherboard.svg'} alt={'cpu'} />
           </Card.Section>
           <Text ta={'center'} fw={500}>
-            مادربورد
+            مادربرد
           </Text>
         </Card>
       </Grid.Col>

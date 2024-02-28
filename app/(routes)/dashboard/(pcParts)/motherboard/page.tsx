@@ -3,7 +3,7 @@ import ClientMotherboard from "./clientMotherboard";
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-    title: 'لیست مادربورد',
+    title: 'لیست مادربرد',
     description: '',
 }
 

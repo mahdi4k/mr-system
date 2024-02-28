@@ -47,7 +47,7 @@ const Step2Image = (props: Iprops) => {
                     console.log(val)
                     notifications.show({
                         color: 'green',
-                        title: 'تصویر مادربورد با موفقیت ثبت شد',
+                        title: 'تصویر مادربرد با موفقیت ثبت شد',
                         message: '',
                         classNames: notifClasses
                     })

@@ -118,12 +118,12 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
                                             w={420}
                                             withArrow
                                             transitionProps={{ duration: 400 }}
-                                            label="در هنگام خرید رم به حداکثر فرکانس قابل پشتیبانی دقت کنید. درصورتی که رم با فرکانس بالاتر از مقدار گفته شده خریداری کنید فرکانس به حداکثر مقدار مادربورد بازگردانده میشود و عملا هزینه اضافی کرده‌اید "
+                                            label="در هنگام خرید رم به حداکثر فرکانس قابل پشتیبانی دقت کنید. درصورتی که رم با فرکانس بالاتر از مقدار گفته شده خریداری کنید فرکانس به حداکثر مقدار مادربرد بازگردانده میشود و عملا هزینه اضافی کرده‌اید "
                                         >
                                             <IconExclamationCircle color='green' />
                                         </Tooltip>
                                     </Grid.Col>
-                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>سایز مادربورد</Text></Grid.Col>
+                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>سایز مادربرد</Text></Grid.Col>
                                     <Grid.Col className={classes.borderBottomDashed} span={6}>
                                         <Flex align={'center'}>
                                             <Tooltip
@@ -136,7 +136,7 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
                                             <Tooltip
                                                 withArrow
                                                 transitionProps={{ duration: 400 }}
-                                                label="در هنگام خرید قاب کیس به سایز مادربورد دقت کنید"
+                                                label="در هنگام خرید قاب کیس به سایز مادربرد دقت کنید"
                                             >
                                                 <IconExclamationCircle color='green' />
                                             </Tooltip>

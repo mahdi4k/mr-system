@@ -62,7 +62,7 @@ const GraphicCard : FC<IgraphicProps> = ({setActiveGraphic,activeGraphic}) => {
         return (
             ObjectIsEmpty(selectedPower) ? 'لیست کارت گرافیک' :
                 <Flex align={'center'} justify={'center'}>
-                    لیست cpu سازگار با مادربورد
+                    لیست cpu سازگار با مادربرد
                     <Text mr={'sm'} fw={'bolder'}> {selectedPower.name}</Text>
                 </Flex>
         )
@@ -140,7 +140,7 @@ const GraphicCard : FC<IgraphicProps> = ({setActiveGraphic,activeGraphic}) => {
                                         w={420}
                                         withArrow
                                         transitionProps={{ duration: 400 }}
-                                        label="در هنگام خرید رم به حداکثر فرکانس قابل پشتیبانی دقت کنید. درصورتی که رم با فرکانس بالاتر از مقدار گفته شده خریداری کنید فرکانس به حداکثر مقدار مادربورد بازگردانده میشود و عملا هزینه اضافی کرده‌اید "
+                                        label="در هنگام خرید رم به حداکثر فرکانس قابل پشتیبانی دقت کنید. درصورتی که رم با فرکانس بالاتر از مقدار گفته شده خریداری کنید فرکانس به حداکثر مقدار مادربرد بازگردانده میشود و عملا هزینه اضافی کرده‌اید "
                                     >
                                         <IconExclamationCircle color='green' />
                                     </Tooltip>
