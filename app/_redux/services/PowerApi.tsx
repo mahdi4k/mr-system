@@ -6,20 +6,26 @@ export type POWER = {
     name: string
     attributes?: string[]
     image: string
-    price?:string
-    links:string
+    price?: string
+    links: string
     graphics: Graphic[]
     brand?: string
-    psu:string
-    modular:boolean
+    psu: string
+    modular: number
 };
 
 
 export const PowerApi = api.injectEndpoints({
 
     endpoints: (builder) => ({
-        getPowers: builder.query<POWER[], void>({
-            query: () => "/powers",
+        getPowers: builder.query<POWER[], { modular?: string[] | never[] }>({
+            query: ({ modular }) => {
+                return {
+                    url: `/powers`,
+                    method: 'GET',
+                    params: { modular: modular }
+                }
+            },
             providesTags: ['power']
         }),
         createPower: builder.mutation({

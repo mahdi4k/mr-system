@@ -22,8 +22,14 @@ export type Graphic = {
 export const graphicApi = api.injectEndpoints({
 
     endpoints: (builder) => ({
-        getGraphics: builder.query<Graphic[], void>({
-            query: () => "/graphics",
+        getGraphics: builder.query<Graphic[],  { manufacturer?: string[] | never[] }>({
+            query: ({ manufacturer }) => {
+                return {
+                    url: `/graphics`,
+                    method: 'GET',
+                    params: { manufacturer: manufacturer }
+                }
+            },
             providesTags: ['graphic']
         }),
         createGraphic: builder.mutation({

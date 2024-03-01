@@ -8,6 +8,11 @@ export type Motherboard = {
     total_slot_ram: number
     brand: string
     price?:string
+    cpu_socket?: string
+    ddr3?:boolean
+    ddr4?:boolean
+    ddr5?:boolean
+    wifi_support?:boolean
     links:string
     image:string
     cpus:CPU[]
@@ -24,8 +29,14 @@ type authTokenDTO = {
 export const motherboardApi = api.injectEndpoints({
 
     endpoints: (builder) => ({
-        getMotherboards: builder.query<Motherboard[], void>({
-            query: () => "/motherboards",
+        getMotherboards: builder.query<Motherboard[],  { manufacturer?: string[] | never[] }>({
+            query: ({ manufacturer }) => {
+                return {
+                    url: `/motherboards`,
+                    method: 'GET',
+                    params: { manufacturer: manufacturer }
+                }
+            },
             providesTags:['motherboards']
         }),
         createMotherboard: builder.mutation({
