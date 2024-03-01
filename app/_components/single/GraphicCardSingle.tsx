@@ -1,9 +1,10 @@
 import { Graphic } from '@/_redux/services/graphicApi'
-import { Avatar, Badge, Button, Card, Container, Flex, Grid, Group, Stack, Tabs, Text, Tooltip, rem } from '@mantine/core';
+import { Badge, Button, Card, Container, Flex, Grid, Group, Stack, Tabs, Text } from '@mantine/core';
 import React from 'react'
 import Image from 'next/image';
-import classes from '../../_cssModules/PcSection.module.css'
+import classes from '@/_cssModules/PcSection.module.css'
 import Link from 'next/link';
+import CardPartPrice from '../shared/CardPartPrice';
 
 const GraphicCardSingle = ({ product }: { product: Graphic }) => {
     console.log(product, 'product');
@@ -81,16 +82,17 @@ const GraphicCardSingle = ({ product }: { product: Graphic }) => {
                     <Grid my={'xl'} >
                         {product && product.powers?.length > 0 ? product.powers.map((data) => (
                             <Grid.Col key={data.id} span={{ base: 12, md: 6, lg: 3 }}>
-                                <Card miw={20} mih={312} key={data.id} shadow="sm" padding="lg" radius="md" withBorder>
-                                    <Card.Section ta={'center'}>
-                                        {data.image && <Image alt={data.name} width={170} height={160} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${data.image}`} />}
-                                    </Card.Section>
-
-                                    <Stack justify="center" align='center' mt="md" mb="xs">
-                                        <Badge color="pink">{data.brand}</Badge>
-                                        <Text ta={'center'} fw={500}>{data.name}</Text>
-                                    </Stack>
-                                </Card>
+                                <Link href={`/products/powers/${data.id}`}>
+                                    <Card miw={20} mih={300} key={data.id} shadow="sm" padding="lg" radius="md" withBorder>
+                                        <Card.Section ta={'center'}>
+                                            {data.image && <Image alt={data.name} width={170} height={160} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${data.image}`} />}
+                                        </Card.Section>
+                                        <Stack justify="center" align='center' mt="md" mb="xs">
+                                            <Text ta={'center'} fw={500}>{data.name}</Text>
+                                        </Stack>
+                                        <CardPartPrice price={product.price} />
+                                    </Card>
+                                </Link>
                             </Grid.Col>
                         )) : <Card mih={312}><Text>محصولی یافت نشد</Text></Card>}
                     </Grid>
@@ -100,29 +102,22 @@ const GraphicCardSingle = ({ product }: { product: Graphic }) => {
                     <Grid my={'xl'} >
                         {product && product.cpus?.length > 0 ? product.cpus.map((data) => (
                             <Grid.Col key={data.id} span={{ base: 12, md: 6, lg: 3 }}>
-                                <Card miw={20} mih={312} key={data.id} shadow="sm" padding="lg" radius="md" withBorder>
-                                    <Card.Section ta={'center'}>
-                                        {data.image && <Image alt={data.name} width={170} height={160} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${data.image}`} />}
-                                    </Card.Section>
+                                <Link href={`/products/cpus/${data.id}`}>
+                                    <Card miw={20} mih={312} key={data.id} shadow="sm" padding="lg" radius="md" withBorder>
+                                        <Card.Section ta={'center'}>
+                                            {data.image && <Image alt={data.name} width={170} height={160} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${data.image}`} />}
+                                        </Card.Section>
 
-                                    <Stack justify="center" align='center' mt="md" mb="xs">
-                                        <Badge color="pink">{data.manufacturer}</Badge>
-                                        <Text ta={'center'} fw={500}>{data.name}</Text>
-                                    </Stack>
-                                    {data.price ? <>
-                                        <Group gap={8} justify="center" align='center' mt="md" mb="xs">
-                                            <Text>از</Text>
-                                            <Text>{Intl.NumberFormat('fa', {}).format(Number(data.price))}</Text>
-                                            <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
-                                        </Group>
-                                    </> : ''}
-                                </Card>
+                                        <Stack justify="center" align='center' mt="md" mb="xs">
+                                            <Text ta={'center'} fw={500}>{data.name}</Text>
+                                        </Stack>
+                                        <CardPartPrice price={product.price} />
+                                    </Card>
+                                </Link>
                             </Grid.Col>
                         )) : <Card mih={312}><Text>محصولی یافت نشد</Text></Card>}
                     </Grid>
                 </Tabs.Panel>
-
-
             </Tabs>
         </Container>
     )
