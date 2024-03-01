@@ -19,7 +19,7 @@ const AmdOrIntelFilter: FC<Iprops> = ({ value, setValue }) => {
                     value={'amd'}
                 />
                 <Checkbox
-                    label={<Image alt='amd kiwi part' width={40} height={20} src={'/intel.png'}/>}
+                    label={<Image alt='intel kiwi part' width={40} height={20} src={'/intel.png'}/>}
                     value={'intel'}
                 />
             </Flex>
