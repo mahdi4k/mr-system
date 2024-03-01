@@ -30,7 +30,7 @@ const GraphicCard : FC<IgraphicProps> = ({setActiveGraphic,activeGraphic}) => {
      
     const graphicListFromSelectedCpu = useSelector((state: RootState) => state.cpu.relatedGraphic);
     const graphicListFromSelectedPower = useSelector((state: RootState) => state.power.relatedGraphic);
-    const { isSuccess, data = [], error, } = useGetGraphicsQuery();
+    const { isSuccess, data = [], error, } = useGetGraphicsQuery({});
     const currentGraphic = useSelector((state: RootState) => state.graphic.selectedGraphic);
     const selectedPower = useSelector((state: RootState) => state.power.selectedPower);
     useEffect(()=>{

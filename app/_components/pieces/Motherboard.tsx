@@ -29,7 +29,7 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
 
     const MotherboardListFromSelectedCpu = useSelector((state: RootState) => state.cpu.relatedMotherboards)
     const currentMotherboard = useSelector((state: RootState) => state.motherboard.selectedMotherboard, shallowEqual)
-    const { isSuccess, data = [], error, isLoading } = useGetMotherboardsQuery()
+    const { isSuccess, data = [], error, isLoading } = useGetMotherboardsQuery({})
     useEffect(() => {
         if (loadingEnd) {
             setActiveMotherboard(currentMotherboard)

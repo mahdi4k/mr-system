@@ -16,7 +16,7 @@ import Image from 'next/image';
 const ClientPower = () => {
     const [loadingSession, setLoadingSession] = useState(false)
     const session = useSession()
-    const { isSuccess, data = [], error } = useGetPowersQuery(undefined, { skip: !loadingSession })
+    const { isSuccess, data = [], error } = useGetPowersQuery({}, { skip: !loadingSession })
     const [opened, { open, close }] = useDisclosure(false);
     const [selectedPowerID, setSelectedPowerID] = useState<number>()
     const [removePower, response] = useRemovePowerMutation();

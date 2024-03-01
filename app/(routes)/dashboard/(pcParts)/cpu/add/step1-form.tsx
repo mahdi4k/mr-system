@@ -24,7 +24,7 @@ import {useGetMotherboardsQuery} from "@/_redux/services/motherboardApi";
 
 const Step1Form = (props: StepProps) => {
     const [createCpu, response] = useCreateCpusMutation();
-    const {isSuccess, data = [], error} = useGetMotherboardsQuery()
+    const {isSuccess, data = [], error} = useGetMotherboardsQuery({})
     const dispatch = useDispatch()
     const form = useForm({
         initialValues: {
@@ -50,7 +50,6 @@ const Step1Form = (props: StepProps) => {
         createCpu(form.values)
             .unwrap()
             .then((val) => {
-                console.log(val)
                 dispatch(currentCpuOnSave({id: val.data.id, name: val.data.name}))
                 form.onReset
                 notifications.show({

@@ -28,7 +28,7 @@ const Power : FC<IPowerProps> = ({setActivePower,activePower}) => {
     
      
     const powerListFromSelectedGraphic = useSelector((state: RootState) => state.graphic.relatedPowers);
-    const { isSuccess, data = [], error, } = useGetPowersQuery();
+    const { isSuccess, data = [], error, } = useGetPowersQuery({});
     const currentPower = useSelector((state: RootState) => state.power.selectedPower);
     const selectedGraphic = useSelector((state: RootState) => state.graphic.selectedGraphic);
     useEffect(()=>{

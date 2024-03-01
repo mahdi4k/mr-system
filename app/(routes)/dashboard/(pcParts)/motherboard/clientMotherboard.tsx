@@ -19,7 +19,7 @@ import Image from 'next/image';
 const ClientMotherBoard = () => {
     const [loadingSession, setLoadingSession] = useState(false)
     const session = useSession()
-    const {isSuccess, data = [], error} = useGetMotherboardsQuery(undefined, {skip: !loadingSession})
+    const {isSuccess, data = [], error} = useGetMotherboardsQuery({}, {skip: !loadingSession})
     const [opened, {open, close}] = useDisclosure(false);
     const [selectedMotherboardID, setSelectedMotherboardID] = useState<number>()
     const [removeMotherboard, response] = useRemoveMotherboardMutation();

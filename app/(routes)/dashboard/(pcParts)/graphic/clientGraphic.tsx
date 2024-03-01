@@ -16,7 +16,7 @@ import Image from 'next/image';
 const ClientGraphic = () => {
     const [loadingSession, setLoadingSession] = useState(false)
     const session = useSession()
-    const { isSuccess, data = [], error } = useGetGraphicsQuery(undefined, { skip: !loadingSession })
+    const { isSuccess, data = [], error } = useGetGraphicsQuery({}, { skip: !loadingSession })
     const [opened, { open, close }] = useDisclosure(false);
     const [selectedGraphicID, setSelectedGraphicID] = useState<number>()
     const [removeGraphic, response] = useRemoveGraphicMutation();

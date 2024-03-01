@@ -26,7 +26,7 @@ import { useGetCpusQuery } from '@/_redux/services/cpuApi';
 
 const Step1Form = (props: StepProps) => {
     const [createGraphic, response] = useCreateGraphicMutation();
-    const {isSuccess, data = [], error} = useGetPowersQuery();
+    const {isSuccess, data = [], error} = useGetPowersQuery({});
     const {isSuccess:isSuccessCpu, data : cpus = [], error:errorCpus} = useGetCpusQuery({});
     const dispatch = useDispatch();
     const form = useForm({
@@ -55,7 +55,6 @@ const Step1Form = (props: StepProps) => {
         createGraphic(form.values)
             .unwrap()
             .then((val) => {
-                console.log(val)
                 dispatch(currentGraphicOnSave({id: val.data.id, name: val.data.name}))
                 form.onReset
                 notifications.show({
