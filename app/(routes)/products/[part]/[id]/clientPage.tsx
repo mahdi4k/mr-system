@@ -23,17 +23,16 @@ const ComponentPower = dynamic(() => import('@/_components/single/PowerSingle'),
 
 
 const ClientPage: FC<productType> = ({ product, type }) => {
-  console.log("🚀 ~ ClientPage ~ product:", product)
 
   switch (type) {
     case "cpus":
-      return <ComponentCPU />;
+      return <ComponentCPU product={product as CPU} />;
     case "motherboards":
-      return <ComponentMotherboard />;
+      return <ComponentMotherboard product={product as Motherboard} />;
     case "graphics":
       return <ComponentGraphicCard product={product as Graphic} />;
     case "powers":
-      return <ComponentPower />;
+      return <ComponentPower product={product as POWER} />;
     default:
       return <h1>No piece match</h1>
   }
