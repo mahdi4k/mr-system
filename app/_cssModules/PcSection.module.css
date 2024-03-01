@@ -85,5 +85,5 @@
      }
 }
 .tomanIcon {
-    filter: light-dark(invert(0), invert(1));
+    /* filter: light-dark(invert(0), invert(1)); */
 }
