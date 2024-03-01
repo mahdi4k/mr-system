@@ -1,4 +1,4 @@
-import { Flex, Popover, Button, Card, Group, Badge, Text, Divider, Stack, Grid, Avatar, Tooltip, Modal } from '@mantine/core'
+import { Flex, Popover, Button, Card, Group, Badge, Text, Divider, Stack, Grid, Avatar, Tooltip, Modal, Box } from '@mantine/core'
 import { IconChevronDown } from '@tabler/icons-react'
 import React, { useState } from 'react'
 import AmdOrIntelFilter from '../filters/AmdOrIntelFilter'
@@ -9,6 +9,9 @@ import { useDisclosure } from '@mantine/hooks'
 import { Graphic } from '@/_redux/services/graphicApi'
 import ModalItems from './modalItems'
 import { Motherboard } from '@/_redux/services/motherboardApi'
+import classes from './category.module.css'
+import Link from 'next/link'
+import CardPartPrice from '../shared/CardPartPrice'
 const CpuCategory = () => {
     const [value, setValue] = useState<string[]>([]);
     const { isSuccess, data = [], error, isLoading } = useGetCpusQuery({ manufacturer: value })
@@ -19,6 +22,8 @@ const CpuCategory = () => {
         open()
         setModalData(data);
     }
+
+
 
     return (
         <>
@@ -33,31 +38,38 @@ const CpuCategory = () => {
                     </Popover.Dropdown>
                 </Popover>
             </Flex>
-            <Divider color='#eee' mb={'md'} />
+            <Divider color='#d2d2d269' mb={'md'} />
 
             {isLoading ? <>
                 <LoadingCategorySkeleton />
             </> : ''}
-            <Grid >
+            <Grid pb='md' mb='xl' >
                 {data && data.map((data) => (
                     <Grid.Col key={data.id} span={{ base: 12, md: 6, lg: 3 }}>
-                        <Card miw={'250px'} key={data.id} shadow="sm" padding="lg" radius="md" withBorder>
-                            <Card.Section ta={'center'}>
-                                {data.image && <Image alt={data.name} width={180} height={170} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${data.image}`} />}
-                            </Card.Section>
+                        <Card className={classes.categoryCard} mih={375} miw={'250px'} key={data.id} shadow="sm" padding="lg" radius="md" withBorder>
+                            <Link href={`/products/cpus/${data.id}`}>
+                                <Card.Section ta={'center'}>
+                                    {data.image && <Image alt={data.name} width={180} height={170} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${data.image}`} />}
+                                </Card.Section>
 
-                            <Stack justify="center" align='center' mt="md" mb="xs">
-                                <Badge color="pink">{data.manufacturer}</Badge>
-                                <Text fw={500}>{data.name}</Text>
-                            </Stack>
-                            <Group align='center' justify='center'>
-                                <Tooltip styles={{ tooltip: { fontSize: '12px' } }} position="bottom" label='کارت گرافیک‌های مطابق'>
-                                    <Avatar onClick={() => openModal(data.graphics)} style={{ cursor: 'pointer' }}><Image alt='graphic card' width={20} height={20} src={'/svg/graphic.svg'} /></Avatar>
-                                </Tooltip>
-                                <Tooltip styles={{ tooltip: { fontSize: '12px' } }} position="bottom" label='مادربوردهای مطابق'>
-                                    <Avatar onClick={() => openModal(data.motherboards)} style={{ cursor: 'pointer' }}><Image alt='motherboard' width={20} height={20} src={'/svg/motherboard.svg'} /></Avatar>
-                                </Tooltip>
-                            </Group>
+                                <Stack h={50} justify="start" align='center' mt="md" mb="xs">
+                                    <Text ta={'center'} fw={500}>{data.name}</Text>
+                                </Stack>
+                                <CardPartPrice price={data.price} />
+                            </Link>
+
+
+                            <Box pos={'absolute'} left={0} right={0} bottom={'2px'} component='div' >
+                                <Divider color='#d2d2d269' mb={'4px'} />
+                                <Group align='center' justify='center'>
+                                    <Tooltip styles={{ tooltip: { fontSize: '12px' } }} position="bottom" label='کارت گرافیک‌های مطابق'>
+                                        <Avatar onClick={() => openModal(data.graphics)} style={{ cursor: 'pointer' }}><Image alt='graphic card' width={20} height={20} src={'/svg/graphic.svg'} /></Avatar>
+                                    </Tooltip>
+                                    <Tooltip styles={{ tooltip: { fontSize: '12px' } }} position="bottom" label='مادربردهای مطابق'>
+                                        <Avatar onClick={() => openModal(data.motherboards)} style={{ cursor: 'pointer' }}><Image alt='motherboard' width={20} height={20} src={'/svg/motherboard.svg'} /></Avatar>
+                                    </Tooltip>
+                                </Group>
+                            </Box>
                         </Card>
                     </Grid.Col>
                 ))}
