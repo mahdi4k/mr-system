@@ -44,7 +44,6 @@ const Step2Image = (props: Iprops) => {
                 })
             }).unwrap()
                 .then((val) => {
-                    console.log(val)
                     notifications.show({
                         color: 'green',
                         title: 'تصویر گرافیک با موفقیت ثبت شد',

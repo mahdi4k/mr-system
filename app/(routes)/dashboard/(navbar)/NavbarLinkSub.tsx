@@ -20,7 +20,6 @@ type activeLink = 'pcParts' | 'articles'
 const NavbarLinkSub = ({activeLink}: { activeLink: activeLink }) => {
     const pathname = usePathname()
     const activeTabBaseUrl = pathname.split('/')[2];
-    console.log(activeTabBaseUrl === 'motherboard' )
 
     const links: linkDataDTO[] =
         [
@@ -58,8 +57,6 @@ const NavbarLinkSub = ({activeLink}: { activeLink: activeLink }) => {
             }
         ]
     const linkGroup = links.map((item) => <LinksGroup {...item} key={item.label} />);
-
-    console.log('hi');
     
     return (
         <div>

@@ -48,7 +48,6 @@ const Step1Form = (props: StepProps) => {
         createPower(form.values)
             .unwrap()
             .then((val) => {
-                console.log(val)
                 dispatch(currentPowerOnSave({ id: val.data.id, name: val.data.name }))
                 form.onReset
                 notifications.show({
@@ -96,14 +95,20 @@ const Step1Form = (props: StepProps) => {
                             data={['green']}
                         />
                     </Grid.Col>
-                    <Grid.Col style={{display:'flex',alignItems:'flex-end'}} mt={'sm'} span={{ base: 12, md: 6 }}>
+                    <Grid.Col style={{ display: 'flex', alignItems: 'flex-end' }} mt={'sm'} span={{ base: 12, md: 6 }}>
                         <Checkbox
                             label="ماژولار"
                             tabIndex={-1}
                             styles={{ input: { cursor: 'pointer' } }}
                             {...form.getInputProps('modular')}
-
-                         />
+                        />
+                        <Select
+                            data={[
+                                { value: '1', label: 'غیر ماژولار' },
+                                { value: '2', label: 'نیمه ماژولار' },
+                                { value: '3', label: 'کاملار ماژولار' },
+                            ]}
+                        />
                     </Grid.Col>
                 </Grid>
                 <Group justify="flex-end" mt="md">

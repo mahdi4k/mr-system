@@ -74,7 +74,6 @@ const Step1Form = (props: StepProps) => {
         createMotherboard(form.values)
             .unwrap()
             .then((val) => {
-                console.log(val)
                 dispatch(currentMotherboardOnSave({id: val.data.id, name: val.data.name}))
                 form.onReset
                 notifications.show({
