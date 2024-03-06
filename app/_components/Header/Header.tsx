@@ -9,7 +9,7 @@ import Image from 'next/image'
 
 export function Header() {
     const [opened, { toggle }] = useDisclosure(false);
-    const { setColorScheme ,colorScheme} = useMantineColorScheme();
+    const { setColorScheme, colorScheme } = useMantineColorScheme();
     const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
     const isLoading = UseLoading();
 
@@ -41,45 +41,54 @@ export function Header() {
 
                             <HoverCard.Dropdown style={{ overflow: 'hidden' }}>
                                 <SimpleGrid cols={3} spacing={0}>
-                                    <UnstyledButton p={'lg'} className={classes.subLink}>
-                                        <Group wrap="nowrap" align="center">
-                                            <ThemeIcon size={34} variant="default" radius="md">
-                                                <Image width={20} height={20} src={'/svg/cpu.svg'} alt={'cpu'} />
-                                            </ThemeIcon>
-                                            <Text size="sm" fw={500}>
-                                                cpu
-                                            </Text>
-                                        </Group>
+                                    <Link href='/category/motherboard'>
+                                        <UnstyledButton p={'lg'} className={classes.subLink} >
+                                            <Group wrap="nowrap" align="center">
+                                                <ThemeIcon size={34} variant="default" radius="md">
+                                                    <Image width={20} height={20} src={'/svg/motherboard.svg'} alt={'cpu'} />
+                                                </ThemeIcon>
+                                                <Text size="sm" fw={500}>
+                                                    مادربرد
+                                                </Text>
+                                            </Group>
+                                        </UnstyledButton>
+                                    </Link>
+                                    <UnstyledButton p={'lg'} className={classes.subLink} >
+                                        <Link href='/category/graphic'>
+                                            <Group wrap="nowrap" align="center">
+                                                <ThemeIcon size={34} variant="default" radius="md">
+                                                    <Image width={20} height={20} src={'/svg/graphic.svg'} alt={'cpu'} />
+                                                </ThemeIcon>
+                                                <Text size="sm" fw={500}>
+                                                    کارت گرافیک
+                                                </Text>
+                                            </Group>
+                                        </Link>
+                                    </UnstyledButton>
+
+                                    <UnstyledButton p={'lg'} className={classes.subLink} >
+                                        <Link href='/category/power'>
+                                            <Group wrap="nowrap" align="center">
+                                                <ThemeIcon size={34} variant="default" radius="md">
+                                                    <Image width={20} height={30} src={'/svg/power.svg'} alt={'cpu'} />
+                                                </ThemeIcon>
+                                                <Text size="sm" fw={500}>
+                                                    پاور
+                                                </Text>
+                                            </Group>
+                                        </Link>
                                     </UnstyledButton>
                                     <UnstyledButton p={'lg'} className={classes.subLink} >
-                                        <Group wrap="nowrap" align="center">
-                                            <ThemeIcon size={34} variant="default" radius="md">
-                                                <Image width={20} height={20} src={'/svg/motherboard.svg'} alt={'cpu'} />
-                                            </ThemeIcon>
-                                            <Text size="sm" fw={500}>
-                                                مادربرد
-                                            </Text>
-                                        </Group>
-                                    </UnstyledButton>
-                                    <UnstyledButton p={'lg'} className={classes.subLink} >
-                                        <Group wrap="nowrap" align="center">
-                                            <ThemeIcon size={34} variant="default" radius="md">
-                                                <Image width={20} height={20} src={'/svg/graphic.svg'} alt={'cpu'} />
-                                            </ThemeIcon>
-                                            <Text size="sm" fw={500}>
-                                                کارت گرافیک
-                                            </Text>
-                                        </Group>
-                                    </UnstyledButton>
-                                    <UnstyledButton p={'lg'} className={classes.subLink} >
-                                        <Group wrap="nowrap" align="center">
-                                            <ThemeIcon size={34} variant="default" radius="md">
-                                                <IconChartPie3 style={{ width: rem(22), height: rem(22) }} color={'blue'} />
-                                            </ThemeIcon>
-                                            <Text size="sm" fw={500}>
-                                                پاور
-                                            </Text>
-                                        </Group>
+                                        <Link href='/category/cpu'>
+                                            <Group wrap="nowrap" align="center">
+                                                <ThemeIcon size={34} variant="default" radius="md">
+                                                    <Image width={20} height={20} src={'/svg/cpu.svg'} alt={'cpu'} />
+                                                </ThemeIcon>
+                                                <Text size="sm" fw={500}>
+                                                    cpu
+                                                </Text>
+                                            </Group>
+                                        </Link>
                                     </UnstyledButton>
                                     <UnstyledButton p={'lg'} className={classes.subLink} >
                                         <Group wrap="nowrap" align="center">
