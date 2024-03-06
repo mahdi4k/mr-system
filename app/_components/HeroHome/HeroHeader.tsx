@@ -1,20 +1,25 @@
-import { Container, Title, Button, Group, Text, List, ThemeIcon, rem } from '@mantine/core';
+import { Container, Title, Button, Group, Text, List, ThemeIcon, rem, Box, Skeleton } from '@mantine/core';
 import classes from './Hero.module.css';
 import { IconCheck, IconMoodSmile } from '@tabler/icons-react';
 import ListItem from './ListItem';
 import Image from 'next/image'
+import SVG from "react-inlinesvg"
 
 export function HeroHeader() {
   return (
     <Container size="lg">
       <div className={classes.inner}>
-        <Image
+        {/* <Image
           className={classes.responiveImage}
           src="/svg/hero.svg"
           width={507}
           height={478}
           alt="Picture of the author"
-        />
+        /> */}
+        <SVG
+         loader={<Box component='div' w={507} h={478}></Box>}
+         width={507}
+          height={478} src='/svg/hero.svg' />
         <div className={classes.content}>
           <Title className={classes.title}>
             سیستمی <span className={classes.highlight}> که دوست داری</span> خیلی راحت  رو هم کن
