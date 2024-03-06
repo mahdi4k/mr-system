@@ -18,8 +18,19 @@ const PageClient: React.FC<PiecesProps> = ({ params }) => {
     const loadingEnd = useLoading();
     const [isPartSelected, setIsPartSelected] = useState<boolean>(false)
 
-    useEffect(() => {
-        setIsPartSelected(!ObjectIsEmpty(secondPiece.props.activeCpu) && !ObjectIsEmpty(firstPiece.props.activeMotherboard))
+    useEffect(() => {        
+        
+        if(secondPiece.props.activeCpu && firstPiece.props.activeMotherboard){
+            setIsPartSelected(!ObjectIsEmpty(secondPiece.props.activeCpu) && !ObjectIsEmpty(firstPiece.props.activeMotherboard))
+
+        }
+        if(secondPiece.props.activePower && firstPiece.props.activeGraphic){
+            setIsPartSelected(!ObjectIsEmpty(secondPiece.props.activePower) && !ObjectIsEmpty(firstPiece.props.activeGraphic))
+        }
+        if(secondPiece.props.activeCpu && firstPiece.props.activeGraphic){
+            setIsPartSelected(!ObjectIsEmpty(secondPiece.props.activeCpu) && !ObjectIsEmpty(firstPiece.props.activeGraphic))
+        }
+
     }, [secondPiece.props, firstPiece.props])
 
     return (
