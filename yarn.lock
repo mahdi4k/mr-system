@@ -10225,6 +10225,7 @@ __metadata:
     react: "npm:18.2.0"
     react-advanced-cropper: "npm:^0.19.3"
     react-dom: "npm:18.2.0"
+    react-inlinesvg: "npm:^4.1.3"
     react-redux: "npm:^8.1.3"
     storybook: "npm:^7.5.2"
     storybook-dark-mode: "npm:^3.0.1"
@@ -11991,6 +11992,26 @@ __metadata:
     react: ^0.14.8 || ^15.0.1 || ^16.0.0 || ^17.0.1 || ^18.0.0
     react-dom: ^0.14.8 || ^15.0.1 || ^16.0.0 || ^17.0.1 || ^18.0.0
   checksum: 0d60a0ea758529c32a706d0c69d70b69fb94de3c46442fffdee34f08f51ffceddbb5395b41dfd1565895653e9f60f98ca525835be9d5db1f16d6b22be12f4cd4
+  languageName: node
+  linkType: hard
+
+"react-from-dom@npm:^0.7.2":
+  version: 0.7.2
+  resolution: "react-from-dom@npm:0.7.2"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: ac094cebaa8a6bff6866e7919312bb38bb219c6900290dac0a07f57ad6d568600298b4d4dd1f02502f509029fe6a753b9c0fd102c2ef899d71283db8679d6200
+  languageName: node
+  linkType: hard
+
+"react-inlinesvg@npm:^4.1.3":
+  version: 4.1.3
+  resolution: "react-inlinesvg@npm:4.1.3"
+  dependencies:
+    react-from-dom: "npm:^0.7.2"
+  peerDependencies:
+    react: 16.8 - 18
+  checksum: f71bac89fb0b7af800d7a2a18a240d35392d4612792e16dda35450b0d3d129f55edd8b8df4a5400ac58862fe0497fdd794675f0e1821f38c54f57cd784d7a503
   languageName: node
   linkType: hard
 
