@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Motherboard } from "../services/motherboardApi";
 import { CPU } from "../services/cpuApi";
 import { Graphic } from "../services/graphicApi";
+import { POWER } from "../services/powerApi";
 
 
 
@@ -12,7 +13,7 @@ type currentPower = {
 
 type CpuType = {
     currentPower: currentPower; //this for add cpu in admin panel
-    selectedPower: Partial<CPU>  // selected motherboard for show in box
+    selectedPower: Partial<POWER>  // selected motherboard for show in box
     relatedMotherboards: Motherboard[] //  related motherboard from selected cpu 
     relatedGraphic:Graphic[]
 };
