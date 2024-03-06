@@ -2,7 +2,7 @@
 
 import React, { FC, useEffect, useState } from 'react';
 import classes from './pieces.module.css'
-import { Badge, Card, Drawer, Flex, Grid, Group, Skeleton, Tabs, Text, Tooltip } from "@mantine/core";
+import { Badge, Button, Card, Drawer, Flex, Grid, Group, Skeleton, Tabs, Text, Tooltip } from "@mantine/core";
 import Image from "next/image";
 import cardClasses from '../cardService/cardService.module.css'
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
@@ -14,6 +14,8 @@ import { ObjectIsEmpty } from '@/_utils/utils';
 import { Motherboard as MotherboardType } from '@/_redux/services/motherboardApi';
 import { IconBuildingStore, IconExclamationCircle, IconListDetails, IconX } from '@tabler/icons-react';
 import useLoading from '@/_utils/customHook/useLoading';
+import Link from 'next/link';
+import ShopsLink from './shared/ShopsLink';
 
 export type ImotherboardProps = {
     setActiveMotherboard: React.Dispatch<React.SetStateAction<Partial<MotherboardType> | undefined>>
@@ -72,7 +74,7 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
                             <Image className={classes.piecesImg} width={60} height={60} src={'/svg/motherboard.svg'} alt={'motherboard'} />
                         </Flex>
                     ) : (
-                        <Card style={{ padding: '0 35px', marginTop: '20px', width: '195px' }} radius="md" shadow='md' >
+                        <Card style={{ padding: '0 35px', marginTop: '20px', width: '195px' }} radius="md" shadow='xs' >
                             <IconX onClick={removeSelected} size={18} style={{ position: 'absolute', right: '4px', top: '3px' }} />
                             <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
                                 {currentMotherboard.image && <Image alt={currentMotherboard.name ? currentMotherboard.name : ''} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${currentMotherboard.image}`} />}
@@ -83,6 +85,14 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
                                 </Badge>
                                 <Text fz={"sm"} mt={'md'}>{currentMotherboard.name}</Text>
                             </Flex>
+                            {currentMotherboard.price ? <>
+                                <Group gap={3} justify="center" align='center' mb="xs">
+                                    <Text fz={'xs'} ml={'2px'}>از</Text>
+                                    <Text fz={'xs'} fw={'bold'}>{Intl.NumberFormat('fa', {}).format(Number(currentMotherboard.price))}</Text>
+                                    <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
+                                </Group>
+                            </> : ''}
+
                         </Card>
                     )}
 
@@ -100,9 +110,19 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
 
                             <Tabs.Panel value="info">
                                 <Grid my={'md'}>
-                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>تعداد اسلات رم</Text></Grid.Col>
+                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>سوکت پردازنده</Text></Grid.Col>
+                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fw={'bold'} fz={'sm'}>{currentMotherboard.cpu_socket}</Text></Grid.Col>
+
+                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>نوع RAM</Text></Grid.Col>
+                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fw={'bold'} fz={'sm'}>{currentMotherboard.ddr3 ? 'DDR3' : currentMotherboard.ddr4 ? 'DDR4' : currentMotherboard.ddr5 ? 'DDR5' : 'نامشخص'} </Text></Grid.Col>
+
+                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>تعداد اسلات RAM</Text></Grid.Col>
                                     <Grid.Col className={classes.borderBottomDashed} span={6}><Text fw={'bold'} fz={'sm'}>{currentMotherboard.total_slot_ram}</Text></Grid.Col>
-                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>فرکانس‌های رم قابل پشتیبانی</Text></Grid.Col>
+
+                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}> ارتباط بیسیم</Text></Grid.Col>
+                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fw={'bold'} fz={'sm'}> {currentMotherboard.wifi_support ? 'دارد' : 'ندارد'}</Text></Grid.Col>
+
+                                    {/* <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>فرکانس‌های رم قابل پشتیبانی</Text></Grid.Col>
                                     <Grid.Col className={`${classes.borderBottomDashed} ${classes.dFlex}`} span={6}>{currentMotherboard.attributes?.map(el => (
                                         <Tooltip
                                             key={el}
@@ -122,7 +142,7 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
                                         >
                                             <IconExclamationCircle color='green' />
                                         </Tooltip>
-                                    </Grid.Col>
+                                    </Grid.Col> */}
                                     <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>سایز مادربرد</Text></Grid.Col>
                                     <Grid.Col className={classes.borderBottomDashed} span={6}>
                                         <Flex align={'center'}>
@@ -145,7 +165,7 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
                                 </Grid>
                             </Tabs.Panel>
                             <Tabs.Panel value="shop">
-                                Messages tab content
+                                 <ShopsLink currentPiece={currentMotherboard} /> 
                             </Tabs.Panel>
                         </Tabs>
                     )}
@@ -157,17 +177,22 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
                 <Group>
                     {isLoading ? Array(7).map((_, index) => (<Skeleton mx={'md'} height={'190px'} mt={6} width="190px" radius="md" key={index} />)) :
                         motherboardSelected?.map(el => (
-                            <Card onClick={() => selectedMotherboard(el.id)} key={el.id} className={cardClasses.hoverCard}
+                            <Card h={220} onClick={() => selectedMotherboard(el.id)} key={el.id} className={cardClasses.hoverCard}
                                 style={{ padding: '0  10px', width: '190px' }} radius="md" withBorder>
                                 <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
                                     {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${el.image}`} />}
                                 </Card.Section>
                                 <Flex direction={'column'} justify="center" align={'center'} mt="sm" mb="xs">
-                                    <Badge color="pink" variant="light">
-                                        {el.brand}
-                                    </Badge>
-                                    <Text fz={"sm"} mt={'md'}>{el.name}</Text>
+                                    <Text h={40} ta={'center'} fz={"sm"}>{el.name}</Text>
                                 </Flex>
+                                {el.price ? <>
+                                    <Group gap={3} justify="center" align='center' mb="xs">
+                                        <Text fz={'xs'} ml={'2px'}>از</Text>
+                                        <Text fz={'xs'} fw={'bold'}>{Intl.NumberFormat('fa', {}).format(Number(el.price))}</Text>
+                                        <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
+                                    </Group>
+                                </> : ''}
+
                             </Card>
 
                         ))
