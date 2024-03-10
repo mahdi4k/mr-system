@@ -111,7 +111,7 @@ const Cpu: FC<IcpuProps> = ({ setActiveCpu, activeCpu }) => {
                 )}
 
                 {ObjectIsEmpty(currentCpu) ? '' : (
-                    <Tabs onClick={(e) => e.stopPropagation()} className={classes.tabSection} defaultValue="info">
+                    <Tabs w={'100%'} onClick={(e) => e.stopPropagation()} className={classes.tabSection} defaultValue="info">
                         <Tabs.List>
                             <Tabs.Tab value="info" rightSection={<IconListDetails size={18} />}>
                                 مشخصات
@@ -143,31 +143,35 @@ const Cpu: FC<IcpuProps> = ({ setActiveCpu, activeCpu }) => {
             </div>
             <Drawer position={"bottom"} opened={opened} onClose={close} title={titleDrawer()}>
 
-                <Group>
+                <Grid pb={'xl'}>
                     {
                         cpuSelected?.map(el => (
-                            <Card onClick={() => selectedCpu(el.id)} key={el.id} className={cardClasses.hoverCard}
-                                style={{ padding: '0 45px' }} radius="md" withBorder>
-                                <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
-                                    {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${el.image}`} />}
-                                </Card.Section>
+                            <Grid.Col key={el.id} span={{ base: 6, sm: 4, md: 2 }}>
 
-                                <Flex direction={'column'} justify="center" align={'center'} mt="xs" mb="xs">
-                                    <Text ta={'center'} fz={"sm"} >{el.name}</Text>
-                                </Flex>
-                                {el.price ? <>
-                                    <Group gap={3} justify="center" align='center' mb="xs">
-                                        <Text fz={'xs'} ml={'2px'}>از</Text>
-                                        <Text fz={'xs'} fw={'bold'}>{Intl.NumberFormat('fa', {}).format(Number(el.price))}</Text>
-                                        <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
-                                    </Group>
-                                </> : ''}
+                                <Card onClick={() => selectedCpu(el.id)} key={el.id} className={cardClasses.hoverCard}
+                                    style={{ padding: '0 20px' }} radius="md" withBorder>
+                                    <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
+                                        {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${el.image}`} />}
+                                    </Card.Section>
+
+                                    <Flex direction={'column'} justify="center" align={'center'} mt="xs" mb="xs">
+                                        <Text ta={'center'} fz={"sm"} >{el.name}</Text>
+                                    </Flex>
+                                    {el.price ? <>
+                                        <Group gap={3} justify="center" align='center' mb="xs">
+                                            <Text fz={'xs'} ml={'2px'}>از</Text>
+                                            <Text fz={'xs'} fw={'bold'}>{Intl.NumberFormat('fa', {}).format(Number(el.price))}</Text>
+                                            <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
+                                        </Group>
+                                    </> : ''}
 
 
-                            </Card>
+                                </Card>
+                            </Grid.Col>
+
                         ))
                     }
-                </Group>
+                </Grid>
             </Drawer>
         </>
 

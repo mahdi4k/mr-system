@@ -88,6 +88,13 @@
     opacity: 1;
 }
 
+.groupSection {
+    @media (max-width: $mantine-breakpoint-md) {
+        flex-direction: column;
+        width: 325px;
+    }
+}
+
 @keyframes pulse {
 	0% {
 		transform: scale(0.95);

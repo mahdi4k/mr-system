@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react';
-import { Container, Group, Paper, Skeleton, Table, Text } from "@mantine/core";
+import { Container, Flex, Group, Paper, Skeleton, Table, Text } from "@mantine/core";
 import useLoading from "@/_utils/customHook/useLoading";
 import { useAuth } from '@/_utils/customHook/useAuth';
 import usePiecePc from '@/_utils/customHook/usePiecePc';
@@ -35,13 +35,13 @@ const PageClient: React.FC<PiecesProps> = ({ params }) => {
 
     return (
         <Container className={classes.piecesSection} styles={{ root: { flex: '1 0 auto' } }} size={'xl'}>
-            <Group mt={'100px'} justify={'space-between'} align={'start'}>
+            <Group className={classes.groupSection} mt={'100px'} justify={'space-between'} align={'start'}>
                 {!loadingEnd &&
                     (
-                        <>
-                            <Skeleton radius={'xl'} width={400} height={300} mb="xl" />
-                            <Skeleton radius={'xl'} height={300} width={400} mb="xl" />
-                        </>
+                        <Flex direction={{base:'column',md:'row'}} gap={7}>
+                            <Skeleton radius={'xl'} w={{base:325,md:400}} h={300} mb="xl" />
+                            <Skeleton radius={'xl'} w={{base:325,md:400}} h={300}  mb="xl" />
+                        </Flex>
                     )
                 }
 

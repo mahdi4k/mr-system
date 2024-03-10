@@ -65,64 +65,63 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
     return (
         <>
 
-            <Flex direction={'column'}>
-                <div onClick={open} className={`${classes.pieces} ${cardClasses.cardMain}`}>
-                    {ObjectIsEmpty(currentMotherboard) ? (
-                        <Flex className={classes.hoverCard} mb={'lg'} align={'center'} justify={'center'} direction={'column'}>
-                            <Text ta={'center'} fz={"xl"}>انتخاب</Text>
-                            <Text fw={"bold"}>motherboard</Text>
-                            <Image className={classes.piecesImg} width={60} height={60} src={'/svg/motherboard.svg'} alt={'motherboard'} />
+            <div onClick={open} className={`${classes.pieces} ${cardClasses.cardMain}`}>
+                {ObjectIsEmpty(currentMotherboard) ? (
+                    <Flex className={classes.hoverCard} mb={'lg'} align={'center'} justify={'center'} direction={'column'}>
+                        <Text ta={'center'} fz={"xl"}>انتخاب</Text>
+                        <Text fw={"bold"}>motherboard</Text>
+                        <Image className={classes.piecesImg} width={60} height={60} src={'/svg/motherboard.svg'} alt={'motherboard'} />
+                    </Flex>
+                ) : (
+                    <Card style={{ padding: '0 35px', marginTop: '20px', width: '195px' }} radius="md" shadow='xs' >
+                        <IconX onClick={removeSelected} size={18} style={{ position: 'absolute', right: '4px', top: '3px' }} />
+                        <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
+                            {currentMotherboard.image && <Image alt={currentMotherboard.name ? currentMotherboard.name : ''} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${currentMotherboard.image}`} />}
+                        </Card.Section>
+                        <Flex direction={'column'} justify="center" align={'center'} mt="sm" mb="xs">
+                            <Badge color="pink" variant="light">
+                                {currentMotherboard.brand}
+                            </Badge>
+                            <Text fz={"sm"} mt={'md'}>{currentMotherboard.name}</Text>
                         </Flex>
-                    ) : (
-                        <Card style={{ padding: '0 35px', marginTop: '20px', width: '195px' }} radius="md" shadow='xs' >
-                            <IconX onClick={removeSelected} size={18} style={{ position: 'absolute', right: '4px', top: '3px' }} />
-                            <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
-                                {currentMotherboard.image && <Image alt={currentMotherboard.name ? currentMotherboard.name : ''} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${currentMotherboard.image}`} />}
-                            </Card.Section>
-                            <Flex direction={'column'} justify="center" align={'center'} mt="sm" mb="xs">
-                                <Badge color="pink" variant="light">
-                                    {currentMotherboard.brand}
-                                </Badge>
-                                <Text fz={"sm"} mt={'md'}>{currentMotherboard.name}</Text>
-                            </Flex>
-                            {currentMotherboard.price ? <>
-                                <Group gap={3} justify="center" align='center' mb="xs">
-                                    <Text fz={'xs'} ml={'2px'}>از</Text>
-                                    <Text fz={'xs'} fw={'bold'}>{Intl.NumberFormat('fa', {}).format(Number(currentMotherboard.price))}</Text>
-                                    <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
-                                </Group>
-                            </> : ''}
+                        {currentMotherboard.price ? <>
+                            <Group gap={3} justify="center" align='center' mb="xs">
+                                <Text fz={'xs'} ml={'2px'}>از</Text>
+                                <Text fz={'xs'} fw={'bold'}>{Intl.NumberFormat('fa', {}).format(Number(currentMotherboard.price))}</Text>
+                                <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
+                            </Group>
+                        </> : ''}
 
-                        </Card>
-                    )}
+                    </Card>
+                )}
 
-                    {ObjectIsEmpty(currentMotherboard) ? '' : (
-                        <Tabs onClick={(e) => e.stopPropagation()} className={classes.tabSection} defaultValue="info">
-                            <Tabs.List>
-                                <Tabs.Tab value="info" rightSection={<IconListDetails size={18} />}>
-                                    مشخصات
-                                </Tabs.Tab>
-                                <Tabs.Tab value="shop" rightSection={<IconBuildingStore size={18} />}>
-                                    فروشگاه
-                                </Tabs.Tab>
+                {ObjectIsEmpty(currentMotherboard) ? '' : (
+                    <Tabs w={'100%'} onClick={(e) => e.stopPropagation()} className={classes.tabSection} defaultValue="info">
+                        <Tabs.List>
+                            <Tabs.Tab value="info" rightSection={<IconListDetails size={18} />}>
+                                مشخصات
+                            </Tabs.Tab>
+                            <Tabs.Tab value="shop" rightSection={<IconBuildingStore size={18} />}>
+                                فروشگاه
+                            </Tabs.Tab>
 
-                            </Tabs.List>
+                        </Tabs.List>
 
-                            <Tabs.Panel value="info">
-                                <Grid my={'md'}>
-                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>سوکت پردازنده</Text></Grid.Col>
-                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fw={'bold'} fz={'sm'}>{currentMotherboard.cpu_socket}</Text></Grid.Col>
+                        <Tabs.Panel value="info">
+                            <Grid my={'md'}>
+                                <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>سوکت پردازنده</Text></Grid.Col>
+                                <Grid.Col className={classes.borderBottomDashed} span={6}><Text fw={'bold'} fz={'sm'}>{currentMotherboard.cpu_socket}</Text></Grid.Col>
 
-                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>نوع RAM</Text></Grid.Col>
-                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fw={'bold'} fz={'sm'}>{currentMotherboard.ddr3 ? 'DDR3' : currentMotherboard.ddr4 ? 'DDR4' : currentMotherboard.ddr5 ? 'DDR5' : 'نامشخص'} </Text></Grid.Col>
+                                <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>نوع RAM</Text></Grid.Col>
+                                <Grid.Col className={classes.borderBottomDashed} span={6}><Text fw={'bold'} fz={'sm'}>{currentMotherboard.ddr3 ? 'DDR3' : currentMotherboard.ddr4 ? 'DDR4' : currentMotherboard.ddr5 ? 'DDR5' : 'نامشخص'} </Text></Grid.Col>
 
-                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>تعداد اسلات RAM</Text></Grid.Col>
-                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fw={'bold'} fz={'sm'}>{currentMotherboard.total_slot_ram}</Text></Grid.Col>
+                                <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>تعداد اسلات RAM</Text></Grid.Col>
+                                <Grid.Col className={classes.borderBottomDashed} span={6}><Text fw={'bold'} fz={'sm'}>{currentMotherboard.total_slot_ram}</Text></Grid.Col>
 
-                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}> ارتباط بیسیم</Text></Grid.Col>
-                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fw={'bold'} fz={'sm'}> {currentMotherboard.wifi_support ? 'دارد' : 'ندارد'}</Text></Grid.Col>
+                                <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}> ارتباط بیسیم</Text></Grid.Col>
+                                <Grid.Col className={classes.borderBottomDashed} span={6}><Text fw={'bold'} fz={'sm'}> {currentMotherboard.wifi_support ? 'دارد' : 'ندارد'}</Text></Grid.Col>
 
-                                    {/* <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>فرکانس‌های رم قابل پشتیبانی</Text></Grid.Col>
+                                {/* <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>فرکانس‌های رم قابل پشتیبانی</Text></Grid.Col>
                                     <Grid.Col className={`${classes.borderBottomDashed} ${classes.dFlex}`} span={6}>{currentMotherboard.attributes?.map(el => (
                                         <Tooltip
                                             key={el}
@@ -143,61 +142,59 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
                                             <IconExclamationCircle color='green' />
                                         </Tooltip>
                                     </Grid.Col> */}
-                                    <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>سایز مادربرد</Text></Grid.Col>
-                                    <Grid.Col className={classes.borderBottomDashed} span={6}>
-                                        <Flex align={'center'}>
-                                            <Tooltip
-                                                withArrow
-                                                transitionProps={{ duration: 400 }}
-                                                label="خرید قاب کیس"
-                                            >
-                                                <Text mt={'4px'} ml={'4px'} style={{ width: 'fit-content' }} fw={'bold'} fz={'sm'}>{currentMotherboard.size}</Text>
-                                            </Tooltip>
-                                            <Tooltip
-                                                withArrow
-                                                transitionProps={{ duration: 400 }}
-                                                label="در هنگام خرید قاب کیس به سایز مادربرد دقت کنید"
-                                            >
-                                                <IconExclamationCircle color='green' />
-                                            </Tooltip>
-                                        </Flex>
-                                    </Grid.Col>
-                                </Grid>
-                            </Tabs.Panel>
-                            <Tabs.Panel value="shop">
-                                 <ShopsLink currentPiece={currentMotherboard} /> 
-                            </Tabs.Panel>
-                        </Tabs>
-                    )}
-                </div>
+                                <Grid.Col className={classes.borderBottomDashed} span={6}><Text fz={'sm'}>سایز مادربرد</Text></Grid.Col>
+                                <Grid.Col className={classes.borderBottomDashed} span={6}>
+                                    <Flex align={'center'}>
+                                        <Tooltip
+                                            withArrow
+                                            transitionProps={{ duration: 400 }}
+                                            label="خرید قاب کیس"
+                                        >
+                                            <Text mt={'4px'} ml={'4px'} style={{ width: 'fit-content' }} fw={'bold'} fz={'sm'}>{currentMotherboard.size}</Text>
+                                        </Tooltip>
+                                        <Tooltip
+                                            withArrow
+                                            transitionProps={{ duration: 400 }}
+                                            label="در هنگام خرید قاب کیس به سایز مادربرد دقت کنید"
+                                        >
+                                            <IconExclamationCircle color='green' />
+                                        </Tooltip>
+                                    </Flex>
+                                </Grid.Col>
+                            </Grid>
+                        </Tabs.Panel>
+                        <Tabs.Panel value="shop">
+                            <ShopsLink currentPiece={currentMotherboard} />
+                        </Tabs.Panel>
+                    </Tabs>
+                )}
+            </div>
 
-
-            </Flex>
             <Drawer position={"bottom"} opened={opened} onClose={close} title="انتخاب motherboard">
-                <Group>
+                <Grid pb={'xl'}>
                     {isLoading ? Array(7).map((_, index) => (<Skeleton mx={'md'} height={'190px'} mt={6} width="190px" radius="md" key={index} />)) :
                         motherboardSelected?.map(el => (
-                            <Card h={220} onClick={() => selectedMotherboard(el.id)} key={el.id} className={cardClasses.hoverCard}
-                                style={{ padding: '0  10px', width: '190px' }} radius="md" withBorder>
-                                <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
-                                    {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${el.image}`} />}
-                                </Card.Section>
-                                <Flex direction={'column'} justify="center" align={'center'} mt="sm" mb="xs">
-                                    <Text h={40} ta={'center'} fz={"sm"}>{el.name}</Text>
-                                </Flex>
-                                {el.price ? <>
-                                    <Group gap={3} justify="center" align='center' mb="xs">
-                                        <Text fz={'xs'} ml={'2px'}>از</Text>
-                                        <Text fz={'xs'} fw={'bold'}>{Intl.NumberFormat('fa', {}).format(Number(el.price))}</Text>
-                                        <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
-                                    </Group>
-                                </> : ''}
-
-                            </Card>
-
+                            <Grid.Col key={el.id} span={{ base: 6, sm: 4, md: 2 }}>
+                                <Card onClick={() => selectedMotherboard(el.id)} className={cardClasses.hoverCard}
+                                    style={{ padding: '0  10px' }} radius="md" withBorder>
+                                    <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
+                                        {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${el.image}`} />}
+                                    </Card.Section>
+                                    <Flex direction={'column'} justify="center" align={'center'} mt="sm" mb="xs">
+                                        <Text h={40} ta={'center'} fz={"sm"}>{el.name}</Text>
+                                    </Flex>
+                                    {el.price ? <>
+                                        <Group gap={3} justify="center" align='center' mb="xs">
+                                            <Text fz={'xs'} ml={'2px'}>از</Text>
+                                            <Text fz={'xs'} fw={'bold'}>{Intl.NumberFormat('fa', {}).format(Number(el.price))}</Text>
+                                            <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
+                                        </Group>
+                                    </> : ''}
+                                </Card>
+                            </Grid.Col>
                         ))
                     }
-                </Group>
+                </Grid>
             </Drawer>
         </>
     );

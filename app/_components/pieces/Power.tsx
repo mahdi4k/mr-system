@@ -101,7 +101,7 @@ const Power: FC<IPowerProps> = ({ setActivePower, activePower }) => {
                 )}
 
                 {ObjectIsEmpty(currentPower) ? '' : (
-                    <Tabs onClick={(e) => e.stopPropagation()} className={classes.tabSection} defaultValue="info">
+                    <Tabs w={'100%'} onClick={(e) => e.stopPropagation()} className={classes.tabSection} defaultValue="info">
                         <Tabs.List>
                             <Tabs.Tab value="info" rightSection={<IconListDetails size={18} />}>
                                 مشخصات
@@ -130,32 +130,35 @@ const Power: FC<IPowerProps> = ({ setActivePower, activePower }) => {
             </div>
             <Drawer position={"bottom"} opened={opened} onClose={close} title={titleDrawer()}>
 
-                <Group>
+                <Grid pb={'xl'}>
                     {
                         powerSelected?.map(el => (
-                            <Card onClick={() => selectedPower(el.id)} key={el.id} className={cardClasses.hoverCard}
-                                style={{ padding: '0 45px' }} radius="md" withBorder>
-                                <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
+                            <Grid.Col key={el.id} span={{ base: 6, sm: 4, md: 2 }}>
 
-                                    {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${el.image}`} />}
+                                <Card onClick={() => selectedPower(el.id)} key={el.id} className={cardClasses.hoverCard}
+                                    style={{ padding: '0 20px' }} radius="md" withBorder>
+                                    <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
 
-                                </Card.Section>
+                                        {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${el.image}`} />}
 
-                                <Flex direction={'column'} justify="center" align={'center'} mt="sm" mb="xs">
-                                    <Text fz={"sm"}  >{el.name}</Text>
-                                </Flex>
-                                {el.price ? <>
-                                    <Group gap={3} justify="center" align='center' mb="xs">
-                                        <Text fz={'xs'} ml={'2px'}>از</Text>
-                                        <Text fz={'xs'} fw={'bold'}>{Intl.NumberFormat('fa', {}).format(Number(el.price))}</Text>
-                                        <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
-                                    </Group>
-                                </> : ''}
+                                    </Card.Section>
 
-                            </Card>
+                                    <Flex direction={'column'} justify="center" align={'center'} mt="sm" mb="xs">
+                                        <Text ta={'center'} fz={"sm"}  >{el.name}</Text>
+                                    </Flex>
+                                    {el.price ? <>
+                                        <Group gap={3} justify="center" align='center' mb="xs">
+                                            <Text fz={'xs'} ml={'2px'}>از</Text>
+                                            <Text fz={'xs'} fw={'bold'}>{Intl.NumberFormat('fa', {}).format(Number(el.price))}</Text>
+                                            <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
+                                        </Group>
+                                    </> : ''}
+
+                                </Card>
+                            </Grid.Col>
                         ))
                     }
-                </Group>
+                </Grid>
             </Drawer>
         </>
 

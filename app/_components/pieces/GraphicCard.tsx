@@ -69,8 +69,8 @@ const GraphicCard: FC<IgraphicProps> = ({ setActiveGraphic, activeGraphic }) => 
         return (
             ObjectIsEmpty(selectedPower) ? 'لیست کارت گرافیک' :
                 <Flex align={'center'} justify={'center'}>
-                    لیست cpu سازگار با مادربرد
-                    <Text mr={'sm'} fw={'bolder'}> {selectedPower.name}</Text>
+                    <Text fz={'sm'}> لیست cpu سازگار با مادربرد</Text>
+                    <Text fz={'xs'} mr={'sm'} fw={'bolder'}> {selectedPower.name}</Text>
                 </Flex>
         )
     }
@@ -122,7 +122,7 @@ const GraphicCard: FC<IgraphicProps> = ({ setActiveGraphic, activeGraphic }) => 
                 )}
 
                 {ObjectIsEmpty(currentGraphic) ? '' : (
-                    <Tabs onClick={(e) => e.stopPropagation()} className={classes.tabSection} defaultValue="info">
+                    <Tabs w={'100%'} onClick={(e) => e.stopPropagation()} className={classes.tabSection} defaultValue="info">
                         <Tabs.List>
                             <Tabs.Tab value="info" rightSection={<IconListDetails size={18} />}>
                                 مشخصات
@@ -164,32 +164,34 @@ const GraphicCard: FC<IgraphicProps> = ({ setActiveGraphic, activeGraphic }) => 
             </Box>
             <Drawer position={"bottom"} opened={opened} onClose={close} title={titleDrawer()}>
 
-                <Group>
+                <Grid pb={'xl'}>
                     {
                         graphicSelected?.map(el => (
-                            <Card onClick={() => selectedGraphic(el.id)} key={el.id} className={cardClasses.hoverCard}
-                                style={{ padding: '0 45px' }} radius="md" withBorder>
-                                <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
+                            <Grid.Col key={el.id} span={{ base: 6, sm: 4, md: 2 }}>
+                                <Card h={230} onClick={() => selectedGraphic(el.id)} key={el.id} className={cardClasses.hoverCard}
+                                    style={{ padding: '0 25x' }} radius="md" withBorder>
+                                    <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
 
-                                    {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${el.image}`} />}
+                                        {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${el.image}`} />}
 
-                                </Card.Section>
+                                    </Card.Section>
 
-                                <Flex direction={'column'} justify="center" align={'center'} mt="sm" mb="xs">
-                                    <Text fz={"sm"} >{el.name}</Text>
-                                </Flex>
-                                {el.price ? <>
-                                    <Group gap={3} justify="center" align='center' mb="xs">
-                                        <Text fz={'xs'} ml={'2px'}>از</Text>
-                                        <Text fz={'xs'} fw={'bold'}>{Intl.NumberFormat('fa', {}).format(Number(el.price))}</Text>
-                                        <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
-                                    </Group>
-                                </> : ''}
+                                    <Flex direction={'column'} justify="center" align={'center'} mt="sm" mb="xs">
+                                        <Text ta={'center'} fz={"sm"} >{el.name}</Text>
+                                    </Flex>
+                                    {el.price ? <>
+                                        <Group gap={3} justify="center" align='center' mb="xs">
+                                            <Text fz={'xs'} ml={'2px'}>از</Text>
+                                            <Text fz={'xs'} fw={'bold'}>{Intl.NumberFormat('fa', {}).format(Number(el.price))}</Text>
+                                            <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
+                                        </Group>
+                                    </> : ''}
 
-                            </Card>
+                                </Card>
+                            </Grid.Col>
                         ))
                     }
-                </Group>
+                </Grid>
             </Drawer>
         </>
 
