@@ -94,3 +94,12 @@
       background-image: unset
     }
   }
+
+  .heroSvg {
+    width: 507px;
+    height: 478px;
+    @media (max-width: $mantine-breakpoint-md) {
+      width: auto;
+      height: 100%;
+    }
+  }

@@ -17,13 +17,14 @@ export function HeroHeader() {
           alt="Picture of the author"
         /> */}
         <SVG
-         loader={<Box component='div' w={507} h={478}></Box>}
-         width={507}
-          height={478} src='/svg/hero.svg' />
+          className={classes.heroSvg}
+          loader={<Box component='div' w={507} h={478}></Box>}
+
+          src='/svg/hero.svg' />
         <div className={classes.content}>
           <Title className={classes.title}>
             سیستمی <span className={classes.highlight}> که دوست داری</span> خیلی راحت  رو هم کن
-            <IconMoodSmile className={classes.IconSmile} size={50}  color='var(--mantine-color-kiwi-8)' />
+            <IconMoodSmile className={classes.IconSmile} size={50} color='var(--mantine-color-kiwi-8)' />
           </Title>
           <ListItem />
         </div>

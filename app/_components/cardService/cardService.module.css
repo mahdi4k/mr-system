@@ -94,6 +94,6 @@
     transition: all .3s;
     cursor: pointer;
     &:hover {
-         box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+         box-shadow: rgba(17, 12, 46, 0.15) 0px 8px 27px 0px;
  }
 }
