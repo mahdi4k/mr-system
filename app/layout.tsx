@@ -5,6 +5,7 @@ import { theme } from "../theme";
 import { Vazirmatn } from 'next/font/google'
 import './global.css'
 import '@mantine/notifications/styles.css';
+import '@mantine/carousel/styles.css';
 import {ReduxProviders} from "@/_redux/provider";
 import {Header} from "@/_components/Header/Header";
 import {Footer} from "@/_components/Footer/Footer";
