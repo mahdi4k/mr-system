@@ -1,62 +1,41 @@
- "use client"
+import ArticleSectionClient from "./ArticleSection.client"
 
-import { Carousel, Embla } from '@mantine/carousel'
-import { Box, Button, Container, Flex, Grid } from '@mantine/core'
-import React, { useEffect, useState } from 'react'
-import SVG from "react-inlinesvg"
-import { ArticleCard } from './ArticleCard'
-import classess from './Article.module.css'
 
-const ArticleSection = () => {
-    const [embla, setEmbla] = useState<Embla | null>(null);
+type featuredmedia ={
+    id:number,
+    link:string,
+    mime_type:string,
+}
 
-    useEffect(() => {
-        if (embla) {
-            embla?.reInit({ direction: 'rtl' })
-        }
-    }, [embla]);
+export type postsMO = {
+    title: { rendered: string },
+    excerpt:{ rendered: string },
+    id: string,
+    date:string,
+    slug:string,
+    content: { rendered: string },
+    _embedded: { 'wp:featuredmedia': featuredmedia[] }
 
+}
+
+async function getData() {
+    const res = await fetch('http://localhost/wordpress/wp-json/wp/v2/posts?_fields=id,content,slug,excerpt,date,title,_links,_embedded&_embed')
+    // The return value is *not* serialized
+    // You can return Date, Map, Set, etc.
+
+    if (!res.ok) {
+        // This will activate the closest `error.js` Error Boundary
+        throw new Error('Failed to fetch data')
+    }
+
+    return res.json()
+}
+
+const ArticleSection = async () => {
+    const posts: postsMO[] = await getData()
 
     return (
-        <Container mt={'50px'} mb={'80px'} size="lg">
-            
-            <Grid classNames={{ inner: classess.articleGrid }} w={'100%'}>
-                <Grid.Col span={{ base: 12, md: 5 }}>
-                    <SVG
-                        className={classess.articleSvg}
-                        loader={<Box component='div'></Box>}
-                        src='/svg/article.svg' />
-                    <Flex align={'center'} justify={'center'} mt={'sm'}>
-                        <Button variant='gradient' gradient={{ from: ' rgb(14,163,93)', to: ' rgb(12,119,115)', deg: 90 }}>مشاهده تمام مقالات</Button>
-                    </Flex>
-                </Grid.Col>
-                <Grid.Col span={{ base: 12, md: 7 }}>
-                    <div style={{ direction: 'rtl' }}>
-                        <Carousel
-                            align="start"
-                            slideSize={{ base: '100%', sm: '47%' }}
-                            slideGap={{ base: 0, sm: 'xl' }}
-                            getEmblaApi={setEmbla}
-                            height={345}
-                            withControls={false}>
-                            <Carousel.Slide>
-                                <ArticleCard />
-                            </Carousel.Slide>
-                            <Carousel.Slide>
-                                <ArticleCard />
-                            </Carousel.Slide>
-                            <Carousel.Slide>
-                                <ArticleCard />
-                            </Carousel.Slide>
-                            <Carousel.Slide>
-                                <ArticleCard />
-                            </Carousel.Slide>
-                        </Carousel>
-                    </div>
-
-                </Grid.Col>
-            </Grid>
-        </Container>
+        <ArticleSectionClient posts={posts} />
     )
 }
 

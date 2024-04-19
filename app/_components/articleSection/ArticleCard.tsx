@@ -4,40 +4,40 @@ import {
     ActionIcon,
     Group,
     Text,
-    Avatar,
-    Badge,
     useMantineTheme,
     rem,
 } from '@mantine/core';
-import { IconHeart, IconBookmark, IconShare } from '@tabler/icons-react';
+import { IconShare } from '@tabler/icons-react';
 import classes from './Article.module.css';
+import { postsMO } from './ArticleSection';
+import Link from 'next/link';
 
-export function ArticleCard() {
+export function ArticleCard({ post }: { post: postsMO }) {
     const theme = useMantineTheme();
 
+    const gregorianDate = new Date(post.date);
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    const jalaliDate = gregorianDate.toLocaleDateString('fa-IR', options);
+
+
     return (
-        <Card withBorder padding="lg" radius="md" className={classes.card}>
-            <Card.Section mb="sm">
-                <Image
-                    src="/svg/cpu.svg"
-                    alt="Top 50 underrated plants for house decoration"
-                    height={180}
-                />
-            </Card.Section>
+        <Link href={`/blog/${post.slug}`}>
+            <Card withBorder padding="lg" radius="md" className={classes.card}>
+                <Card.Section mb="sm">
+                    <Image
+                        src={post?._embedded['wp:featuredmedia'][0].link}
+                        alt="Top 50 underrated plants for house decoration"
+                        height={180}
+                    />
+                </Card.Section>
 
-            <Badge w="fit-content" variant="light">
-                decorations
-            </Badge>
+                <Text fw={700} className={classes.title} >
+                    {post.title.rendered}
+                </Text>
+                <div className={classes.excerptTitle} dangerouslySetInnerHTML={{ __html: post.excerpt.rendered }} />
 
-            <Text fw={700} className={classes.title} mt="xs">
-                Top 50 underrated plants for house decoration
-            </Text>
-
-             
-
-            <Card.Section className={classes.footer}>
-                <Group justify="flex-end">
-                    <Group gap={0}>
+                <Card.Section className={classes.footer}>
+                    <Group align='center' justify='space-between' gap={0}>
                         <ActionIcon variant="subtle" color="gray">
                             <IconShare
                                 style={{ width: rem(20), height: rem(20) }}
@@ -45,9 +45,10 @@ export function ArticleCard() {
                                 stroke={1.5}
                             />
                         </ActionIcon>
+                        <Text fz={'xs'}>{jalaliDate}</Text>
                     </Group>
-                </Group>
-            </Card.Section>
-        </Card>
+                </Card.Section>
+            </Card>
+        </Link>
     );
 }
