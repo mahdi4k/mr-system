@@ -88,7 +88,7 @@ const Cpu: FC<IcpuProps> = ({ setActiveCpu, activeCpu }) => {
                         <Image className={classes.piecesImg} width={60} height={60} src={'/svg/cpu.svg'} alt={'cpu'} />
                     </Flex>
                 ) : (
-                    <Card style={{ padding: '0 35px', marginTop: '20px', width: '195px' }} radius="md" shadow='xs'>
+                    <Card style={{ padding: '0 35px', marginTop: '20px', width: '200px' }} radius="md" shadow='xs'>
                         <IconX onClick={removeSelected} size={18} style={{ position: 'absolute', right: '4px', top: '3px' }} />
                         <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
                             {currentCpu.image && <Image alt={currentCpu.name ? currentCpu.name : ''} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${currentCpu.image}`} />}

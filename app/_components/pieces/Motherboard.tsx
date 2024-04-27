@@ -73,7 +73,7 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
                         <Image className={classes.piecesImg} width={60} height={60} src={'/svg/motherboard.svg'} alt={'motherboard'} />
                     </Flex>
                 ) : (
-                    <Card style={{ padding: '0 35px', marginTop: '20px', width: '195px' }} radius="md" shadow='xs' >
+                    <Card style={{ padding: '0 35px', marginTop: '20px', width: '200px' }} radius="md" shadow='xs' >
                         <IconX onClick={removeSelected} size={18} style={{ position: 'absolute', right: '4px', top: '3px' }} />
                         <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
                             {currentMotherboard.image && <Image alt={currentMotherboard.name ? currentMotherboard.name : ''} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${currentMotherboard.image}`} />}

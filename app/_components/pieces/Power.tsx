@@ -80,7 +80,7 @@ const Power: FC<IPowerProps> = ({ setActivePower, activePower }) => {
                         <Image style={{ bottom: '5px' }} className={classes.piecesImg} width={100} height={100} src={'/svg/power.svg'} alt={'power'} />
                     </Flex>
                 ) : (
-                    <Card style={{ padding: '0 35px', marginTop: '20px', width: '195px' }} radius="md" shadow='xs'>
+                    <Card style={{ padding: '0 35px', marginTop: '20px', width: '200px' }} radius="md" shadow='xs'>
                         <IconX onClick={removeSelected} size={18} style={{ position: 'absolute', right: '4px', top: '3px' }} />
                         <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
                             {currentPower.image && <Image alt={currentPower.name ? currentPower.name : ''} width={75} height={85} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${currentPower.image}`} />}
