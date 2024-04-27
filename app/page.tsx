@@ -6,6 +6,7 @@ import CpuMotherboard from "@/_components/cpuMotherboard/CpuMotherboard"
 import GraphicPower from './_components/graphicPower/GraphicPower'
 import CardParts from './_components/cardParts/CardParts'
 import ArticleSection from './_components/articleSection/ArticleSection'
+import BannerSection from './_components/BannerSection/BannerSection'
 
 const page = () => {
   return (
@@ -16,6 +17,7 @@ const page = () => {
       <CpuMotherboard />
       <CpuGraphic />
       <GraphicPower />
+      <BannerSection />
       {/* <CardService /> */}
       <ArticleSection />
     </div>
