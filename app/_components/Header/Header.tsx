@@ -33,7 +33,7 @@ export function Header() {
                                         </Box>
                                         <IconChevronDown
                                             style={{ width: rem(16), height: rem(16) }}
-                                            color={'blue'}
+                                            
                                         />
                                     </Center>
                                 </a>
