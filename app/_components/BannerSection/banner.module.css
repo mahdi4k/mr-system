@@ -76,11 +76,11 @@
 /* CSS */
 .bannerBtn {
     align-self: center;
-    background-color: light-dark(#fff,  #606060);
+    background-color: light-dark(#fff, #606060);
     border-width: 2px;
     box-shadow: rgba(0, 0, 0, .2) 15px 28px 25px -18px;
     box-sizing: border-box;
-    color: light-dark(#41403e,  #ffffff);
+    color: light-dark(#41403e, #ffffff);
     cursor: pointer;
     display: inline-block;
     font-size: 1rem;
@@ -105,3 +105,35 @@
 .bannerBtn:focus {
     box-shadow: rgba(0, 0, 0, .3) 2px 8px 4px -6px;
 }
+
+
+.paperPlane {
+    animation: plane 8s 0.000s ease-in-out infinite;
+
+    &:hover {
+        animation: go 3.75s 0.000s ease-in-out infinite;
+    }
+}
+
+@keyframes plane {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    25% {
+        transform: translate(-3px, 3px);
+    }
+
+    50% {
+        transform: translate(2px, -3px);
+    }
+
+    75% {
+        transform: translate(3px, -3px);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+ 

@@ -24,7 +24,7 @@ const BannerSection = () => {
                                 <Text ml={'5px'}>
                                     ورود به کانال تلگرام
                                 </Text>
-                                <IconBrandTelegram color='#24A1DE' size={'20px'} />
+                                <IconBrandTelegram className={bannerClasses.paperPlane} color='#24A1DE' size={'20px'} />
                             </Flex>
                         </button>
 
