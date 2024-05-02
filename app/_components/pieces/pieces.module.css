@@ -1,4 +1,5 @@
 .piecesSection {
+    margin-bottom: 60px;
     flex-wrap: nowrap;
     @mixin smaller-than $mantine-breakpoint-sm {
         flex-wrap: flex-wrap;

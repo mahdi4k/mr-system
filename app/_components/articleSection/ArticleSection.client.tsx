@@ -11,7 +11,7 @@ import { postsMO } from './ArticleSection'
 const ArticleSectionClient = ({ posts }: { posts: postsMO[] }) => {
     const [embla, setEmbla] = useState<Embla | null>(null);
 
- 
+
 
     useEffect(() => {
         if (embla) {
@@ -38,24 +38,23 @@ const ArticleSectionClient = ({ posts }: { posts: postsMO[] }) => {
                             مشاهده تمام مقالات
                         </Button>
                     </Flex>
-                    
+
                 </Grid.Col>
-                <Grid.Col span={{ base: 12, md: 7 }}>
+                <Grid.Col pb={'lg'} span={{ base: 12, md: 7 }}>
                     <div style={{ direction: 'rtl' }}>
                         <Carousel
+                            styles={{ indicators: { bottom: '-7px' }, viewport: { minHeight: '400px' }, indicator: { backgroundColor: 'var(--mantine-color-green-6)' } }}
                             align="start"
                             slideSize={{ base: '100%', sm: '50%' }}
                             slideGap={{ base: 0, sm: 'xl' }}
                             getEmblaApi={setEmbla}
                             height={375}
-                            withControls={false}>
+                            withControls={false} withIndicators>
                             {posts.map(post => (
                                 <Carousel.Slide key={post.id}>
                                     <ArticleCard post={post} />
                                 </Carousel.Slide>
                             ))}
-
-
                         </Carousel>
                     </div>
 

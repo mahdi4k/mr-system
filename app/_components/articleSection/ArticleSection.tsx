@@ -19,7 +19,7 @@ export type postsMO = {
 }
 
 async function getData() {
-    const res = await fetch('http://localhost/wordpress/wp-json/wp/v2/posts?_fields=id,content,slug,excerpt,date,title,_links,_embedded&_embed')
+    const res = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API}/posts?_fields=id,content,slug,excerpt,date,title,_links,_embedded&_embed`) 
     // The return value is *not* serialized
     // You can return Date, Map, Set, etc.
 
