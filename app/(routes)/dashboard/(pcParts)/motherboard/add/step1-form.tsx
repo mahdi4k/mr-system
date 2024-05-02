@@ -38,6 +38,9 @@ const Step1Form = (props: StepProps) => {
             cpu_socket: '',
             brand: '',
             size: '',
+            emalls:'',
+            torob:'',
+            price:'',
             manufacturer: '',
             total_slot_ram: 1,
             ddr3: false,
@@ -71,7 +74,27 @@ const Step1Form = (props: StepProps) => {
 
     const submitHandleForm = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault();
-        createMotherboard(form.values)
+        createMotherboard(
+            {
+                name: form.values.name,
+                cpu_socket: form.values.cpu_socket,
+                brand: form.values.brand,
+                size: form.values.size,
+                price: form.values.price,
+                manufacturer: form.values.manufacturer,
+                total_slot_ram: form.values.total_slot_ram,
+                ddr3: form.values.ddr3,
+                ddr4: form.values.ddr4,
+                ddr5: form.values.ddr5,
+                hdmi_support: form.values.hdmi_support,
+                sli_support: form.values.sli_support,
+                wifi_support: form.values.wifi_support,
+                rgb_support: form.values.rgb_support,
+                attributes: form.values.attributes,
+                links: JSON.stringify([form.values.torob,form.values.emalls])       
+
+            }
+        )
             .unwrap()
             .then((val) => {
                 dispatch(currentMotherboardOnSave({id: val.data.id, name: val.data.name}))
@@ -109,6 +132,14 @@ const Step1Form = (props: StepProps) => {
                     </Grid.Col>
                     <Grid.Col span={{base: 12, md: 6}}>
                         <TextInput
+                            label="قیمت"
+                            placeholder=""
+                            {...form.getInputProps('price')}
+                        />
+                    </Grid.Col>
+
+                    <Grid.Col span={{base: 12, md: 6}}>
+                        <TextInput
 
                             label="cpu socket"
                             placeholder="LGA 1700"
@@ -132,7 +163,20 @@ const Step1Form = (props: StepProps) => {
 
                         />
                     </Grid.Col>
-
+                    <Grid.Col span={{base: 12, md: 6}}>
+                        <TextInput
+                            label="لینک ترب"
+                            placeholder=""
+                            {...form.getInputProps('torob')}
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={{base: 12, md: 6}}>
+                        <TextInput
+                            label="لینک ایمالز"
+                            placeholder=""
+                            {...form.getInputProps('emalls')}
+                        />
+                    </Grid.Col>
                     <Grid.Col span={{base: 12}}>
                         <Radio.Group
                             name="favoriteFramework"

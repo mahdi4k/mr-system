@@ -34,6 +34,9 @@ const Step1Form = (props: StepProps) => {
             name: '',
             brand:'',
             manufacturer: '',
+            emalls: '',
+            torob: '',
+            price: '',
             powers: [],
             cpus:[],
             attributes: [],
@@ -52,7 +55,17 @@ const Step1Form = (props: StepProps) => {
 
     const submitHandleForm = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault();
-        createGraphic(form.values)
+        createGraphic({
+            name:form.values.name,
+            brand:form.values.brand,
+            manufacturer:form.values.manufacturer,
+            price:form.values.price,
+            powers:form.values.powers,
+            cpus:form.values.cpus,
+            psu:form.values.psu,
+            attributes:form.values.attributes,
+            links: JSON.stringify([form.values.torob, form.values.emalls])
+        })
             .unwrap()
             .then((val) => {
                 dispatch(currentGraphicOnSave({id: val.data.id, name: val.data.name}))
@@ -91,10 +104,18 @@ const Step1Form = (props: StepProps) => {
                         <Select
                             label="برند"
                             placeholder="Pick value"
-                            data={['asus', 'msi']}
+                            data={['asus', 'msi','xfx','Sapphire']}
                             {...form.getInputProps('brand')}
                         />
                     </Grid.Col>
+                    <Grid.Col span={{ base: 12, md: 6 }}>
+                        <TextInput
+                            label="قیمت"
+                            placeholder=""
+                            {...form.getInputProps('price')}
+                        />
+                    </Grid.Col>
+
                      <Grid.Col span={{base: 12, md: 6}}>
                         <MultiSelect
                             styles={{
@@ -106,6 +127,21 @@ const Step1Form = (props: StepProps) => {
                             data={data.map(el => ({value:`${el.id}`,label:el.name}))}
                         />
                     </Grid.Col>
+                    <Grid.Col span={{ base: 12, md: 6 }}>
+                        <TextInput
+                            label="لینک ترب"
+                            placeholder=""
+                            {...form.getInputProps('torob')}
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={{ base: 12, md: 6 }}>
+                        <TextInput
+                            label="لینک ایمالز"
+                            placeholder=""
+                            {...form.getInputProps('emalls')}
+                        />
+                    </Grid.Col>
+
                      <Grid.Col span={{base: 12, md: 6}}>
                         <MultiSelect
                             styles={{

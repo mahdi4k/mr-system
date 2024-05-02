@@ -33,6 +33,9 @@ const Step1Form = (props: StepProps) => {
             manufacturer: '',
             motherboards: [],
             integrated_graphic: '',
+            emalls:'',
+            torob:'',
+            price:'',
             attributes: []
         },
 
@@ -47,7 +50,16 @@ const Step1Form = (props: StepProps) => {
 
     const submitHandleForm = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault();
-        createCpu(form.values)
+        createCpu({
+            name: form.values.name,
+            cpu_socket: form.values.cpu_socket,
+            manufacturer: form.values.manufacturer,
+            motherboards: form.values.motherboards,
+            integrated_graphic: form.values.integrated_graphic,
+            price: form.values.price,
+            links: JSON.stringify([form.values.torob,form.values.emalls])       
+             
+        })
             .unwrap()
             .then((val) => {
                 dispatch(currentCpuOnSave({id: val.data.id, name: val.data.name}))
@@ -83,6 +95,13 @@ const Step1Form = (props: StepProps) => {
                         />
                     </Grid.Col>
                     <Grid.Col span={{base: 12, md: 6}}>
+                        <TextInput
+                            label="قیمت"
+                            placeholder=""
+                            {...form.getInputProps('price')}
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={{base: 12, md: 6}}>
                         <MultiSelect
                             styles={{
                                 pill: {direction: 'ltr'}
@@ -109,7 +128,7 @@ const Step1Form = (props: StepProps) => {
                         />
                     </Grid.Col>
 
-
+{/* 
                     <Grid.Col span={{base: 12, md: 6}}>
                         <MultiSelect
                             styles={{
@@ -118,6 +137,20 @@ const Step1Form = (props: StepProps) => {
                             label="نوع رم قابل پشتیبانی"
                             placeholder=""
                             data={['dd3', 'ddr4', 'ddr5']}
+                        />
+                    </Grid.Col> */}
+                    <Grid.Col span={{base: 12, md: 6}}>
+                        <TextInput
+                            label="لینک ترب"
+                            placeholder=""
+                            {...form.getInputProps('torob')}
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={{base: 12, md: 6}}>
+                        <TextInput
+                            label="لینک ایمالز"
+                            placeholder=""
+                            {...form.getInputProps('emalls')}
                         />
                     </Grid.Col>
                     <Grid.Col span={{base: 12, md: 6}}>

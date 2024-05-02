@@ -3,12 +3,8 @@
 import React from 'react';
 import {
     Button,
-    Checkbox,
-    Flex,
     Grid,
     Group,
-    MultiSelect,
-    Radio,
     Select,
     Stack,
     Text,
@@ -31,6 +27,9 @@ const Step1Form = (props: StepProps) => {
             name: '',
             psu: '',
             brand: '',
+            emalls: '',
+            torob: '',
+            price: '',
             modular: '',
             attributes: []
         },
@@ -45,7 +44,16 @@ const Step1Form = (props: StepProps) => {
 
     const submitHandleForm = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault();
-        createPower(form.values)
+        createPower({
+            name: form.values.name,
+            psu: form.values.psu,
+            brand: form.values.brand,
+            price: form.values.price,
+            modular: form.values.modular,
+            attributes:form.values.attributes,
+            links: JSON.stringify([form.values.torob, form.values.emalls])
+
+        })
             .unwrap()
             .then((val) => {
                 dispatch(currentPowerOnSave({ id: val.data.id, name: val.data.name }))
@@ -82,6 +90,14 @@ const Step1Form = (props: StepProps) => {
                     </Grid.Col>
                     <Grid.Col span={{ base: 12, md: 6 }}>
                         <TextInput
+                            label="قیمت"
+                            placeholder=""
+                            {...form.getInputProps('price')}
+                        />
+                    </Grid.Col>
+
+                    <Grid.Col span={{ base: 12, md: 6 }}>
+                        <TextInput
                             label="توان خروجی"
                             placeholder=" 600w"
                             {...form.getInputProps('psu')}
@@ -92,22 +108,34 @@ const Step1Form = (props: StepProps) => {
                             label="برند"
                             placeholder=""
                             {...form.getInputProps('brand')}
-                            data={['green']}
+                            data={['green','Cooler Master']}
                         />
                     </Grid.Col>
-                    <Grid.Col style={{ display: 'flex', alignItems: 'flex-end' }} mt={'sm'} span={{ base: 12, md: 6 }}>
-                        <Checkbox
-                            label="ماژولار"
-                            tabIndex={-1}
-                            styles={{ input: { cursor: 'pointer' } }}
-                            {...form.getInputProps('modular')}
-                        />
+                    <Grid.Col style={{ display: 'flex', alignItems: 'flex-end' }} span={{ base: 12, md: 6 }}>
+                       
                         <Select
+                            w={'100%'}
+                            {...form.getInputProps('modular')}
+                            label="ماژولار"
                             data={[
                                 { value: '1', label: 'غیر ماژولار' },
                                 { value: '2', label: 'نیمه ماژولار' },
                                 { value: '3', label: 'کاملار ماژولار' },
                             ]}
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={{ base: 12, md: 6 }}>
+                        <TextInput
+                            label="لینک ترب"
+                            placeholder=""
+                            {...form.getInputProps('torob')}
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={{ base: 12, md: 6 }}>
+                        <TextInput
+                            label="لینک ایمالز"
+                            placeholder=""
+                            {...form.getInputProps('emalls')}
                         />
                     </Grid.Col>
                 </Grid>

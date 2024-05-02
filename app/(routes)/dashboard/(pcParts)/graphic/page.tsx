@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import ClientCpu from "./clientGraphic";
 
 export const metadata: Metadata = {
-    title: 'لیست CPU',
+    title: 'لیست کارت گرافیک',
     description: '',
 }
 
