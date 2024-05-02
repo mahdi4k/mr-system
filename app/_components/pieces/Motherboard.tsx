@@ -62,6 +62,11 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
         setSelectedMotherboard(MotherboardListFromSelectedCpu.length ? MotherboardListFromSelectedCpu : data);
     }, [MotherboardListFromSelectedCpu, isSuccess])
 
+    useEffect(() => {
+        dispatch(addselectedMotherboard({}))
+        dispatch(relatedCpuList([]))
+    }, [])
+
     return (
         <>
 

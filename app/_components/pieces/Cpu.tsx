@@ -78,6 +78,13 @@ const Cpu: FC<IcpuProps> = ({ setActiveCpu, activeCpu }) => {
     useEffect(() => {
         setSelectedCpu(cpuListFromSelectedGraphic.length ? cpuListFromSelectedGraphic : data);
     }, [cpuListFromSelectedGraphic, isSuccess])
+
+    useEffect(() => {
+        dispatch(addselectedCpu({}))
+        dispatch(relatedGraphicList([]))
+        dispatch(relatedMotherboardList([]))
+    }, [])
+
     return (
         <>
             <div onClick={open} className={`${classes.pieces} ${cardClasses.cardMain}`}>
