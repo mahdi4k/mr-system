@@ -17,10 +17,15 @@ const CpuCategory = () => {
     const { isSuccess, data = [], error, isLoading } = useGetCpusQuery({ manufacturer: value })
     const [opened, { open, close }] = useDisclosure(false);
     const [modalData, setModalData] = useState<Graphic[] | Motherboard[]>()
+    const [modalTitle, setModalTitle] = useState<string>('')
+    const [modalType, setModalType] = useState<'motherboards' | 'graphics'>()
 
-    const openModal = (data: Graphic[] | Motherboard[]) => {
+    const openModal = (data: Graphic[] | Motherboard[], name: string, type: 'motherboards' | 'graphics') => {
         open()
         setModalData(data);
+        setModalTitle(name);
+        setModalType(type)
+
     }
 
 
@@ -63,10 +68,10 @@ const CpuCategory = () => {
                                 <Divider color='#d2d2d269' mb={'4px'} />
                                 <Group align='center' justify='center'>
                                     <Tooltip styles={{ tooltip: { fontSize: '12px' } }} position="bottom" label='کارت گرافیک‌های مطابق'>
-                                        <Avatar onClick={() => openModal(data.graphics)} style={{ cursor: 'pointer' }}><Image alt='graphic card' width={20} height={20} src={'/svg/graphic.svg'} /></Avatar>
+                                        <Avatar onClick={() => openModal(data.graphics, data.name, 'graphics')} style={{ cursor: 'pointer' }}><Image alt='graphic card' width={20} height={20} src={'/svg/graphic.svg'} /></Avatar>
                                     </Tooltip>
                                     <Tooltip styles={{ tooltip: { fontSize: '12px' } }} position="bottom" label='مادربردهای مطابق'>
-                                        <Avatar onClick={() => openModal(data.motherboards)} style={{ cursor: 'pointer' }}><Image alt='motherboard' width={20} height={20} src={'/svg/motherboard.svg'} /></Avatar>
+                                        <Avatar onClick={() => openModal(data.motherboards, data.name, 'motherboards')} style={{ cursor: 'pointer' }}><Image alt='motherboard' width={20} height={20} src={'/svg/motherboard.svg'} /></Avatar>
                                     </Tooltip>
                                 </Group>
                             </Box>
@@ -75,8 +80,8 @@ const CpuCategory = () => {
                 ))}
             </Grid>
 
-            <Modal opened={opened} size={'xl'} onClose={close} title=" ">
-                <ModalItems items={modalData} />
+            <Modal opened={opened} size={'xl'} onClose={close} title={` لیست ${modalType === 'graphics' ? 'کارت گرافیک‌' : ' مادربرد'}های مطابق با ${modalTitle}`}>
+                <ModalItems type={modalType} items={modalData} />
             </Modal>
         </>
     )

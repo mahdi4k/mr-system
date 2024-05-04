@@ -18,10 +18,15 @@ const GraphicCardCategory = () => {
   const { isSuccess, data = [], error, isLoading } = useGetGraphicsQuery({ manufacturer: value })
   const [opened, { open, close }] = useDisclosure(false);
   const [modalData, setModalData] = useState<CPU[] | POWER[]>()
+  const [modalTitle, setModalTitle] = useState<string>('')
+  const [modalType, setModalType] = useState<'cpus'|'powers'>()
 
-  const openModal = (data: CPU[] | POWER[]) => {
+  const openModal = (data: CPU[] | POWER[], name: string, type: 'cpus'|'powers') => {
     open()
     setModalData(data);
+    setModalTitle(name)
+    setModalType(type)
+
   }
 
   return (
@@ -64,10 +69,10 @@ const GraphicCardCategory = () => {
                 <Divider color='#d2d2d269' mb={'4px'} />
                 <Group align='center' justify='center'>
                   <Tooltip styles={{ tooltip: { fontSize: '12px' } }} position="bottom" label='cpu مطابق'>
-                    <Avatar onClick={(e) => { e.stopPropagation(); openModal(data.cpus); }} style={{ cursor: 'pointer' }}><Image alt='graphic card' width={20} height={20} src={'/svg/cpu.svg'} /></Avatar>
+                    <Avatar onClick={(e) => { e.stopPropagation(); openModal(data.cpus, data.name, 'cpus'); }} style={{ cursor: 'pointer' }}><Image alt='graphic card' width={20} height={20} src={'/svg/cpu.svg'} /></Avatar>
                   </Tooltip>
                   <Tooltip styles={{ tooltip: { fontSize: '12px' } }} position="bottom" label='پاورهای مطابق'>
-                    <Avatar onClick={() => openModal(data.powers)} style={{ cursor: 'pointer' }}><Image alt='graphic card' width={20} height={25} src={'/svg/power.svg'} /></Avatar>
+                    <Avatar onClick={() => openModal(data.powers, data.name, 'powers')} style={{ cursor: 'pointer' }}><Image alt='graphic card' width={20} height={25} src={'/svg/power.svg'} /></Avatar>
                   </Tooltip>
                 </Group>
               </Box>
@@ -78,8 +83,8 @@ const GraphicCardCategory = () => {
         ))}
       </Grid >
 
-      <Modal opened={opened} size={'1300px'} onClose={close} title=" ">
-        <ModalItems items={modalData} />
+      <Modal opened={opened} size={'1300px'} onClose={close} title={` لیست ${modalType === 'powers' ? 'پاور' : ' cpu'}های مطابق با ${modalTitle}`}>
+        <ModalItems type={modalType} items={modalData} />
       </Modal>
     </>
   )

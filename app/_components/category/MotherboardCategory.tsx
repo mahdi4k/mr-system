@@ -17,9 +17,13 @@ const MotherboardCategory = () => {
   const { isSuccess, data = [], error, isLoading } = useGetMotherboardsQuery({ manufacturer: value })
   const [opened, { open, close }] = useDisclosure(false);
   const [modalData, setModalData] = useState<CPU[]>()
+  const [modalTitle, setModalTitle] = useState<string>('')
+  const [modalType, setModalType] = useState<'motherboards'>()
 
-  const openModal = (data: CPU[]) => {
+  const openModal = (data: CPU[], name: string, type: 'motherboards') => {
     open()
+    setModalTitle(name)
+    setModalType(type)
     setModalData(data);
   }
 
@@ -63,7 +67,7 @@ const MotherboardCategory = () => {
 
                 <Group align='center' justify='center'>
                   <Tooltip styles={{ tooltip: { fontSize: '12px' } }} position="bottom" label='cpu های مطابق'>
-                    <Avatar onClick={() => openModal(data.cpus)} style={{ cursor: 'pointer' }}><Image alt='graphic card' width={20} height={20} src={'/svg/cpu.svg'} /></Avatar>
+                    <Avatar onClick={() => openModal(data.cpus, data.name, 'motherboards')} style={{ cursor: 'pointer' }}><Image alt='graphic card' width={20} height={20} src={'/svg/cpu.svg'} /></Avatar>
                   </Tooltip>
                 </Group>
               </Box>
@@ -73,8 +77,8 @@ const MotherboardCategory = () => {
         ))}
       </Grid>
 
-      <Modal opened={opened} size={'1300px'} onClose={close} title=" ">
-        <ModalItems items={modalData} />
+      <Modal opened={opened} size={'1300px'} onClose={close} title={`لیست cpu های مطابق با ${modalTitle}`}>
+        <ModalItems type={modalType} items={modalData} />
       </Modal>
     </>
   )

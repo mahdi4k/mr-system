@@ -18,10 +18,16 @@ const PowerCategory = () => {
   const { isSuccess, data = [], error, isLoading } = useGetPowersQuery({ modular: value })
   const [opened, { open, close }] = useDisclosure(false);
   const [modalData, setModalData] = useState<Graphic[]>()
+  const [modalTitle, setModalTitle] = useState<string>('')
+  const [modalType, setModalType] = useState<'graphics'>()
 
-  const openModal = (data: Graphic[]) => {
+
+  const openModal = (data: Graphic[], name: string, type: 'graphics') => {
     open()
     setModalData(data);
+    setModalTitle(name)
+    setModalType(type)
+
   }
 
   return (
@@ -62,7 +68,7 @@ const PowerCategory = () => {
 
                 <Group align='center' justify='center'>
                   <Tooltip styles={{ tooltip: { fontSize: '12px' } }} position="bottom" label='کارت گرافیک‌های مطابق'>
-                    <Avatar onClick={() => openModal(data.graphics)} style={{ cursor: 'pointer' }}><Image alt='graphic card' width={20} height={20} src={'/svg/graphic.svg'} /></Avatar>
+                    <Avatar onClick={() => openModal(data.graphics, data.name, 'graphics')} style={{ cursor: 'pointer' }}><Image alt='graphic card' width={20} height={20} src={'/svg/graphic.svg'} /></Avatar>
                   </Tooltip>
                 </Group>
               </Box>
@@ -72,8 +78,8 @@ const PowerCategory = () => {
         ))}
       </Grid>
 
-      <Modal opened={opened} size={'1300px'} onClose={close} title=" ">
-        <ModalItems items={modalData} />
+      <Modal opened={opened} size={'1300px'} onClose={close} title={`لیست کارت گرافیک‌های مطابق با ${modalTitle}`}>
+        <ModalItems type={modalType} items={modalData} />
       </Modal>
     </>
   )

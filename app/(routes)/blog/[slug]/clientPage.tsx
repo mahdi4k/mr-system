@@ -19,13 +19,13 @@ const ClientPage = ({ post }: { post: postsMO[] }) => {
         <Container mb={'50px'} styles={{ root: { flex: '1 0 auto', width: '100%' } }} size={'md'}>
             <Title mt={'60px'} fz={'h2'}>{post[0].title.rendered}</Title>
             {jalaliDate}
-            <Image my={'30px'}
+            <Image mah={500} my={'30px'}
                 src={post[0]?._embedded['wp:featuredmedia'][0].link}
-                alt="Top 50 underrated plants for house decoration"
+                alt={post[0].slug}
 
             />
-            <div dangerouslySetInnerHTML={{ __html: post[0].content.rendered }} />
-            <Divider mt={'50px'} size={'md'} label={<Text fz={'lg'}>نظرات</Text>} />
+            <div className='contentPost' dangerouslySetInnerHTML={{ __html: post[0].content.rendered }} />
+            <Divider mt={'50px'} mb={'xl'} size={'md'} label={<Text fz={'lg'}>نظرات</Text>} />
 
             <CommentPost postID={post[0].id} />
             <CommentList postID={post[0].id} />

@@ -14,6 +14,7 @@ import classes from './Article.module.css';
 import { postsMO } from './ArticleSection';
 import Link from 'next/link';
 import { Notification } from '@mantine/core';
+import { usePathname } from 'next/navigation'
 
 export function ArticleCard({ post }: { post: postsMO }) {
     const theme = useMantineTheme();
@@ -21,7 +22,9 @@ export function ArticleCard({ post }: { post: postsMO }) {
     const gregorianDate = new Date(post.date);
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
     const jalaliDate = gregorianDate.toLocaleDateString('fa-IR', options);
-
+    const pathname = usePathname()
+    console.log(pathname,'{pathname}');
+    
 
     return (
 
