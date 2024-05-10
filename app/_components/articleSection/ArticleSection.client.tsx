@@ -7,6 +7,7 @@ import SVG from "react-inlinesvg"
 import { ArticleCard } from './ArticleCard'
 import classess from './Article.module.css'
 import { postsMO } from './ArticleSection'
+import Link from 'next/link'
 
 const ArticleSectionClient = ({ posts }: { posts: postsMO[] }) => {
     const [embla, setEmbla] = useState<Embla | null>(null);
@@ -33,10 +34,13 @@ const ArticleSectionClient = ({ posts }: { posts: postsMO[] }) => {
                         src='/svg/article.svg' />
 
                     <Flex align={'center'} justify={'center'} mt={'sm'}>
-                        <Button variant='gradient'
-                            gradient={{ from: ' rgb(14,163,93)', to: ' rgb(12,119,115)', deg: 90 }}>
-                            مشاهده تمام مقالات
-                        </Button>
+                        <Link href={'/blog/category'}>
+
+                            <Button variant='gradient'
+                                gradient={{ from: ' rgb(14,163,93)', to: ' rgb(12,119,115)', deg: 90 }}>
+                                مشاهده تمام مقالات
+                            </Button>
+                        </Link>
                     </Flex>
 
                 </Grid.Col>

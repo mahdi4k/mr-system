@@ -33,7 +33,7 @@ export function ArticleCard({ post }: { post: postsMO }) {
                 <Card.Section mb="sm">
                     <Image
                         src={post?._embedded['wp:featuredmedia'][0].link}
-                        alt="Top 50 underrated plants for house decoration"
+                        alt={post.slug}
                         height={180}
                     />
                 </Card.Section>
@@ -62,7 +62,6 @@ export function ArticleCard({ post }: { post: postsMO }) {
                                         </Notification>
                                     </Affix> : ''}
                             </>
-
                         )}
                     </CopyButton>
 
