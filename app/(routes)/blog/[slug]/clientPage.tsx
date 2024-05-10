@@ -18,7 +18,9 @@ const ClientPage = ({ post }: { post: postsMO[] }) => {
 
         <Container mb={'50px'} styles={{ root: { flex: '1 0 auto', width: '100%' } }} size={'md'}>
             <Title mt={'60px'} fz={'h2'}>{post[0].title.rendered}</Title>
-            {jalaliDate}
+            <Text className={'Date'} size="xs" c="dimmed">
+                {jalaliDate}
+            </Text>
             <Image mah={500} my={'30px'}
                 src={post[0]?._embedded['wp:featuredmedia'][0].link}
                 alt={post[0].slug}
