@@ -6,9 +6,10 @@ import { IconSun, IconMoon, IconChevronDown, IconChartPie3 } from '@tabler/icons
 import Link from "next/link";
 import UseLoading from "@/_utils/customHook/useLoading";
 import Image from 'next/image'
+import DrawerHeader from './Drawer';
 
 export function Header() {
-    const [opened, { toggle }] = useDisclosure(false);
+    const [opened, { open, close }] = useDisclosure(false);
     const { setColorScheme, colorScheme } = useMantineColorScheme();
     const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
     const isLoading = UseLoading();
@@ -33,7 +34,7 @@ export function Header() {
                                         </Box>
                                         <IconChevronDown
                                             style={{ width: rem(16), height: rem(16) }}
-                                            
+
                                         />
                                     </Center>
                                 </a>
@@ -117,7 +118,7 @@ export function Header() {
                 </Flex>
 
 
-                <Group gap={5} visibleFrom="xs">
+                <Group gap={5} >
                     <Group justify="center">
                         {isLoading ? (<ActionIcon
                             onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
@@ -129,9 +130,10 @@ export function Header() {
                             {computedColorScheme === 'light' ? <IconMoon /> : <IconSun />}
                         </ActionIcon>) : ''}
                     </Group>
+                    <Burger opened={opened} onClick={open} hiddenFrom="xs" size="sm" />
                 </Group>
-                <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" />
             </Container>
+            <DrawerHeader opened={opened} close={close} />
         </header>
     );
 }
