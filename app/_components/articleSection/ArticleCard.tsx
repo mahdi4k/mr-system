@@ -45,7 +45,7 @@ export function ArticleCard({ post }: { post: postsMO }) {
             </Link >
             <Card.Section className={classes.footer}>
                 <Group align='center' justify='space-between' gap={0}>
-                    <CopyButton value={`${window.origin}/blog/${post.slug}`}>
+                    <CopyButton value={`https://kiwipart.ir/blog/${post.slug}`}>
                         {({ copied, copy }) => (
                             <>
                                 <ActionIcon loading={copied} onClick={copy} variant="subtle" color="gray">

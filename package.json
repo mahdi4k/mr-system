@@ -17,6 +17,7 @@
     "storybook:build": "storybook build"
   },
   "dependencies": {
+    "@ducanh2912/next-pwa": "^10.2.7",
     "@mantine/carousel": "^7.6.1",
     "@mantine/core": "7.3.0",
     "@mantine/dropzone": "^7.3.0",

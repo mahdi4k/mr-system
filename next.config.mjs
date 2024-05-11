@@ -1,10 +1,30 @@
 import bundleAnalyzer from '@next/bundle-analyzer';
+import withPWAInit from "@ducanh2912/next-pwa";
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
 
-export default withBundleAnalyzer({
+const withPWA = withPWAInit({
+  cacheOnFrontEndNav: true,
+  aggressiveFrontEndNavCaching: true,
+  reloadOnOnline: true,
+  swcMinify: true,
+  dest: "public",
+  fallbacks: {
+    //image: "/static/images/fallback.png",
+    document: "/offline", // if you want to fallback to a custom page rather than /_offline
+    // font: '/static/font/fallback.woff2',
+    // audio: ...,
+    // video: ...,
+  },
+  workboxOptions: {
+    disableDevLogs: true,
+  },
+});
+
+// Compose the configurations
+export default withPWA(withBundleAnalyzer({
   reactStrictMode: false,
   experimental: {
     optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
@@ -13,9 +33,11 @@ export default withBundleAnalyzer({
   images: {
     remotePatterns: [ 
       {
-      protocol: 'http',
-      hostname: '127.0.0.1',
-      pathname: '**',
-    } ],
+        protocol: 'http',
+        hostname: '127.0.0.1',
+        pathname: '**',
+      },
+    ],
   },
-});
+  // Add any additional Next.js config options here
+}));
