@@ -17,19 +17,19 @@ export const viewport: Viewport = {
 export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL("https://kiwipart.ir"),
-    title: "کیوی پارت | مادربرد | cpu | کارت گرافیک | پاور",
+    title: "کیوی پارت | انتخاب هوشمند",
     manifest: "/manifest.json",
     description: "انتخاب هوشمند قطعات کامبپوتر - کمترین قیمت موجود در بازار - کارت گرافیک - پاور - مادربرد - cpu",
     authors: [
       {
-        name: "Site Name",
+        name: "kiwipart",
         url: "https://kiwipart.ir",
       },
     ],
     twitter: {
       card: "summary_large_image",
-      creator: "@example",
-      images: "some-image",
+      creator: "kiwipart",
+      images: "https://kiwipart.ir/kiwipart.png",
     },
     robots: "index, follow",
     alternates: {
