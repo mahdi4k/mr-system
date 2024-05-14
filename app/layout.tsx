@@ -6,16 +6,17 @@ import { Vazirmatn } from 'next/font/google'
 import './global.css'
 import '@mantine/notifications/styles.css';
 import '@mantine/carousel/styles.css';
-import {ReduxProviders} from "@/_redux/provider";
-import {Header} from "@/_components/Header/Header";
-import {Footer} from "@/_components/Footer/Footer";
+import { ReduxProviders } from "@/_redux/provider";
+import { Header } from "@/_components/Header/Header";
+import { Footer } from "@/_components/Footer/Footer";
 import Providers from "./(routes)/dashboard/Provider";
 
 const vazirmatn = Vazirmatn({
-  weight: ['100', '200', '300', '400', '500', '600', '700' ],
+  weight: ['100', '200', '300', '400', '500', '600', '700'],
   subsets: ['arabic'],
   variable: '--font-vazirmatn',
   display: 'swap',
+  adjustFontFallback: false
 })
 
 export const metadata = {
@@ -38,11 +39,11 @@ export default function RootLayout({ children }: { children: any }) {
         <DirectionProvider>
           <MantineProvider theme={theme}>
             <ReduxProviders>
-            <Providers>
-              <Header />
+              <Providers>
+                <Header />
                 {children}
-              <Footer/>
-            </Providers>
+                <Footer />
+              </Providers>
             </ReduxProviders>
           </MantineProvider>
         </DirectionProvider>
