@@ -34,7 +34,6 @@ const CommentPost = ({ postID }: { postID: string }) => {
                 content: form.values.text
             })
         });
-        console.log(response.status);
 
         if (response.status === 201) {
             notifications.show({
@@ -56,7 +55,6 @@ const CommentPost = ({ postID }: { postID: string }) => {
         }
 
         const result = await response.json();
-        console.log(result);
         setLoading(false)
 
     };

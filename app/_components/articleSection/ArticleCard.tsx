@@ -22,9 +22,7 @@ export function ArticleCard({ post }: { post: postsMO }) {
     const gregorianDate = new Date(post.date);
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
     const jalaliDate = gregorianDate.toLocaleDateString('fa-IR', options);
-    const pathname = usePathname()
-    console.log(pathname,'{pathname}');
-    
+    const pathname = usePathname()    
 
     return (
 

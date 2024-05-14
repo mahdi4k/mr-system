@@ -7,7 +7,6 @@ import Link from 'next/link';
 import CardPartPrice from '../shared/CardPartPrice';
 
 const GraphicCardSingle = ({ product }: { product: Graphic }) => {
-    console.log(product, 'product');
 
     return (
         <Container styles={{ root: { flex: '1 0 auto', width: '100%' } }} size={'lg'}>
