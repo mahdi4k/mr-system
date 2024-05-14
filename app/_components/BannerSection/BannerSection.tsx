@@ -3,6 +3,7 @@ import { IconBrandTelegram } from '@tabler/icons-react'
 import React from 'react'
 import bannerClasses from "./banner.module.css"
 import SVG from "react-inlinesvg"
+import Link from 'next/link'
 
 const BannerSection = () => {
     return (
@@ -21,9 +22,11 @@ const BannerSection = () => {
 
                         <button className={bannerClasses.bannerBtn}>
                             <Flex align={'center'} justify={'center'}>
-                                <Text ml={'5px'}>
-                                    ورود به کانال تلگرام
-                                </Text>
+                                <Link target='_blank' href={'https://t.me/kiwi_part'}>
+                                    <Text ml={'5px'}>
+                                        ورود به کانال تلگرام
+                                    </Text>
+                                </Link>
                                 <IconBrandTelegram className={bannerClasses.paperPlane} color='#24A1DE' size={'20px'} />
                             </Flex>
                         </button>
