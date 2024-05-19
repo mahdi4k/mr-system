@@ -11,13 +11,13 @@ const ListItem = () => {
             spacing="sm"
             size="sm"
             icon={
-                <ThemeIcon             color='#A08556'
+                <ThemeIcon color='#A08556'
                 size={20} radius="xl">
                     <IconCheck />
                 </ThemeIcon>
             }
         >
-            <List.Item>
+            <List.Item style={{lineHeight:'25px'}}>
                  میتونی قبل از خرید قطعات خیالت بابت گلوگاه و یا این که بهترین قطعات براساس بودجه‌‌ات انتخاب کردی , راحت کنی  
             </List.Item>
             <List.Item>
