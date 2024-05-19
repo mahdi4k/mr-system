@@ -10,9 +10,11 @@ const CpuGraphic = () => {
     return (
         <Container my={'xl'} size="lg">
             <Flex className={classes.wrapper}>
-                <Image width={500}
-                        height={500} alt="graphic card vs cpu"
-                        src={'/svg/cpu-graphic.svg'} className={classes.image}/>
+                <Link href={'/pieces/graphic/cpu'}>
+                    <Image width={500}
+                            height={500} alt="graphic card vs cpu"
+                            src={'/svg/cpu-graphic.svg'} className={classes.image}/>
+                </Link>
                 <div className={classes.bodyRight}>
                     <Group mb={'md'} align={'center'}>
                         <Title fs={'italic'} className={classes.title}>CPU</Title>

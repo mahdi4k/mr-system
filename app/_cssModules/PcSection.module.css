@@ -12,10 +12,15 @@
 }
 
 .image {
-    max-width: 50%;
     height: 100%;
-    width: 100%;
+    width: 500px;
     border-radius: 30px;
+    transform: translateY(0px);
+    transition: all .3s;
+
+    &:hover{
+        transform: translateY(-10px);
+    }
 
 @media (max-width: $mantine-breakpoint-sm) {
     max-width: 100%;

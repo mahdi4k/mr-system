@@ -30,10 +30,11 @@ const CpuMotherboard = () => {
                         </Link>
                     </div>
                 </div>
+                <Link href={'/pieces/motherboard/cpu'}>
                 <Image width={500}
                        height={500} alt="graphic card vs cpu"
                        src={'/svg/cpu-motherboard.svg'} className={classes.image}/>
-
+                </Link>
             </Flex>
         </Container>
     );
