@@ -16,8 +16,9 @@ const ModalItems: FC<Iprops> = ({ items, type }) => {
     return (
         <Grid my={'xl'} >
             {items && items.map((item) => (
-                <Link href={`/products/${type}/${item.id}`}>
-                    <Grid.Col key={item.id} span={{ base: 12, md: 6, lg: 3 }}>
+                <Grid.Col key={item.id} span={{ base: 12, md: 6, lg: 3 }}>
+                    <Link href={`/products/${type}/${item.id}`}>
+
                         <Card miw={'250px'} key={item.id} shadow="sm" padding="lg" radius="md" withBorder>
                             <Card.Section mt={'1px'} ta={'center'}>
                                 {item.image && <Image alt={item.name} width={180} height={170} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${item.image}`} />}
@@ -29,8 +30,9 @@ const ModalItems: FC<Iprops> = ({ items, type }) => {
                             <CardPartPrice price={item.price} />
 
                         </Card>
-                    </Grid.Col>
-                </Link>
+                    </Link>
+
+                </Grid.Col>
             ))}
         </Grid>
     )

@@ -77,7 +77,7 @@ const MotherboardCategory = () => {
         ))}
       </Grid>
 
-      <Modal opened={opened} size={'1300px'} onClose={close} title={`لیست cpu های مطابق با ${modalTitle}`}>
+      <Modal opened={opened} size={'1300px'} styles={{title:{marginTop:'10px',lineHeight:'28px',marginLeft:'20px'},header:{alignItems:'baseline'},close:{position:'relative',top:'-10px'}}} onClose={close} title={`لیست cpu های مطابق با ${modalTitle}`}>
         <ModalItems type={modalType} items={modalData} />
       </Modal>
     </>

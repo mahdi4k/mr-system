@@ -80,7 +80,7 @@ const CpuCategory = () => {
                 ))}
             </Grid>
 
-            <Modal opened={opened} size={'xl'} onClose={close} title={` لیست ${modalType === 'graphics' ? 'کارت گرافیک‌' : ' مادربرد'}های مطابق با ${modalTitle}`}>
+            <Modal opened={opened} size={'xl'} onClose={close} styles={{title:{marginTop:'10px',lineHeight:'28px',marginLeft:'20px'},header:{alignItems:'baseline'},close:{position:'relative',top:'-10px'}}} title={` لیست ${modalType === 'graphics' ? 'کارت گرافیک‌' : ' مادربرد'}های مطابق با ${modalTitle}`}>
                 <ModalItems type={modalType} items={modalData} />
             </Modal>
         </>
