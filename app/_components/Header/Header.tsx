@@ -94,23 +94,14 @@ export function Header() {
                                     <UnstyledButton p={'lg'} className={classes.subLink} >
                                         <Group wrap="nowrap" align="center">
                                             <ThemeIcon size={34} variant="default" radius="md">
-                                                <IconChartPie3 style={{ width: rem(22), height: rem(22) }} color={'blue'} />
+                                                <Image width={25} height={25} src={'/svg/case.svg'} alt={'cpu'} />
                                             </ThemeIcon>
                                             <Text size="sm" fw={500}>
                                                 قاب کیس
                                             </Text>
                                         </Group>
                                     </UnstyledButton>
-                                    <UnstyledButton p={'lg'} className={classes.subLink} >
-                                        <Group wrap="nowrap" align="center">
-                                            <ThemeIcon size={34} variant="default" radius="md">
-                                                <IconChartPie3 style={{ width: rem(22), height: rem(22) }} color={'blue'} />
-                                            </ThemeIcon>
-                                            <Text size="sm" fw={500}>
-                                                رم
-                                            </Text>
-                                        </Group>
-                                    </UnstyledButton>
+                                     
                                 </SimpleGrid>
                             </HoverCard.Dropdown>
                         </HoverCard>

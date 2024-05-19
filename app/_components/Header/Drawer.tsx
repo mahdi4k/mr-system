@@ -11,8 +11,8 @@ type Props = {
 const DrawerHeader: FC<Props> = ({ opened, close }) => {
   return (
     <div>
-      <Drawer position="left" size={'xs'} opened={opened} onClose={close} title="">
-        <Text mb={'lg'} fw={'bold'}>قطعات کامپیوتر</Text>
+      <Drawer withCloseButton={false} position="left" size={'xs'} opened={opened} onClose={close} title="">
+        <Text mt={'lg'} mb={'lg'} fz={'xl'} fw={'bold'}>قطعات کامپیوتر</Text>
         <List
           spacing="md"
           size="sm"
@@ -21,49 +21,53 @@ const DrawerHeader: FC<Props> = ({ opened, close }) => {
           icon={''}
         >
           <List.Item
+            mb={'xl'}
+            mt={'xl'}
             onClick={() => close()}
             icon={
               <Link style={{ marginBottom: '10px' }} href='/category/motherboard'>
                 <ThemeIcon variant='transparent' size={24} radius="xl">
-                  <Image width={20} height={20} src={'/svg/motherboard.svg'} alt={'motherboard'} />
+                  <Image width={25} height={25} src={'/svg/motherboard.svg'} alt={'motherboard'} />
                 </ThemeIcon>
               </Link>
             }
           >
             <Link style={{ marginBottom: '10px' }} href='/category/motherboard'>
-              مادربرد
+              <Text fz={'lg'}> مادربرد</Text>
             </Link>
           </List.Item>
 
           <List.Item
+            mb={'xl'}
             onClick={() => close()}
             icon={
               <Link href='/category/cpu'>
 
                 <ThemeIcon variant='transparent' size={24} radius="xl">
-                  <Image width={20} height={20} src={'/svg/cpu.svg'} alt={'cpu'} />
+                  <Image width={25} height={25} src={'/svg/cpu.svg'} alt={'cpu'} />
                 </ThemeIcon>
               </Link>
             }
           >
             <Link href='/category/cpu'>
-              cpu
+              <Text fz={'lg'}> cpu</Text>
             </Link>
           </List.Item>
 
 
           <List.Item
+            mb={'xl'}
             onClick={() => close()}
             icon={
               <Link href='/category/graphic'>
                 <ThemeIcon variant='transparent' size={24} radius="xl">
-                  <Image width={20} height={20} src={'/svg/graphic.svg'} alt={'graphic'} />
+                  <Image width={25} height={25} src={'/svg/graphic.svg'} alt={'graphic'} />
                 </ThemeIcon>
               </Link>
             }
           >
             <Link href='/category/graphic'>
-              کارت گرافیک
+              <Text fz={'lg'}> کارت گرافیک</Text>
             </Link>
 
           </List.Item>
@@ -73,13 +77,13 @@ const DrawerHeader: FC<Props> = ({ opened, close }) => {
             icon={
               <Link href='/category/power'>
                 <ThemeIcon variant='transparent' size={24} radius="xl">
-                  <Image width={20} height={20} src={'/svg/power.svg'} alt={'power'} />
+                  <Image width={25} height={30} src={'/svg/power.svg'} alt={'power'} />
                 </ThemeIcon>
               </Link>
             }
           >
             <Link href='/category/power'>
-              پاور
+              <Text fz={'lg'}> پاور</Text>
             </Link>
 
           </List.Item>
