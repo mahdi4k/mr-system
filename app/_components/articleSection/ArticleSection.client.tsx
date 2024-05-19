@@ -50,7 +50,7 @@ const ArticleSectionClient = ({ posts }: { posts: postsMO[] }) => {
                             styles={{ indicators: { bottom: '-7px' }, viewport: { minHeight: '400px' }, indicator: { backgroundColor: 'var(--mantine-color-green-6)' } }}
                             align="start"
                             slideSize={{ base: '100%', sm: '50%' }}
-                            slideGap={{ base: 0, sm: 'xl' }}
+                            slideGap={{ base: 'sm', sm: 'xl' }}
                             getEmblaApi={setEmbla}
                             height={375}
                             withControls={false} withIndicators>
