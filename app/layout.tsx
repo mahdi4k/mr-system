@@ -10,6 +10,7 @@ import { ReduxProviders } from "@/_redux/provider";
 import { Header } from "@/_components/Header/Header";
 import { Footer } from "@/_components/Footer/Footer";
 import Providers from "./(routes)/dashboard/Provider";
+import NextTopLoader from "nextjs-toploader";
 
 const vazirmatn = Vazirmatn({
   weight: ['100', '200', '300', '400', '500', '600', '700'],
@@ -36,6 +37,8 @@ export default function RootLayout({ children }: { children: any }) {
         />
       </head>
       <body>
+      <NextTopLoader color="#87A10C" />
+
         <DirectionProvider>
           <MantineProvider theme={theme}>
             <ReduxProviders>
