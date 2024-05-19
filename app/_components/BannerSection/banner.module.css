@@ -34,7 +34,7 @@
 
 .title {
     color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-    line-height: 1;
+    line-height: 48px;
     margin-bottom: var(--mantine-spacing-md);
 }
 

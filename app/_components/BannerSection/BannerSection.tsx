@@ -19,17 +19,18 @@ const BannerSection = () => {
                     </Text>
 
                     <div className={bannerClasses.controls}>
+                        <Link target='_blank' href={'https://t.me/kiwi_part'}>
+                            <button className={bannerClasses.bannerBtn}>
+                                <Flex align={'center'} justify={'center'}>
 
-                        <button className={bannerClasses.bannerBtn}>
-                            <Flex align={'center'} justify={'center'}>
-                                <Link target='_blank' href={'https://t.me/kiwi_part'}>
                                     <Text ml={'5px'}>
                                         ورود به کانال تلگرام
                                     </Text>
-                                </Link>
-                                <IconBrandTelegram className={bannerClasses.paperPlane} color='#24A1DE' size={'20px'} />
-                            </Flex>
-                        </button>
+                                    <IconBrandTelegram className={bannerClasses.paperPlane} color='#24A1DE' size={'20px'} />
+                                </Flex>
+                            </button>
+                        </Link>
+
 
                     </div>
                 </div>
