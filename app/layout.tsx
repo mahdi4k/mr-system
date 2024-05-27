@@ -11,6 +11,7 @@ import { Header } from "@/_components/Header/Header";
 import { Footer } from "@/_components/Footer/Footer";
 import Providers from "./(routes)/dashboard/Provider";
 import NextTopLoader from "nextjs-toploader";
+import { GoogleAnalytics  } from '@next/third-parties/google'
 
 const vazirmatn = Vazirmatn({
   weight: ['100', '200', '300', '400', '500', '600', '700'],
@@ -28,6 +29,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: any }) {
   return (
     <html dir="rtl" lang="en" className={vazirmatn.className}>
+      <GoogleAnalytics gaId="G-0V5T3XRVPY" />
       <head>
         <ColorSchemeScript />
         <link rel="shortcut icon" href="/favicon.ico" />
@@ -37,7 +39,7 @@ export default function RootLayout({ children }: { children: any }) {
         />
       </head>
       <body>
-      <NextTopLoader color="#87A10C" />
+        <NextTopLoader showSpinner={false} height={5} color="#87A10C" />
 
         <DirectionProvider>
           <MantineProvider theme={theme}>
