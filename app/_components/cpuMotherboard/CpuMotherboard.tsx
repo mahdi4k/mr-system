@@ -30,10 +30,9 @@ const CpuMotherboard = () => {
                         </Link>
                     </div>
                 </div>
-                <Link href={'/pieces/motherboard/cpu'}>
-                <Image width={500}
-                       height={500} alt="graphic card vs cpu"
-                       src={'/svg/cpu-motherboard.svg'} className={classes.image}/>
+                <Link className={classes.image} href={'/pieces/motherboard/cpu'}>
+                <Image fill alt="graphic card vs cpu"
+                       src={'/svg/cpu-motherboard.svg'}/>
                 </Link>
             </Flex>
         </Container>

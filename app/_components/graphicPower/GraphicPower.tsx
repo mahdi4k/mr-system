@@ -30,11 +30,10 @@ const GraphicPower = () => {
                         </Link>
                     </div>
                 </div>
-                <Link  href={'/pieces/graphic/power'}>
+                <Link className={classes.image} href={'/pieces/graphic/power'}>
 
-                    <Image width={500}
-                        height={500} alt="graphic card vs cpu"
-                        src={'/svg/graphic-power.svg'} className={classes.image} />
+                    <Image fill alt="graphic card vs cpu"
+                        src={'/svg/graphic-power.svg'}  />
                 </Link>
 
             </Flex>
