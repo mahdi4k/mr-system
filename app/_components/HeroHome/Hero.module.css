@@ -4,7 +4,7 @@
     padding-top: calc(var(--mantine-spacing-xl) * 4);
     padding-bottom: calc(var(--mantine-spacing-xl) * 4);
     align-items: center;
-    @media (max-width: $mantine-breakpoint-md) {
+    @media (max-width: $mantine-breakpoint-sm) {
       flex-direction: column;
       padding-top: 20px;
       padding-bottom: 20px;
@@ -34,8 +34,11 @@
     font-size: rem(44px);
     line-height: 1.6;
     font-weight: 700;
-  
-    @media (max-width: $mantine-breakpoint-xs) {
+
+    @media (max-width: $mantine-breakpoint-md) {
+      font-size: rem(38px);
+    }
+    @media (max-width: $mantine-breakpoint-sm) {
       font-size: rem(28px);
     }
   }
@@ -99,6 +102,12 @@
     width: 507px;
     height: 478px;
     @media (max-width: $mantine-breakpoint-md) {
+      margin-left: 50px;
+      width: auto;
+      height: 100%;
+    }
+    @media (max-width: $mantine-breakpoint-sm) {
+      margin-left: 0;
       width: auto;
       height: 100%;
     }
