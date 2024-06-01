@@ -5,16 +5,16 @@ const LoadingCategorySkeleton = () => {
     return (
         <Grid >
             <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
-                <Skeleton radius={'md'} height={350} mb="xl" />
+                <Skeleton radius={'md'} h={{base:250,md:350}} mb={{base:'md',md:'xl'}} />
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
-                <Skeleton radius={'md'} height={350} mb="xl" />
+                <Skeleton radius={'md'} h={{base:250,md:350}} mb={{base:'md',md:'xl'}} />
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
-                <Skeleton radius={'md'} height={350} mb="xl" />
+                <Skeleton radius={'md'} h={{base:250,md:350}} mb={{base:'md',md:'xl'}} />
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
-                <Skeleton radius={'md'} height={350} mb="xl" />
+                <Skeleton radius={'md'} h={{base:250,md:350}} mb={{base:'md',md:'xl'}} />
             </Grid.Col>
         </Grid>
     )
