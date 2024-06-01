@@ -5,22 +5,24 @@ import Image from 'next/image';
 import classes from '@/_cssModules/PcSection.module.css'
 import React from 'react'
 import CardPartPrice from '../shared/CardPartPrice';
+import TabsSection from './components/TabsSection';
 
 const PowerSingle = ({ product }: { product: POWER }) => {
   const torobLink = JSON.parse(product.links)[0];
   const EmallsLink = JSON.parse(product.links)[1];
   return (
-    <Container styles={{ root: { flex: '1 0 auto', width: '100%' } }} size={'lg'}>
+    <>
       <Grid mt={'xl'}>
-        <Grid.Col span={{ base: 12, lg: 5 }}>
+        <Grid.Col span={{ base: 12, lg: 4 }}>
           {product.image && <Image alt={product.name} width={450} height={450} sizes="100vw"
             style={{
               width: '100%',
-              height: 'auto',
+              height: 'revert-layer',
+              objectFit: 'contain'
             }}
             src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${product.image}`} />}
         </Grid.Col>
-        <Grid.Col pr={{ base: 'xs', lg: 'xl' }} span={{ base: 12, lg: 7 }}>
+        <Grid.Col pr={{ base: 'xs', lg: 'xl' }} span={{ base: 12, lg: 8 }}>
           <Text fz={{ base: '18pt', lg: '28pt' }} fw={'bold'}> {product.name}</Text>
           <Flex mt={'xl'}>
             <Text fz={'16px'} c="dimmed">توان حقیقی :‌</Text>
@@ -60,37 +62,13 @@ const PowerSingle = ({ product }: { product: POWER }) => {
           </Flex>
         </Grid.Col>
       </Grid>
-      <Tabs mt={'xl'} defaultValue="cpu">
-        <Tabs.List>
-          <Tabs.Tab value="cpu" leftSection={<Image width={20} height={20} alt='' src={'/svg/graphic.svg'} />}>
-            کارت گرافیک مطابق
-          </Tabs.Tab>
-        </Tabs.List>
+       
 
-        <Tabs.Panel value="cpu">
-          <Grid my={'xl'} >
-            {product && product.graphics?.length > 0 ? product.graphics.map((data) => (
-              <Grid.Col key={data.id} span={{ base: 12, md: 6, lg: 3 }}>
-                <Card miw={20} mih={312} key={data.id} shadow="sm" padding="lg" radius="md" withBorder>
-                  <Link href={`/products/graphics/${data.id}`}>
-
-                    <Card.Section ta={'center'}>
-                      {data.image && <Image alt={data.name} width={170} height={160} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${data.image}`} />}
-                    </Card.Section>
-
-                    <Stack justify="center" align='center' mt="md" mb="xs">
-                      <Badge color="pink">{data.manufacturer}</Badge>
-                      <Text ta={'center'} fw={500}>{data.name}</Text>
-                    </Stack>
-                    <CardPartPrice price={product.price} />
-                  </Link>
-                </Card>
-              </Grid.Col>
-            )) : <Card mih={312}><Text>محصولی یافت نشد</Text></Card>}
-          </Grid>
-        </Tabs.Panel>
-      </Tabs>
-    </Container>
+      {/* tab section */}
+      {product && <TabsSection defaultValue='graphics'
+        tabLists={[{ title: "کارت گرافیک مطابق", img: '/svg/graphic.svg', value: 'graphics' }]}
+        tabPanels={[{ value: 'graphics', item: product.graphics }]} />}
+    </>
   )
 }
 

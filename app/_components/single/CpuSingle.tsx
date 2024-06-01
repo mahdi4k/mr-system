@@ -1,24 +1,25 @@
-import { Container, Grid, Flex, Group, Button, Tabs, Card, Stack, Badge, Text } from '@mantine/core'
+import { Grid, Flex, Group, Button, Tabs, Card, Stack, Badge, Text } from '@mantine/core'
 import Link from 'next/link'
 import React from 'react'
 import Image from 'next/image';
 import { CPU } from '@/_redux/services/cpuApi';
 import classes from '@/_cssModules/PcSection.module.css'
-import CardPartPrice from '../shared/CardPartPrice';
+import TabsSection from './components/TabsSection';
 
 const CpuSingle = ({ product }: { product: CPU }) => {
   return (
-    <Container styles={{ root: { flex: '1 0 auto', width: '100%' } }} size={'lg'}>
+    <>
       <Grid mt={'xl'}>
-        <Grid.Col span={{ base: 12, lg: 5 }}>
-          {product.image && <Image alt={product.name} width={450} height={450} sizes="100vw"
+        <Grid.Col className={classes.imgSingleProduct} span={{ base: 12, sm: 4 }}>
+          {product.image && <Image alt={product.name} width={400} height={250} sizes="100vw"
             style={{
-              width: '100%',
-              height: 'auto',
+              width: 'auto',
+              height: 'revert-layer',
+              objectFit: 'cover'
             }}
             src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${product.image}`} />}
         </Grid.Col>
-        <Grid.Col pr={{ base: 'xs', lg: 'xl' }} span={{ base: 12, lg: 7 }}>
+        <Grid.Col pr={{ base: 'xs', lg: 'xl' }} span={{ base: 12, sm: 8 }}>
           <Text fz={{ base: '18pt', lg: '28pt' }} fw={'bold'}> {product.name}</Text>
           <Flex mt={'xl'}>
             <Text fz={'16px'} c="dimmed">گرافیک مجتمع :‌</Text>
@@ -58,64 +59,14 @@ const CpuSingle = ({ product }: { product: CPU }) => {
           </Flex>
         </Grid.Col>
       </Grid>
-      <Tabs mt={'xl'} defaultValue="motherboard">
-        <Tabs.List>
-          <Tabs.Tab value="motherboard" leftSection={<Image width={20} height={27} alt='' src={'/svg/motherboard.svg'} />}>
-            مادربردهای مطابق
-          </Tabs.Tab>
-          <Tabs.Tab value="graphic" leftSection={<Image width={20} height={20} alt='' src={'/svg/graphic.svg'} />}>
-            کارت گرافیک‌های مطابق
-          </Tabs.Tab>
+    
 
-        </Tabs.List>
 
-        <Tabs.Panel value="motherboard">
-          <Grid my={'xl'} >
-            {product && product.motherboards?.length > 0 ? product.motherboards.map((data) => (
-              <Grid.Col key={data.id} span={{ base: 12, md: 6, lg: 3 }}>
-                <Link href={`/products/motherboards/${data.id}`}>
-
-                  <Card miw={20} mih={312} key={data.id} shadow="sm" padding="lg" radius="md" withBorder>
-                    <Card.Section ta={'center'}>
-                      {data.image && <Image alt={data.name} width={170} height={160} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${data.image}`} />}
-                    </Card.Section>
-
-                    <Stack justify="center" align='center' mt="md" mb="xs">
-                      <Badge color="pink">{data.brand}</Badge>
-                      <Text ta={'center'} fw={500}>{data.name}</Text>
-                    </Stack>
-                    <CardPartPrice price={product.price} />
-
-                  </Card>
-                </Link>
-              </Grid.Col>
-            )) : <Card mih={312}><Text>محصولی یافت نشد</Text></Card>}
-          </Grid>
-        </Tabs.Panel>
-
-        <Tabs.Panel value="graphic">
-          <Grid my={'xl'} >
-            {product && product.graphics?.length > 0 ? product.graphics.map((data) => (
-              <Grid.Col key={data.id} span={{ base: 12, md: 6, lg: 3 }}>
-                <Link href={`/products/graphics/${data.id}`}>
-                  <Card miw={20} mih={312} key={data.id} shadow="sm" padding="lg" radius="md" withBorder>
-                    <Card.Section ta={'center'}>
-                      {data.image && <Image alt={data.name} width={170} height={160} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${data.image}`} />}
-                    </Card.Section>
-
-                    <Stack justify="center" align='center' mt="md" mb="xs">
-                      <Badge color="pink">{data.manufacturer}</Badge>
-                      <Text ta={'center'} fw={500}>{data.name}</Text>
-                    </Stack>
-                    <CardPartPrice price={product.price} />
-                  </Card>
-                </Link>
-              </Grid.Col>
-            )) : <Card mih={312}><Text>محصولی یافت نشد</Text></Card>}
-          </Grid>
-        </Tabs.Panel>
-      </Tabs>
-    </Container>
+      {/* tab section */}
+      {product && <TabsSection defaultValue='motherboards'
+        tabLists={[{ title: 'مادربوردهای مطابق', img: '/svg/motherboard.svg', value: 'motherboards' }, { title: "کارت گرافیک‌های مطابق", img: '/svg/graphic.svg', value: 'graphics' }]}
+        tabPanels={[{ value: 'motherboards', item: product.motherboards }, { value: 'graphics', item: product.graphics }]} />}
+    </>
   )
 }
 

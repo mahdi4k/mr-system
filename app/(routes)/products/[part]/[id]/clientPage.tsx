@@ -1,13 +1,13 @@
 "use client"
 
-import { Container, Grid } from '@mantine/core'
+import { Container } from '@mantine/core'
 import React, { FC } from 'react'
-import Image from 'next/image'
 import { Graphic } from '@/_redux/services/graphicApi'
 import { CPU } from '@/_redux/services/cpuApi'
 import { POWER } from '@/_redux/services/powerApi'
 import { Motherboard } from '@/_redux/services/motherboardApi'
 import dynamic from 'next/dynamic'
+import BreadCrumbKiwi from '@/_components/single/BreadCrumbKiwi'
 
 
 type productType = {
@@ -26,13 +26,33 @@ const ClientPage: FC<productType> = ({ product, type }) => {
 
   switch (type) {
     case "cpus":
-      return <ComponentCPU product={product as CPU} />;
+      return (
+        <Container styles={{ root: { flex: '1 0 auto', width: '100%' } }} size={'lg'}>
+          <BreadCrumbKiwi title={product.name} type='cpu' />
+          <ComponentCPU product={product as CPU} />
+        </Container>
+      );
     case "motherboards":
-      return <ComponentMotherboard product={product as Motherboard} />;
+      return (
+        <Container styles={{ root: { flex: '1 0 auto', width: '100%' } }} size={'lg'}>
+          <BreadCrumbKiwi title={product.name} type='motherboard' />
+          <ComponentMotherboard product={product as Motherboard} />
+        </Container>
+      );
     case "graphics":
-      return <ComponentGraphicCard product={product as Graphic} />;
+      return (
+        <Container styles={{ root: { flex: '1 0 auto', width: '100%' } }} size={'lg'}>
+          <BreadCrumbKiwi title={product.name} type='graphic' />
+          <ComponentGraphicCard product={product as Graphic} />
+        </Container>
+      );
     case "powers":
-      return <ComponentPower product={product as POWER} />;
+      return (
+        <Container styles={{ root: { flex: '1 0 auto', width: '100%' } }} size={'lg'}>
+          <BreadCrumbKiwi title={product.name} type='power' />
+          <ComponentPower product={product as POWER} />
+        </Container>
+      );
     default:
       return <h1>No piece match</h1>
   }
