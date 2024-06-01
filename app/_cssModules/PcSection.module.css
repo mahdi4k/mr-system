@@ -98,3 +98,13 @@
 .tomanIcon {
     /* filter: light-dark(invert(0), invert(1)); */
 }
+
+.imgSingleProduct {
+  
+    @media (max-width: $mantine-breakpoint-sm) {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 7px;        
+    }
+}
