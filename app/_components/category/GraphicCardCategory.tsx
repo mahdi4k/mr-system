@@ -3,9 +3,9 @@ import { IconChevronDown } from '@tabler/icons-react'
 import React, { useState } from 'react'
 import AmdOrIntelFilter from '../filters/AmdOrIntelFilter'
 import Image from 'next/image'
-import LoadingCategorySkeleton from './LoadingCategorySkeleton'
+import LoadingCategorySkeleton from './components/LoadingCategorySkeleton'
 import { useDisclosure } from '@mantine/hooks'
-import ModalItems from './modalItems'
+import ModalItems from './components/modalItems'
 import { useGetGraphicsQuery } from '@/_redux/services/graphicApi'
 import { CPU } from '@/_redux/services/cpuApi'
 import { POWER } from '@/_redux/services/powerApi'
@@ -13,15 +13,17 @@ import Link from 'next/link'
 import classes from './category.module.css'
 import CardPartPrice from '../shared/CardPartPrice'
 import AmdOrNvidiaFilter from '../filters/AmdOrNvidiaFilter'
+import CategoryImage from './components/CategoryImage'
+import CategoryLayout from './CategoryLayout'
 const GraphicCardCategory = () => {
   const [value, setValue] = useState<string[]>([]);
   const { isSuccess, data = [], error, isLoading } = useGetGraphicsQuery({ manufacturer: value })
   const [opened, { open, close }] = useDisclosure(false);
   const [modalData, setModalData] = useState<CPU[] | POWER[]>()
   const [modalTitle, setModalTitle] = useState<string>('')
-  const [modalType, setModalType] = useState<'cpus'|'powers'>()
+  const [modalType, setModalType] = useState<'cpus' | 'powers'>()
 
-  const openModal = (data: CPU[] | POWER[], name: string, type: 'cpus'|'powers') => {
+  const openModal = (data: CPU[] | POWER[], name: string, type: 'cpus' | 'powers') => {
     open()
     setModalData(data);
     setModalTitle(name)
@@ -49,22 +51,8 @@ const GraphicCardCategory = () => {
       </> : ''}
       <Grid pb='md' mb='xl' >
         {data && data.map((data) => (
-
-          <Grid.Col key={data.id} span={{ base: 12, md: 6, lg: 3 }}>
-
-            <Card className={classes.categoryCard} pos={'relative'} miw={'250px'} mih={375} key={data.id} shadow="sm" padding="lg" radius="md" withBorder>
-              <Link href={`/products/graphics/${data.id}`}>
-                <Card.Section mt={'0'} ta={'center'}>
-                  {data.image && <Image alt={data.name} width={180} height={170} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${data.image}`} />}
-                </Card.Section>
-
-                <Stack h={50} justify="start" align='center' mt="md" mb="xs">
-                  <Text ta={'center'} fw={500}>{data.name}</Text>
-                </Stack>
-
-                <CardPartPrice price={data.price} />
-
-              </Link>
+          <CategoryLayout type={'graphics'} key={data.id} data={data} children={
+            (
               <Box pos={'absolute'} left={0} right={0} bottom={'2px'} component='div'>
                 <Divider color='#d2d2d269' mb={'4px'} />
                 <Group align='center' justify='center'>
@@ -76,15 +64,15 @@ const GraphicCardCategory = () => {
                   </Tooltip>
                 </Group>
               </Box>
-            </Card>
+            )
+          } />
 
-          </Grid.Col>
 
         ))}
       </Grid >
 
-      <Modal opened={opened} size={'1300px'} onClose={close} styles={{title:{marginTop:'10px',lineHeight:'28px',marginLeft:'20px'},header:{alignItems:'baseline'},close:{position:'relative',top:'-10px'}}} title={` لیست ${modalType === 'powers' ? 'پاور' : ' cpu'}های مطابق با ${modalTitle}`}>
-        <ModalItems type={modalType} items={modalData} />
+      <Modal opened={opened} size={'1300px'} onClose={close} >
+        <ModalItems title={` لیست ${modalType === 'powers' ? 'پاور' : ' cpu'}های مطابق با ${modalTitle}`} type={modalType} items={modalData} />
       </Modal>
     </>
   )

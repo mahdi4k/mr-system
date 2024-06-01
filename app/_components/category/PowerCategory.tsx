@@ -3,15 +3,16 @@ import { IconChevronDown } from '@tabler/icons-react'
 import React, { useState } from 'react'
 import AmdOrIntelFilter from '../filters/AmdOrIntelFilter'
 import Image from 'next/image'
-import LoadingCategorySkeleton from './LoadingCategorySkeleton'
+import LoadingCategorySkeleton from './components/LoadingCategorySkeleton'
 import { useDisclosure } from '@mantine/hooks'
-import ModalItems from './modalItems'
+import ModalItems from './components/modalItems'
 import { useGetPowersQuery } from '@/_redux/services/powerApi'
 import { Graphic } from '@/_redux/services/graphicApi'
 import classes from './category.module.css'
 import Link from 'next/link'
 import CardPartPrice from '../shared/CardPartPrice'
 import PowerModularFilter from '../filters/PowerModularFilter'
+import CategoryLayout from './CategoryLayout'
 
 const PowerCategory = () => {
   const [value, setValue] = useState<string[]>([]);
@@ -50,19 +51,8 @@ const PowerCategory = () => {
       </> : ''}
       <Grid pb='md' mb={'xl'} >
         {data && data.map((data) => (
-          <Grid.Col key={data.id} span={{ base: 12, md: 6, lg: 3 }}>
-            <Card className={classes.categoryCard} miw={'250px'} mih={375} key={data.id} shadow="sm" padding="lg" radius="md" withBorder>
-              <Link href={`/products/powers/${data.id}`}>
-                <Card.Section ta={'center'}>
-                  {data.image && <Image alt={data.name} width={180} height={170} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${data.image}`} />}
-                </Card.Section>
-
-                <Stack h={50} justify="start" align='center' mt="md" mb="xs">
-                  <Text ta={'center'} fw={500}>{data.name}</Text>
-                </Stack>
-                <CardPartPrice price={data.price} />
-
-              </Link>
+          <CategoryLayout key={data.id} type={'powers'} data={data} children={
+            (
               <Box pos={'absolute'} left={0} right={0} bottom={'2px'} component='div' >
                 <Divider color='#d2d2d269' mb={'4px'} />
 
@@ -72,14 +62,14 @@ const PowerCategory = () => {
                   </Tooltip>
                 </Group>
               </Box>
+            )
+          } />
 
-            </Card>
-          </Grid.Col>
         ))}
       </Grid>
 
-      <Modal opened={opened} size={'1300px'} styles={{title:{marginTop:'10px',lineHeight:'28px',marginLeft:'20px'},header:{alignItems:'baseline'},close:{position:'relative',top:'-10px'}}} onClose={close} title={`لیست کارت گرافیک‌های مطابق با ${modalTitle}`}>
-        <ModalItems type={modalType} items={modalData} />
+      <Modal opened={opened} size={'1300px'} onClose={close} >
+        <ModalItems title={`لیست کارت گرافیک‌های مطابق با ${modalTitle}`} type={modalType} items={modalData} />
       </Modal>
     </>
   )
