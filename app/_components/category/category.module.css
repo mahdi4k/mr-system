@@ -10,3 +10,62 @@
         border: 1px solid var(--mantine-color-kiwi-filled-hover);
     }
 }
+
+.categoryItems {
+    @mixin smaller-than $mantine-breakpoint-sm {
+        display: flex;
+    }
+}
+
+.categoryImage {
+    position: relative;
+    width: 180px;
+    height: 170px;
+    margin-left: auto;
+    margin-right: auto;
+
+    @mixin smaller-than $mantine-breakpoint-sm {
+        margin-left: 10px;
+        margin-right: unset;
+        width: 160px;
+        height: 150px;
+    }
+}
+
+.Price {
+    justify-content: center;
+
+    @mixin smaller-than $mantine-breakpoint-sm {
+        justify-content: flex-start;
+    }
+}
+
+.categorySection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    @mixin smaller-than $mantine-breakpoint-sm {
+        flex-direction: row;
+        align-items: unset;
+        justify-content: unset;
+
+    }
+}
+
+.ProductTitle {
+    text-align: center;
+
+    @mixin smaller-than $mantine-breakpoint-sm {
+        text-align: right;
+        font-size: 14px
+    }
+
+}
+.PriceProductTitle {
+    @mixin smaller-than $mantine-breakpoint-sm {
+        text-align: right;
+        font-size: 15px
+    }
+}
