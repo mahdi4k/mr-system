@@ -18,7 +18,7 @@ export function HeroHeader() {
         /> */}
         <SVG
           className={classes.heroSvg}
-          loader={<Box component='div' w={507} h={478}></Box>}
+          loader={<Box component='div' w={{base:300,sm:507}} h={{base:360,md:478}}></Box>}
 
           src='/svg/hero.svg' />
         <div className={classes.content}>

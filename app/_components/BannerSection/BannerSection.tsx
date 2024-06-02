@@ -37,7 +37,7 @@ const BannerSection = () => {
 
                 <SVG
                     className={bannerClasses.image}
-                    loader={<Box component='div' w={507} h={300}></Box>}
+                    loader={<Box component='div' w={{base:300,md:507}} h={220}></Box>}
 
                     src='/svg/bannerRow.svg' />
             </div>
