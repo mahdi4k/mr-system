@@ -75,8 +75,8 @@ const Power: FC<IPowerProps> = ({ setActivePower, activePower }) => {
             <div onClick={open} className={`${classes.pieces} ${cardClasses.cardMain}`}>
                 {ObjectIsEmpty(currentPower) ? (
                     <Flex className={classes.hoverCard} mb={'lg'} align={'center'} justify={'center'} direction={'column'}>
-                        <Text ta={'center'} fz={"xl"}>انتخاب</Text>
-                        <Text fw={"bold"}>پاور</Text>
+                        <Text className={classes.disableText} ta={'center'} fz={"xl"}>انتخاب</Text>
+                        <Text className={classes.disableText} fw={"bold"}>پاور</Text>
                         <Image style={{ bottom: '5px' }} className={classes.piecesImg} width={100} height={100} src={'/svg/power.svg'} alt={'power'} />
                     </Flex>
                 ) : (

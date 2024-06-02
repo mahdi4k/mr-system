@@ -3,7 +3,7 @@
 
 import React, { FC, useEffect, useState } from 'react';
 import classes from "./pieces.module.css";
-import { Badge, Button, Card, Drawer, Flex, Grid, Group, Tabs, Text, Tooltip } from "@mantine/core";
+import { Badge, Card, Drawer, Flex, Grid, Group, Tabs, Text } from "@mantine/core";
 import Image from "next/image";
 import cardClasses from "../cardService/cardService.module.css";
 import { useDisclosure } from "@mantine/hooks";
@@ -12,9 +12,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addselectedCpu, relatedGraphicList, relatedMotherboardList } from '@/_redux/features/cpu';
 import { RootState } from '@/_redux/store';
 import { ObjectIsEmpty } from '@/_utils/utils';
-import { IconBuildingStore, IconExclamationCircle, IconListDetails, IconX } from '@tabler/icons-react';
+import { IconBuildingStore, IconListDetails, IconX } from '@tabler/icons-react';
 import useLoading from '@/_utils/customHook/useLoading';
-import Link from 'next/link';
 import ShopsLink from './shared/ShopsLink';
 
 export type IcpuProps = {
@@ -90,8 +89,8 @@ const Cpu: FC<IcpuProps> = ({ setActiveCpu, activeCpu }) => {
             <div onClick={open} className={`${classes.pieces} ${cardClasses.cardMain}`}>
                 {ObjectIsEmpty(currentCpu) ? (
                     <Flex className={classes.hoverCard} mb={'lg'} align={'center'} justify={'center'} direction={'column'}>
-                        <Text ta={'center'} fz={"xl"}>انتخاب</Text>
-                        <Text fw={"bold"}>CPU</Text>
+                        <Text className={classes.disableText} ta={'center'} fz={"xl"}>انتخاب</Text>
+                        <Text className={classes.disableText} fw={"bold"}>CPU</Text>
                         <Image className={classes.piecesImg} width={60} height={60} src={'/svg/cpu.svg'} alt={'cpu'} />
                     </Flex>
                 ) : (

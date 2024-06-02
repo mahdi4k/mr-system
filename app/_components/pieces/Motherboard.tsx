@@ -73,8 +73,8 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
             <div onClick={open} className={`${classes.pieces} ${cardClasses.cardMain}`}>
                 {ObjectIsEmpty(currentMotherboard) ? (
                     <Flex className={classes.hoverCard} mb={'lg'} align={'center'} justify={'center'} direction={'column'}>
-                        <Text ta={'center'} fz={"xl"}>انتخاب</Text>
-                        <Text fw={"bold"}>motherboard</Text>
+                        <Text className={classes.disableText} ta={'center'} fz={"xl"}>انتخاب</Text>
+                        <Text className={classes.disableText} fw={"bold"}>motherboard</Text>
                         <Image className={classes.piecesImg} width={60} height={60} src={'/svg/motherboard.svg'} alt={'motherboard'} />
                     </Flex>
                 ) : (

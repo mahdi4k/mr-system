@@ -97,8 +97,8 @@ const GraphicCard: FC<IgraphicProps> = ({ setActiveGraphic, activeGraphic }) => 
             <Box component='div' mb={'xl'} onClick={open} className={`${classes.pieces} ${cardClasses.cardMain}`}>
                 {ObjectIsEmpty(currentGraphic) ? (
                     <Flex className={classes.hoverCard} mb={'lg'} align={'center'} justify={'center'} direction={'column'}>
-                        <Text ta={'center'} fz={"xl"}>انتخاب</Text>
-                        <Text fw={"bold"}>کارت گرافیک</Text>
+                        <Text className={classes.disableText} ta={'center'} fz={"xl"}>انتخاب</Text>
+                        <Text className={classes.disableText} fw={"bold"}>کارت گرافیک</Text>
                         <Image className={classes.piecesImg} width={110} height={60} src={'/svg/graphic.svg'} alt={'cpu'} />
                     </Flex>
                 ) : (
