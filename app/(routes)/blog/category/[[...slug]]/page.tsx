@@ -19,7 +19,7 @@ async function getPosts(slug: string, categories: categoriesMO[]) {
 
     let url = `${process.env.NEXT_PUBLIC_WORDPRESS_API}/posts?_fields=id,content,slug,excerpt,date,title,_links,_embedded&_embed`;
     if (categoryID && categoryID.length > 0) {
-        console.log("🚀 ~ getPosts ~ categoryID:", categoryID)
+         
         url += `&categories[]=${categoryID[0].id}`;
     }
     const res = await fetch(url)

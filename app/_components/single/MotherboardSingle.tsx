@@ -8,8 +8,7 @@ import CardPartPrice from '../shared/CardPartPrice';
 import TabsSection from './components/TabsSection';
 
 const MotherboardSingle = ({ product }: { product: Motherboard }) => {
-  console.log(product.links, 'product.links');
-
+ 
   return (
     <>
       <Grid mt={'xl'}>
