@@ -112,7 +112,7 @@ export function Header() {
 
 
                 <Group gap={5} >
-                    <Group justify="center">
+                    <Group w={'27px'} justify="center">
                         {isLoading ? (<ActionIcon
                             onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
                             variant="subtle"
