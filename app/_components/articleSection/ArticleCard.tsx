@@ -28,7 +28,7 @@ export function ArticleCard({ post }: { post: postsMO }) {
 
         <Card withBorder padding="lg" radius="md" className={classes.card}>
             <Link href={`/blog/${post.slug}`}>
-                <Card.Section mb="sm">
+                <Card.Section mt={'0'} mb="sm">
                     <Image
                         src={post?._embedded['wp:featuredmedia'][0].link}
                         alt={post.slug}
