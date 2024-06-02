@@ -21,8 +21,10 @@ const DrawerHeader: FC<Props> = ({ opened, close }) => {
           icon={''}
         >
           <List.Item
+            styles={{ itemWrapper: { width: '100%' },itemLabel:{width:'100%'} }}
             mb={'xl'}
             mt={'xl'}
+            w={'100%'}
             onClick={() => close()}
             icon={
               <Link style={{ marginBottom: '10px' }} href='/category/motherboard'>
@@ -38,7 +40,9 @@ const DrawerHeader: FC<Props> = ({ opened, close }) => {
           </List.Item>
 
           <List.Item
+            styles={{ itemWrapper: { width: '100%' },itemLabel:{width:'100%'} }}
             mb={'xl'}
+            w={'100%'}
             onClick={() => close()}
             icon={
               <Link href='/category/cpu'>
@@ -56,6 +60,8 @@ const DrawerHeader: FC<Props> = ({ opened, close }) => {
 
 
           <List.Item
+            styles={{ itemWrapper: { width: '100%' },itemLabel:{width:'100%'} }}
+            w={'100%'}
             mb={'xl'}
             onClick={() => close()}
             icon={
@@ -73,6 +79,8 @@ const DrawerHeader: FC<Props> = ({ opened, close }) => {
           </List.Item>
 
           <List.Item
+            styles={{ itemWrapper: { width: '100%' },itemLabel:{width:'100%'} }}
+            w={'100%'}
             onClick={() => close()}
             icon={
               <Link href='/category/power'>
