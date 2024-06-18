@@ -4,6 +4,7 @@ import motherboardReducer from "./features/motherboard";
 import graphicReducer from "./features/graphic";
 import cpuReducer from "./features/cpu";
 import PowerReducer from "./features/power";
+import FanReducer from "./features/fan";
 import { api } from './services/api'
 
 export const store = configureStore({
@@ -12,6 +13,7 @@ export const store = configureStore({
         motherboard: motherboardReducer,
         cpu: cpuReducer,
         power: PowerReducer,
+        fan: FanReducer,
         graphic:graphicReducer,
         [api.reducerPath]: api.reducer,
     },

@@ -10,7 +10,7 @@ type authTokenDTO = {
 }
 // Create our baseQuery instance
 const baseQuery = fetchBaseQuery({
-    baseUrl: 'http://127.0.0.1:8000/api',
+    baseUrl: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`,
     prepareHeaders: (headers, { getState }) => {
         // By default, if we have a token in the store, let's use that for authenticated requests
         const token = getState() as authTokenDTO
@@ -41,7 +41,7 @@ export const api = createApi({
      * Tag types must be defined in the original API definition
      * for any tags that would be provided by injected endpoints
      */
-    tagTypes: ['motherboards', 'cpu','graphic','power'],
+    tagTypes: ['motherboards', 'cpu', 'graphic', 'power','fan'],
     /**
      * This api has endpoints injected in adjacent files,
      * which is why no endpoints are shown below.
