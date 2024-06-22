@@ -5,6 +5,7 @@ import {
     Button,
     Grid,
     Group,
+    MultiSelect,
     Select,
     Stack,
     Text,
@@ -17,10 +18,13 @@ import { currentFanOnSave } from "@/_redux/features/fan";
 import { useDispatch } from "react-redux";
 import { StepProps } from "../../motherboard/add/step1-form";
 import { useCreateFanMutation } from '@/_redux/services/fanApi';
+import { useGetCpusQuery } from '@/_redux/services/cpuApi';
 
 
 const Step1Form = (props: StepProps) => {
     const [createFan, response] = useCreateFanMutation();
+    const {isSuccess, data = [], error} = useGetCpusQuery({})
+
     const dispatch = useDispatch()
     const form = useForm({
         initialValues: {
@@ -29,6 +33,7 @@ const Step1Form = (props: StepProps) => {
             brand: '',
             heat_sink_material: '',
             cpu_sockets: '',
+            cpus:[],
             emalls: '',
             torob: '',
             price: '',
@@ -48,6 +53,7 @@ const Step1Form = (props: StepProps) => {
             fan_noise: form.values.fan_noise,
             heat_sink_material: form.values.heat_sink_material,
             cpu_sockets: form.values.cpu_sockets,
+            cpus: form.values.cpus,
             brand: form.values.brand,
             price: form.values.price,
             links: JSON.stringify([form.values.torob, form.values.emalls])
@@ -76,7 +82,7 @@ const Step1Form = (props: StepProps) => {
     }
     return (
         <Stack>
-            <Text my={"lg"} fz={"lg"} fw={'bolder'}>افزودن پاور</Text>
+            <Text my={"lg"} fz={"lg"} fw={'bolder'}>افزودن فن</Text>
             <form onSubmit={form.onSubmit((values) => console.log(values))}>
                 <Grid>
                     <Grid.Col span={{ base: 12, md: 6 }}>
@@ -91,6 +97,18 @@ const Step1Form = (props: StepProps) => {
                             label="قیمت"
                             placeholder=""
                             {...form.getInputProps('price')}
+                        />
+                    </Grid.Col>
+                    
+                    <Grid.Col span={{ base: 12, md: 6 }}>
+                        <MultiSelect
+                            styles={{
+                                pill: { direction: 'ltr' }
+                            }}
+                            label="cpu مرتبط"
+                            placeholder=""
+                            {...form.getInputProps('cpus')}
+                            data={data.map(el => ({ value: `${el.id}`, label: el.name }))}
                         />
                     </Grid.Col>
 
