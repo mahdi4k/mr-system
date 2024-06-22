@@ -5,6 +5,7 @@ import graphicReducer from "./features/graphic";
 import cpuReducer from "./features/cpu";
 import PowerReducer from "./features/power";
 import FanReducer from "./features/fan";
+import RamReducer from "./features/ram";
 import { api } from './services/api'
 
 export const store = configureStore({
@@ -14,6 +15,7 @@ export const store = configureStore({
         cpu: cpuReducer,
         power: PowerReducer,
         fan: FanReducer,
+        ram:RamReducer,
         graphic:graphicReducer,
         [api.reducerPath]: api.reducer,
     },
