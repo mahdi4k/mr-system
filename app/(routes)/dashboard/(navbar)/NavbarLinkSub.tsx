@@ -63,6 +63,14 @@ const NavbarLinkSub = ({activeLink}: { activeLink: activeLink }) => {
                     { label: 'افزودن', link: '/dashboard/fan/add' },
                 ],
             },
+            {
+                label: 'رم',
+                initiallyOpened: activeTabBaseUrl === 'ram',
+                links: [
+                    { label: 'لیست', link: '/dashboard/ram' },
+                    { label: 'افزودن', link: '/dashboard/ram/add' },
+                ],
+            },
         ]
     const linkGroup = links.map((item) => <LinksGroup {...item} key={item.label} />);
     
