@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Motherboard } from "../services/motherboardApi";
-import { CPU } from "../services/cpuApi";
 import { FAN } from "../services/fanApi";
 
 
@@ -10,7 +9,7 @@ type currentFan = {
     name: string
 }
 
-type CpuType = {
+type FanType = {
     currentFan: currentFan; //this for add cpu in admin panel
     selectedFan: Partial<FAN>  // selected motherboard for show in box
     relatedMotherboards: Motherboard[] //  related motherboard from selected cpu 
@@ -22,7 +21,7 @@ const initialState = {
     selectedFan: {},
     relatedMotherboards: [],
 
-} as unknown as CpuType;
+} as unknown as FanType;
 
 export const fanSlice = createSlice({
     name: "fan",
@@ -31,7 +30,7 @@ export const fanSlice = createSlice({
         currentFanOnSave: (state, action: PayloadAction<currentFan>) => {
             state.currentFan = action.payload;
         },
-        addselectedFan: (state, action: PayloadAction<Partial<CPU>>) => {
+        addselectedFan: (state, action: PayloadAction<Partial<FAN>>) => {
             state.selectedFan = action.payload
         },
         relatedMotherboardList: (state, action: PayloadAction<Motherboard[]>) => {
