@@ -6,6 +6,7 @@ import cpuReducer from "./features/cpu";
 import PowerReducer from "./features/power";
 import FanReducer from "./features/fan";
 import RamReducer from "./features/ram";
+import SsdReducer from "./features/ssd";
 import { api } from './services/api'
 
 export const store = configureStore({
@@ -17,6 +18,7 @@ export const store = configureStore({
         fan: FanReducer,
         ram:RamReducer,
         graphic:graphicReducer,
+        ssd:SsdReducer,
         [api.reducerPath]: api.reducer,
     },
     middleware: (getDefaultMiddleware) =>
