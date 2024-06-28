@@ -5,7 +5,7 @@ import Step1Form from "./step1-form";
 import Step2Image from "./step2-image";
 
 export type ActiveStepDTO = 'step-1' | 'step-2'
-const Fan = () => {
+const Ram = () => {
     const [activeStep, setActiveStep] = useState<ActiveStepDTO>('step-1')
     const [active, setActive] = useState(0);
 
@@ -24,4 +24,4 @@ const Fan = () => {
     )
 }
 
-export default Fan
+export default Ram

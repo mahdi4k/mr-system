@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     description: '',
 }
 
-const CPU = () => {
+const RamPage = () => {
 
 
     return (
@@ -17,4 +17,4 @@ const CPU = () => {
     )
 }
 
-export default CPU
+export default RamPage
