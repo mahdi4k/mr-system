@@ -71,6 +71,22 @@ const NavbarLinkSub = ({activeLink}: { activeLink: activeLink }) => {
                     { label: 'افزودن', link: '/dashboard/ram/add' },
                 ],
             },
+            {
+                label: 'ssd',
+                initiallyOpened: activeTabBaseUrl === 'ram',
+                links: [
+                    { label: 'لیست', link: '/dashboard/ssd' },
+                    { label: 'افزودن', link: '/dashboard/ssd/add' },
+                ],
+            },
+            {
+                label: 'کیس',
+                initiallyOpened: activeTabBaseUrl === 'ram',
+                links: [
+                    { label: 'لیست', link: '/dashboard/case' },
+                    { label: 'افزودن', link: '/dashboard/case/add' },
+                ],
+            },
         ]
     const linkGroup = links.map((item) => <LinksGroup {...item} key={item.label} />);
     
