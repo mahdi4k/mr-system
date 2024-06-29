@@ -2,12 +2,13 @@ import React, { FC, useState } from 'react';
 import dynamic from "next/dynamic";
 
 
-type Iprop = 'motherboard' | 'cpu' | 'graphic' | 'power'
+type Iprop = 'motherboard' | 'cpu' | 'graphic' | 'power' | 'ssd'
 
 const ComponentCPU = dynamic(() => import('@/_components/category/CpuCategory'), { ssr: false }) as FC
 const ComponentMotherboard = dynamic(() => import('@/_components/category/MotherboardCategory'), { ssr: false }) as FC
 const ComponentGraphicCard = dynamic(() => import('@/_components/category/GraphicCardCategory'), { ssr: false }) as FC
 const ComponentPower = dynamic(() => import('@/_components/category/PowerCategory'), { ssr: false }) as FC
+const ComponentSsd = dynamic(() => import('@/_components/category/SsdCategory'), { ssr: false }) as FC
 
 const UseCategoryPage = (props: Iprop) => {
 
@@ -20,6 +21,8 @@ const UseCategoryPage = (props: Iprop) => {
             return <ComponentGraphicCard />;
         case "power":
             return <ComponentPower />;
+        case "ssd":
+            return <ComponentSsd />;
         default:
             return <h1>No piece match</h1>
     }
