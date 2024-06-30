@@ -11,7 +11,7 @@ import CategoryImage from './CategoryImage'
 
 type Iprops = {
     items: Graphic[] | Motherboard[] | CPU[] | POWER[] | undefined
-    type: 'motherboards' | 'cpus' | 'powers' | 'graphics' | undefined
+    type: 'motherboards' | 'cpus' | 'powers' | 'graphics' | 'ssds' | undefined
     title: string
 }
 const ModalItems: FC<Iprops> = ({ title, items, type }) => {
@@ -20,23 +20,21 @@ const ModalItems: FC<Iprops> = ({ title, items, type }) => {
             <Text fw={'bold'} fz={'sm'}>{title}</Text>
             <Grid gutter="md" my={'xl'} >
                 {items && items.map((item) => (
-                    <Grid.Col key={item.id} span={{ base: 12, md: 6, lg: 4 }}>
-                        <Link href={`/products/${type}/${item.id}`}>
-                            <Card className={classes.categoryCard} mih={{ base: '200px', md: '375px' }} key={item.id} shadow="sm" padding="lg" radius="md" withBorder>
-                                <Link className={classes.categorySection} href={`/products/${type}/${item.id}`}>
-                                    <Card.Section className={classes.categoryImage} mt={'0'} ta={'center'}>
-                                        {item.image && <CategoryImage img={item.image} alt={item.name} />}
-                                    </Card.Section>
+                    <Grid.Col key={item.id} span={{ base: 12, md: 6, lg: 3 }}>
+                        <Card className={classes.categoryCard} mih={{ base: '200px', md: '375px' }} key={item.id} shadow="sm" padding="lg" radius="md" withBorder>
+                            <Link className={classes.categorySection} href={`/products/${type}/${item.id}`}>
+                                <Card.Section className={classes.categoryImage} mt={'0'} ta={'center'}>
+                                    {item.image && <CategoryImage img={item.image} alt={item.name} />}
+                                </Card.Section>
 
-                                    <Flex direction={'column'}>
-                                        <Stack h={{ md: 50 }} justify="start" align='center' mt="md" mb="xs">
-                                            <Text pt={{ base: 'md', md: 'xs' }} className={classes.ProductTitle} fw={500}>{item.name}</Text>
-                                        </Stack>
-                                        <CardPartPrice price={item.price} />
-                                    </Flex>
-                                </Link>
-                            </Card>
-                        </Link>
+                                <Flex direction={'column'}>
+                                    <Stack h={{ md: 50 }} justify="start" align='center' mt="md" mb="xs">
+                                        <Text pt={{ base: 'md', md: 'xs' }} className={classes.ProductTitle} fw={500}>{item.name}</Text>
+                                    </Stack>
+                                    <CardPartPrice price={item.price} />
+                                </Flex>
+                            </Link>
+                        </Card>
                     </Grid.Col>
                 ))}
             </Grid>

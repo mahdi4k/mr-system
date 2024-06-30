@@ -9,10 +9,11 @@ import { Graphic } from '@/_redux/services/graphicApi'
 import { POWER } from '@/_redux/services/powerApi'
 import { Motherboard } from '@/_redux/services/motherboardApi'
 import { SSD } from '@/_redux/services/ssdApi'
+import { FAN } from '@/_redux/services/fanApi'
 
 type Props = {
-    data: CPU | Motherboard | Graphic | POWER | SSD;
-    type: 'powers' | 'cpus' | 'motherboards' | 'graphics' | 'ssds'
+    data: CPU | Motherboard | Graphic | POWER | SSD | FAN;
+    type: 'powers' | 'cpus' | 'motherboards' | 'graphics' | 'ssds' | 'fans'
     children: React.ReactNode;
 }
 const CategoryLayout: FC<Props> = ({ data, children, type }) => {
