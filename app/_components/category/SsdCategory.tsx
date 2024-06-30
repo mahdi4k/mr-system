@@ -10,7 +10,7 @@ import { Graphic } from '@/_redux/services/graphicApi'
 import PowerModularFilter from '../filters/PowerModularFilter'
 import CategoryLayout from './CategoryLayout'
 
-const PowerCategory = () => {
+const SsdCategory = () => {
     const [value, setValue] = useState<string[]>([]);
     const { isSuccess, data = [], error, isLoading } = useGetSsdsQuery({ modular: value })
     const [opened, { open, close }] = useDisclosure(false);
@@ -68,4 +68,4 @@ const PowerCategory = () => {
     )
 }
 
-export default PowerCategory
+export default SsdCategory
