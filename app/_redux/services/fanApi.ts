@@ -1,4 +1,5 @@
 import { api } from './api'
+import { CPU } from './cpuApi';
 
 export type FAN = {
     id: number
@@ -10,6 +11,7 @@ export type FAN = {
     image: string
     price?: string
     links: string
+    cpus:CPU[]
     brand?: string
 };
 
