@@ -27,7 +27,7 @@ export function Header() {
 
 
                     <Group mr={'xl'} h="100%" gap={0} visibleFrom="sm">
-                        <HoverCard width={600} position="bottom" radius="md" shadow="md" withinPortal>
+                        <HoverCard width={750} position="bottom" radius="md" shadow="md" withinPortal>
                             <HoverCard.Target>
                                 <a href="#" className={classes.link}>
                                     <Center inline>
@@ -43,7 +43,7 @@ export function Header() {
                             </HoverCard.Target>
 
                             <HoverCard.Dropdown style={{ overflow: 'hidden' }}>
-                                <SimpleGrid cols={3} spacing={0}>
+                                <SimpleGrid cols={4} spacing={0}>
                                     <Link href='/category/motherboard'>
                                         <UnstyledButton p={'lg'} className={classes.subLink} >
                                             <Group wrap="nowrap" align="center">
@@ -56,8 +56,8 @@ export function Header() {
                                             </Group>
                                         </UnstyledButton>
                                     </Link>
-                                    <UnstyledButton p={'lg'} className={classes.subLink} >
-                                        <Link href='/category/graphic'>
+                                    <Link href='/category/graphic'>
+                                        <UnstyledButton p={'lg'} className={classes.subLink} >
                                             <Group wrap="nowrap" align="center">
                                                 <ThemeIcon size={34} variant="default" radius="md">
                                                     <Image width={20} height={20} src={'/svg/graphic.svg'} alt={'cpu'} />
@@ -66,11 +66,10 @@ export function Header() {
                                                     کارت گرافیک
                                                 </Text>
                                             </Group>
-                                        </Link>
-                                    </UnstyledButton>
-
-                                    <UnstyledButton p={'lg'} className={classes.subLink} >
-                                        <Link href='/category/power'>
+                                        </UnstyledButton>
+                                    </Link>
+                                    <Link href='/category/power'>
+                                        <UnstyledButton p={'lg'} className={classes.subLink} >
                                             <Group wrap="nowrap" align="center">
                                                 <ThemeIcon size={34} variant="default" radius="md">
                                                     <Image width={20} height={30} src={'/svg/power.svg'} alt={'cpu'} />
@@ -79,10 +78,11 @@ export function Header() {
                                                     پاور
                                                 </Text>
                                             </Group>
-                                        </Link>
-                                    </UnstyledButton>
-                                    <UnstyledButton p={'lg'} className={classes.subLink} >
-                                        <Link href='/category/cpu'>
+                                        </UnstyledButton>
+                                    </Link>
+
+                                    <Link href='/category/cpu'>
+                                        <UnstyledButton p={'lg'} className={classes.subLink} >
                                             <Group wrap="nowrap" align="center">
                                                 <ThemeIcon size={34} variant="default" radius="md">
                                                     <Image width={20} height={20} src={'/svg/cpu.svg'} alt={'cpu'} />
@@ -91,18 +91,57 @@ export function Header() {
                                                     cpu
                                                 </Text>
                                             </Group>
-                                        </Link>
-                                    </UnstyledButton>
-                                    <UnstyledButton p={'lg'} className={classes.subLink} >
-                                        <Group wrap="nowrap" align="center">
-                                            <ThemeIcon size={34} variant="default" radius="md">
-                                                <Image width={25} height={25} src={'/svg/case.svg'} alt={'cpu'} />
-                                            </ThemeIcon>
-                                            <Text size="sm" fw={500}>
-                                                قاب کیس
-                                            </Text>
-                                        </Group>
-                                    </UnstyledButton>
+                                        </UnstyledButton>
+                                    </Link>
+                                    <Link href='/category/case'>
+                                        <UnstyledButton p={'lg'} className={classes.subLink} >
+                                            <Group wrap="nowrap" align="center">
+                                                <ThemeIcon size={34} variant="default" radius="md">
+                                                    <Image width={25} height={25} src={'/svg/case.svg'} alt={'case'} />
+                                                </ThemeIcon>
+                                                <Text size="sm" fw={500}>
+                                                    قاب کیس
+                                                </Text>
+                                            </Group>
+                                        </UnstyledButton>
+                                    </Link>
+                                    <Link href='/category/ssd'>
+                                        <UnstyledButton p={'lg'} className={classes.subLink} >
+                                            <Group wrap="nowrap" align="center">
+                                                <ThemeIcon size={34} variant="default" radius="md">
+                                                    <Image width={25} height={25} src={'/svg/ssd.svg'} alt={'ssd'} />
+                                                </ThemeIcon>
+                                                <Text size="sm" fw={500}>
+                                                    ssd
+                                                </Text>
+                                            </Group>
+                                        </UnstyledButton>
+                                    </Link>
+                                    <Link href='/category/ram'>
+                                        <UnstyledButton p={'lg'} className={classes.subLink} >
+                                            <Group wrap="nowrap" align="center">
+                                                <ThemeIcon size={34} variant="default" radius="md">
+                                                    <Image width={25} height={25} src={'/svg/ram.svg'} alt={'ram'} />
+                                                </ThemeIcon>
+                                                <Text size="sm" fw={500}>
+                                                    رم
+                                                </Text>
+                                            </Group>
+                                        </UnstyledButton>
+                                    </Link>
+                                    <Link href='/category/fan'>
+                                        <UnstyledButton p={'lg'} className={classes.subLink} >
+                                            <Group wrap="nowrap" align="center">
+                                                <ThemeIcon size={34} variant="default" radius="md">
+                                                    <Image width={35} height={35} src={'/svg/fan.svg'} alt={'fan'} />
+                                                </ThemeIcon>
+                                                <Text size="sm" fw={500}>
+                                                    فن
+                                                </Text>
+                                            </Group>
+                                        </UnstyledButton>
+                                    </Link>
+                                    
 
                                 </SimpleGrid>
                             </HoverCard.Dropdown>
