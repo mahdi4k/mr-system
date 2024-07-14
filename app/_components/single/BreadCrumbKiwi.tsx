@@ -3,7 +3,7 @@ import React, { FC } from 'react'
 
 type Props = {
     title: string
-    type: 'cpu' | 'motherboard' | 'power' | 'graphic'
+    type: 'cpu' | 'motherboard' | 'power' | 'graphic' | 'fan' | 'ram' | 'case' | 'ssd'
 }
 
 const BreadCrumbKiwi: FC<Props> = ({ title, type }) => {
@@ -13,7 +13,8 @@ const BreadCrumbKiwi: FC<Props> = ({ title, type }) => {
                 خانه
             </Anchor>
             <Anchor c={'var(--mantine-color-kiwi-2)'} size='sm' href={`/category/${type}`}>
-                {type === 'cpu' ? 'cpu' : type === 'graphic' ? 'گرافیک ' : type === 'power' ? 'پاور' : type === 'motherboard' ? 'مادربرد' : " "}
+                {type === 'cpu' ? 'cpu' : type === 'graphic' ? 'گرافیک ' : type === 'power' ? 'پاور' : type === 'motherboard' ? 'مادربرد' :
+                    type === 'case' ? 'کیس' : type === 'fan' ? 'فن' : type === 'ram' ? 'رم' : type === "ssd" ? 'ssd' : ''}
             </Anchor>
             <Text c="dimmed" size='xs'>
                 {title}

@@ -4,6 +4,9 @@
 body,html h1{
     font-family: var(--font-vazirmatn) !important;
 }
+.vibes {
+    font-family: var(--font-vibes) !important;
+}
 .text-decoration-none{
     text-decoration: none;
 }
