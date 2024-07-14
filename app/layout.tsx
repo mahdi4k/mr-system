@@ -2,8 +2,7 @@ import "@mantine/core/styles.css";
 import React from "react";
 import { MantineProvider, ColorSchemeScript, DirectionProvider } from "@mantine/core";
 import { theme } from "../theme";
-import { Vazirmatn } from 'next/font/google'
-import './global.css'
+import { Vazirmatn , Vibes} from 'next/font/google'
 import '@mantine/notifications/styles.css';
 import '@mantine/carousel/styles.css';
 import { ReduxProviders } from "@/_redux/provider";
@@ -12,6 +11,18 @@ import { Footer } from "@/_components/Footer/Footer";
 import Providers from "./(routes)/dashboard/Provider";
 import NextTopLoader from "nextjs-toploader";
 import { GoogleAnalytics  } from '@next/third-parties/google'
+import './global.css'
+
+
+
+const vibes = Vibes({
+  weight: ['400'],
+  subsets: ['arabic'],
+  variable: '--font-vibes',
+  display: 'swap',
+  adjustFontFallback: false
+})
+
 
 const vazirmatn = Vazirmatn({
   weight: ['100', '200', '300', '400', '500', '600', '700'],
@@ -21,6 +32,7 @@ const vazirmatn = Vazirmatn({
   adjustFontFallback: false
 })
 
+
 export const metadata = {
   title: "کیوی پارت",
   description: "kiwi-part pc building",
@@ -28,7 +40,7 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: any }) {
   return (
-    <html dir="rtl" lang="en" className={vazirmatn.className}>
+    <html dir="rtl" lang="en" className={`${vazirmatn.variable} ${vibes.variable}`}>
       <GoogleAnalytics gaId="G-0V5T3XRVPY" />
       <head>
         <ColorSchemeScript />
