@@ -8,7 +8,7 @@ import cardClasses from '../cardService/cardService.module.css'
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/_redux/store';
 import { useDisclosure } from '@mantine/hooks';
-import { Motherboard, useGetMotherboardsQuery } from '@/_redux/services/motherboardApi';
+import { useGetMotherboardsQuery } from '@/_redux/services/motherboardApi';
 import { addselectedMotherboard, relatedCpuList } from '@/_redux/features/motherboard';
 import { ObjectIsEmpty } from '@/_utils/utils';
 import { Motherboard as MotherboardType } from '@/_redux/services/motherboardApi';
@@ -48,7 +48,7 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
         close()
     }
 
-    const relatedCpu = (motherboard: Motherboard) => {
+    const relatedCpu = (motherboard: MotherboardType) => {
         dispatch(relatedCpuList(motherboard.cpus))
     }
 
