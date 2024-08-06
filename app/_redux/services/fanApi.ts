@@ -1,4 +1,5 @@
 import { api } from './api'
+import { IResult } from './caseApi';
 import { CPU } from './cpuApi';
 
 export type FAN = {
@@ -7,11 +8,11 @@ export type FAN = {
     fan_noise?: string
     heat_sink_material?: string
     cpu_sockets?: string
-    rgb:boolean
+    rgb: boolean
     image: string
     price?: string
     links: string
-    cpus:CPU[]
+    cpus: CPU[]
     brand?: string
 };
 
@@ -25,6 +26,15 @@ export const FanApi = api.injectEndpoints({
                     url: `/fans`,
                     method: 'GET',
                     params: { modular: modular }
+                }
+            },
+            providesTags: ['fan']
+        }),
+        getFan: builder.query<IResult<FAN>, { id: string }>({
+            query: ({ id }) => {
+                return {
+                    url: `/fans/${id}`,
+                    method: 'GET',
                 }
             },
             providesTags: ['fan']
@@ -58,4 +68,4 @@ export const FanApi = api.injectEndpoints({
     }),
 });
 
-export const { useGetFansQuery, useCreateFanMutation, useAddFanImageMutation, useRemoveFanMutation } = FanApi;
+export const { useGetFansQuery, useLazyGetFansQuery, useLazyGetFanQuery, useGetFanQuery, useCreateFanMutation, useAddFanImageMutation, useRemoveFanMutation } = FanApi;

@@ -1,4 +1,5 @@
 import { api } from './api'
+import { IResult } from './caseApi';
 import { Graphic } from './graphicApi';
 
 export type POWER = {
@@ -24,6 +25,15 @@ export const PowerApi = api.injectEndpoints({
                     url: `/powers`,
                     method: 'GET',
                     params: { modular: modular }
+                }
+            },
+            providesTags: ['power']
+        }),
+        getPower: builder.query<IResult<POWER>, { id: string }>({
+            query: ({ id }) => {
+                return {
+                    url: `/powers/${id}`,
+                    method: 'GET',
                 }
             },
             providesTags: ['power']
@@ -57,4 +67,4 @@ export const PowerApi = api.injectEndpoints({
     }),
 });
 
-export const { useGetPowersQuery, useCreatePowerMutation, useAddPowerImageMutation, useRemovePowerMutation } = PowerApi;
+export const { useGetPowersQuery, useLazyGetPowersQuery, useLazyGetPowerQuery, useCreatePowerMutation, useAddPowerImageMutation, useRemovePowerMutation } = PowerApi;

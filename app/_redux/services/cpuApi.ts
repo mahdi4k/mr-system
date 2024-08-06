@@ -1,4 +1,6 @@
 import { api } from './api'
+import { IResult } from './caseApi';
+import { FAN } from './fanApi';
 import { Graphic } from './graphicApi';
 import { Motherboard } from './motherboardApi';
 
@@ -12,8 +14,9 @@ export type CPU = {
     attributes?: string[]
     image: string
     motherboards: Motherboard[]
+    fans: FAN[]
     graphics: Graphic[]
-    links:string
+    links: string
     brand?: string
 };
 
@@ -30,6 +33,16 @@ export const cpuApi = api.injectEndpoints({
                 }
             },
 
+            providesTags: ['cpu']
+        }),
+        getCpu: builder.query<IResult<CPU>, { id: string }>({
+            query: ({ id }) => {
+                return {
+                    url: `/cpus/${id}`,
+                    method: 'GET',
+
+                }
+            },
             providesTags: ['cpu']
         }),
         createCpus: builder.mutation({
@@ -61,4 +74,4 @@ export const cpuApi = api.injectEndpoints({
     }),
 });
 
-export const { useGetCpusQuery, useCreateCpusMutation, useAddCpuImageMutation, useRemoveCpuMutation } = cpuApi;
+export const { useGetCpusQuery, useLazyGetCpuQuery, useLazyGetCpusQuery, useCreateCpusMutation, useAddCpuImageMutation, useRemoveCpuMutation } = cpuApi;

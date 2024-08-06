@@ -1,9 +1,10 @@
 import { api } from './api'
+import { IResult } from './caseApi';
 
 export type RAM = {
     id: number
     name: string
-    frequency:string
+    frequency: string
     brand?: string
     rgb: boolean
     image: string
@@ -33,6 +34,16 @@ export const RamApi = api.injectEndpoints({
             }),
             invalidatesTags: ['ram']
         }),
+        getRam: builder.query<IResult<RAM>, { id: string }>({
+            query: ({ id }) => {
+                return {
+                    url: `/rams/${id}`,
+                    method: 'GET',
+                }
+            },
+            providesTags: ['ram']
+        }),
+
         addRamImage: builder.mutation({
             query: (payload) => {
                 return {
@@ -54,4 +65,4 @@ export const RamApi = api.injectEndpoints({
     }),
 });
 
-export const { useGetRamsQuery, useCreateRamMutation, useAddRamImageMutation, useRemoveRamMutation } = RamApi;
+export const { useGetRamsQuery, useLazyGetRamsQuery, useLazyGetRamQuery, useCreateRamMutation, useAddRamImageMutation, useRemoveRamMutation } = RamApi;

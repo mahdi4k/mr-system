@@ -80,4 +80,4 @@ export const CaseApi = api.injectEndpoints({
     }),
 });
 
-export const { useGetCasesQuery, useCreateCaseMutation, useAddCaseImageMutation, useRemoveCaseMutation, useUpdateCaseMutation, useGetCaseQuery } = CaseApi;
+export const { useGetCasesQuery, useLazyGetCasesQuery, useLazyGetCaseQuery, useCreateCaseMutation, useAddCaseImageMutation, useRemoveCaseMutation, useUpdateCaseMutation, useGetCaseQuery } = CaseApi;

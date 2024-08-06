@@ -1,9 +1,6 @@
 import { api } from './api'
-
-export interface IResult<T> {
-    message: string;
-    data: T
-}
+import { IResult } from './caseApi';
+ 
 
 export type SSD = {
     id: number
@@ -82,4 +79,4 @@ export const SsdApi = api.injectEndpoints({
     }),
 });
 
-export const { useGetSsdsQuery, useCreateSsdMutation, useAddSsdImageMutation, useRemoveSsdMutation, useUpdateSsdMutation, useGetSsdQuery } = SsdApi;
+export const { useGetSsdsQuery, useLazyGetSsdsQuery , useLazyGetSsdQuery, useCreateSsdMutation, useAddSsdImageMutation, useRemoveSsdMutation, useUpdateSsdMutation, useGetSsdQuery } = SsdApi;

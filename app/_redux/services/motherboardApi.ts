@@ -1,4 +1,5 @@
 import { api } from './api'
+import { IResult } from './caseApi';
 import { CPU } from './cpuApi';
 
 export type Motherboard = {
@@ -7,15 +8,15 @@ export type Motherboard = {
     size: string
     total_slot_ram: number
     brand: string
-    price?:string
+    price?: string
     cpu_socket?: string
-    ddr3?:boolean
-    ddr4?:boolean
-    ddr5?:boolean
-    wifi_support?:boolean
-    links:string
-    image:string
-    cpus:CPU[]
+    ddr3?: boolean
+    ddr4?: boolean
+    ddr5?: boolean
+    wifi_support?: boolean
+    links: string
+    image: string
+    cpus: CPU[]
     attributes?: string[]
 };
 
@@ -29,7 +30,7 @@ type authTokenDTO = {
 export const motherboardApi = api.injectEndpoints({
 
     endpoints: (builder) => ({
-        getMotherboards: builder.query<Motherboard[],  { manufacturer?: string[] | never[] }>({
+        getMotherboards: builder.query<Motherboard[], { manufacturer?: string[] | never[] }>({
             query: ({ manufacturer }) => {
                 return {
                     url: `/motherboards`,
@@ -37,7 +38,17 @@ export const motherboardApi = api.injectEndpoints({
                     params: { manufacturer: manufacturer }
                 }
             },
-            providesTags:['motherboards']
+            providesTags: ['motherboards']
+        }),
+        getMotherboard: builder.query<IResult<Motherboard>, { id: string }>({
+            query: ({ id }) => {
+                return {
+                    url: `/motherboards/${id}`,
+                    method: 'GET',
+
+                }
+            },
+            providesTags: ['motherboards']
         }),
         createMotherboard: builder.mutation({
             query: (payload) => ({
@@ -45,7 +56,7 @@ export const motherboardApi = api.injectEndpoints({
                 method: 'POST',
                 body: payload,
             }),
-            invalidatesTags:['motherboards']
+            invalidatesTags: ['motherboards']
         }),
         addMotherboardImage: builder.mutation({
             query: (payload) => {
@@ -63,9 +74,9 @@ export const motherboardApi = api.injectEndpoints({
                     method: 'DELETE',
                 }
             },
-            invalidatesTags:['motherboards']
+            invalidatesTags: ['motherboards']
         })
     }),
 });
 
-export const {useGetMotherboardsQuery, useCreateMotherboardMutation, useAddMotherboardImageMutation,useRemoveMotherboardMutation} = motherboardApi;
+export const { useGetMotherboardsQuery, useLazyGetMotherboardsQuery, useLazyGetMotherboardQuery, useCreateMotherboardMutation, useAddMotherboardImageMutation, useRemoveMotherboardMutation } = motherboardApi;

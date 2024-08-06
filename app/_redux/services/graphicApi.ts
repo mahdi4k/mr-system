@@ -1,6 +1,7 @@
 import { POWER } from './powerApi';
 import { api } from './api'
 import { CPU } from './cpuApi';
+import { IResult } from './caseApi';
 
 export type Graphic = {
     id: number
@@ -22,12 +23,22 @@ export type Graphic = {
 export const graphicApi = api.injectEndpoints({
 
     endpoints: (builder) => ({
-        getGraphics: builder.query<Graphic[],  { manufacturer?: string[] | never[] }>({
+        getGraphics: builder.query<Graphic[], { manufacturer?: string[] | never[] }>({
             query: ({ manufacturer }) => {
                 return {
                     url: `/graphics`,
                     method: 'GET',
                     params: { manufacturer: manufacturer }
+                }
+            },
+            providesTags: ['graphic']
+        }),
+        getGraphic: builder.query<IResult<Graphic>, { id: string }>({
+            query: ({ id }) => {
+                return {
+                    url: `/graphics/${id}`,
+                    method: 'GET',
+
                 }
             },
             providesTags: ['graphic']
@@ -61,4 +72,4 @@ export const graphicApi = api.injectEndpoints({
     }),
 });
 
-export const { useGetGraphicsQuery, useCreateGraphicMutation, useAddGraphicImageMutation, useRemoveGraphicMutation } = graphicApi;
+export const { useGetGraphicsQuery, useLazyGetGraphicsQuery, useLazyGetGraphicQuery, useCreateGraphicMutation, useAddGraphicImageMutation, useRemoveGraphicMutation } = graphicApi;
