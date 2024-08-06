@@ -1,0 +1,49 @@
+.box {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+    transition: all .3s;
+}
+
+.box:hover {
+    box-shadow: 0 20px 25px rgba(0, 0, 0, .15);
+    transform: translateY(-4px);
+}
+
+.container {
+    background-color: light-dark(#eef5f9), var(--mantine-color-white);
+}
+
+.categoryImage {
+    position: relative;
+    width: 120px;
+    height: 110px;
+    margin-left: auto;
+    margin-right: auto;
+
+
+    @mixin smaller-than $mantine-breakpoint-sm {
+        margin-left: 10px;
+        margin-right: unset;
+        width: 110px;
+        height: 90px;
+    }
+}
+
+.partItem {
+    transition: all .3s;
+    box-shadow: var(--mantine-shadow-xs);
+    cursor: pointer;
+
+    &:hover {
+        box-shadow: var(--mantine-shadow-md);
+
+    }
+}
+
+.closeButton {
+    transition: all .3s;
+
+    &:hover {
+        background-color: rgb(76, 198, 255);
+        color: #3a9f8d;
+    }
+}
