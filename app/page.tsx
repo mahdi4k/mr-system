@@ -8,6 +8,7 @@ import CardParts from './_components/cardParts/CardParts'
 import ArticleSection from './_components/articleSection/ArticleSection'
 import BannerSection from './_components/BannerSection/BannerSection'
 import { Metadata, Viewport } from "next";
+import SuggestSection from './_components/suggestSection/SuggestSection'
 
 
 export const viewport: Viewport = {
@@ -65,6 +66,7 @@ const page = () => {
       <CpuMotherboard />
       <CpuGraphic />
       <GraphicPower />
+      <SuggestSection />
       <BannerSection />
       {/* <CardService /> */}
       <ArticleSection />
