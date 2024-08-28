@@ -1,0 +1,180 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Box, TextInput, Group, Button, useMantineColorScheme, Flex, PinInput, Text } from '@mantine/core';
+import Image from 'next/image'
+import { useForm } from '@mantine/form';
+import { IconArrowLeft } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
+import classes from '@/_components/adsSection/ads.module.css'
+export default function LoginModal({ close, setSuccessLogin }: { close: () => void, setSuccessLogin: React.Dispatch<React.SetStateAction<boolean>> }) {
+    const [otpSent, setOtpSent] = useState<boolean>(false);
+    const [showErrorOtp, setShowErrorOtp] = useState<boolean>(false);
+    const router = useRouter();
+    const { colorScheme } = useMantineColorScheme();
+    const OTP_RESEND_TIME = 130;
+
+    const [timeLeft, setTimeLeft] = useState(OTP_RESEND_TIME);
+    const [canResend, setCanResend] = useState(false);
+
+    useEffect(() => {
+        if (otpSent && timeLeft > 0) {
+            const timerId = setInterval(() => {
+                setTimeLeft((prevTime) => prevTime - 1);
+            }, 1000);
+
+            // Clear interval when the component unmounts or the timer reaches 0
+            return () => clearInterval(timerId);
+        } else if (timeLeft === 0) {
+            setCanResend(true);  // Enable resend button when timer reaches 0
+        }
+    }, [otpSent, timeLeft]);
+
+    const handleResendOtp = () => {
+        setCanResend(false);    // Disable the resend button
+        setTimeLeft(OTP_RESEND_TIME);  // Reset the countdown timer
+
+        // Call your OTP resend API here
+        console.log('OTP resent!');
+        handlePhoneSubmit();
+        // Reset the timer and start countdown
+    };
+
+    const form = useForm({
+        initialValues: {
+            code: '',
+            phone: ''
+        },
+        validate: {
+            code: (value) => value ? (value.length !== 6 ? 'code not complete' : null) : null,
+            phone: (value) =>
+                /^0?(9\d{9})$/.test(value)
+                    ? null
+                    : 'شماره موبایل وارد شده معتبر نمی‌باشد',
+        },
+    });
+
+    const handlePhoneSubmit = async () => {
+        setOtpSent(true);
+        try {
+            const response = await fetch('/api/request-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ phone: form.values.phone.replace(/^0/, '') }),
+            });
+
+            if (response.ok) {
+
+                notifications.show({
+                    message: 'کد با موفقیت ارسال شد',
+                    classNames: classes
+                })
+                setSuccessLogin(true)
+            } else {
+                const data = await response.json();
+                notifications.show({
+                    message: 'خطایی پیش آمده لطفا دوباره تلاش کنید',
+                    color: 'red',
+                    classNames: classes
+                })
+            }
+        } catch (error) {
+            console.error('Error sending OTP:', error);
+            notifications.show({
+                message: 'خطایی پیش آمده لطفا دوباره تلاش کنید',
+                color: 'red',
+                classNames: classes
+
+            })
+        }
+    };
+
+    const handleOtpSubmit = async () => {
+        try {
+            const response = await fetch('/api/verify-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ phone: form.values.phone.replace(/^0/, ''), otp: form.values.code ? form.values.code : undefined }),
+            });
+
+            if (response.ok) {
+                setShowErrorOtp(false)
+                notifications.show({
+                    message: 'با موفقیت وارد شدید',
+                    classNames: classes
+                })
+                close()
+            } else {
+                setShowErrorOtp(true)
+                const data = await response.json();
+            }
+        } catch (error) {
+            setShowErrorOtp(true)
+        }
+    };
+
+    return (
+        <Box mb={'xs'} mx="auto" >
+            {!otpSent && <Flex pos={'relative'} top={'-3px'} mb={'lg'} align={'center'} justify={'center'}>
+                <Image style={{ objectFit: 'contain' }} alt='kiwi part' src={colorScheme === 'dark' ? '/logo-dark.png' : '/logo.png'} width={180} height={60} />
+            </Flex>}
+            {!otpSent ? (
+                <form onSubmit={form.onSubmit(handlePhoneSubmit)}>
+                    <TextInput
+                        data-autofocus
+                        label="لطفاً شماره موبایلتان را وارد کنید"
+                        placeholder=" شماره موبایل"
+                        {...form.getInputProps('phone')}
+                        required
+                        withAsterisk={false}
+                        mb="md"
+                    />
+                    <Group w={'100%'} align='center'>
+                        <Button color='var(--mantine-color-kiwi-9)' w={'100%'} type="submit">ارسال کد</Button>
+                    </Group>
+                </form>
+            ) : (
+                <form onSubmit={handleOtpSubmit}>
+                    <Text fz={'xl'}>کُد تایید را وارد کنید: </Text>
+                    <Text c="dimmed" mt={'xs'} fz={'sm'}>این کُد برای شماره {form.values.phone} پیامک شده است.</Text>
+                    <Button onClick={() => setOtpSent(false)} color='var(--mantine-color-kiwi-9)' size='xs' variant='transparent' pr={'0'} rightSection={<IconArrowLeft size={15} />}>تغییر شماره موبایل</Button>
+                    <PinInput
+                        {...form.getInputProps('code')}
+                        onComplete={handleOtpSubmit}
+                        dir={'ltr'}
+                        mt={'xl'}
+                        style={{ justifyContent: 'center' }}
+                        size={'md'}
+                        placeholder={''}
+                        type={'number'}
+                        oneTimeCode
+                        autoFocus
+                        inputMode={'numeric'}
+                        name={'verify-code'}
+                        data-autofocus
+                        aria-autocomplete={'none'}
+                        length={6}
+                    />
+                    {showErrorOtp && <Text fz={'sm'} c={'red'} mt={'lg'}>کد وارد شده اشتباه است یا منقضی شده است.</Text>}
+                    <Flex mt={'md'} justify={'center'} align={'center'}>
+                        <Button size='xs' variant='transparent'
+                            onClick={handleResendOtp}
+                            disabled={!canResend}
+                        >
+                            {canResend ? 'دریافت کد جدید' : <Text fz={'xs'}> {timeLeft}s ثانیه مانده تا تلاش مجدد  </Text>}
+                        </Button>
+
+                    </Flex>
+                    <Group mt={'lg'} w={'100%'} align='center'>
+                        <Button color='var(--mantine-color-kiwi-9)' w={'100%'} type="submit">تایید</Button>
+                    </Group>
+                </form>
+            )}
+        </Box>
+    );
+}
