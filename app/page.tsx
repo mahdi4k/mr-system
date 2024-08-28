@@ -9,6 +9,8 @@ import ArticleSection from './_components/articleSection/ArticleSection'
 import BannerSection from './_components/BannerSection/BannerSection'
 import { Metadata, Viewport } from "next";
 import SuggestSection from './_components/suggestSection/SuggestSection'
+import AdsSection from './_components/adsSection/AdsSection'
+import { cookies } from 'next/headers';
 
 
 export const viewport: Viewport = {
@@ -58,6 +60,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const page = () => {
+  const token = cookies().get('authToken')?.value;
+
   return (
     <div>
 
@@ -67,6 +71,7 @@ const page = () => {
       <CpuGraphic />
       <GraphicPower />
       <SuggestSection />
+      <AdsSection token={token} />
       <BannerSection />
       {/* <CardService /> */}
       <ArticleSection />
