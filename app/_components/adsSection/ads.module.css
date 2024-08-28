@@ -1,0 +1,78 @@
+.card {
+    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
+}
+
+.title {
+    font-family:
+        Greycliff CF,
+        var(--mantine-font-family);
+    font-weight: 700;
+}
+
+.item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: var(--mantine-radius-md);
+    height: rem(90px);
+    background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-7));
+    transition:
+        box-shadow 150ms ease,
+        transform 100ms ease;
+
+    @mixin hover {
+        box-shadow: var(--mantine-shadow-md);
+        transform: scale(1.05);
+    }
+}
+
+.activeItem {
+    background-color: var(--mantine-color-kiwi-5);
+    transform: scale(1.05);
+    box-shadow: var(--mantine-shadow-md);
+
+}
+
+.removeIcon {
+    display: none;
+}
+
+.imageBox {
+    transition: all .3s;
+
+    &:hover .removeIcon {
+        display: block;
+    }
+}
+
+.successSvg {
+    max-width: 60%;
+    height: 100%;
+
+    @media (max-width: $mantine-breakpoint-sm) {
+        max-width: 90%;
+    }
+}
+
+.root {
+    background-color: var(--notification-color, var(--mantine-primary-color-filled));
+
+    &::before {
+        background-color: var(--mantine-color-white);
+    }
+}
+
+.description,
+.title {
+    color: var(--mantine-color-white);
+}
+
+.closeButton {
+    color: var(--mantine-color-white);
+
+    @mixin hover {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+}
