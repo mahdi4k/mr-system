@@ -6,3 +6,4 @@ export * from "./motherboardApi"
 export * from "./powerApi"
 export * from "./ramApi"
 export * from "./ssdApi"
+ 
