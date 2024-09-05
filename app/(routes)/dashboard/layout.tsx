@@ -43,7 +43,7 @@ export default function DashboardLayout({children}: Props) {
                 <Group align='center' h="100%" px="md">
                     <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm"/>
                     <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm"/>
-                    <Text mt={'4px'}> mr sysyem panel</Text>
+                    <Text fw={'bolder'} mt={'4px'}> پنل مدیریت</Text>
                     <ActionIcon onClick={logout} mr={'auto'} variant='default'><IconLogout2/></ActionIcon>
                 </Group>
 
@@ -54,7 +54,7 @@ export default function DashboardLayout({children}: Props) {
             </AppShell.Navbar>
             <AppShell.Main>
                 <Paper>
-                    <Container size={'lg'}>
+                    <Container size={'xl'}>
                         <Paper my={'lg'} shadow={'md'} p={'lg'}>
                             {children}
                         </Paper>
