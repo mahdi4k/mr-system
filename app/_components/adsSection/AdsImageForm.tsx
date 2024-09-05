@@ -23,7 +23,7 @@ const AdsImageForm: FC<props> = ({ images, setImages }) => {
   };
   return (
     <>
-      <Text fz={'sm'} mb={'3px'} mt={'xl'}>عکس‌های آگهی</Text>
+      <Text fz={'sm'} mb={'3px'} mt={'xl'}>عکس‌های آگهی <span style={{fontSize:'12px',color:'gray'}}>(حداکثر ۳ عکس)</span></Text>
 
       <Flex mb={'xl'}>
         <Dropzone
