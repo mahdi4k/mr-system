@@ -1,3 +1,24 @@
+
+import moment from 'moment-jalaali';
+moment.locale('fa'); // Persian/Farsi locale
+moment.loadPersian({ dialect: 'persian-modern' }); // This is for Persian digits and formatting
+
+export const formatJalaliTimeAgo = (date: string) => {
+    const now = moment();
+    const past = moment(date);
+
+    const duration = moment.duration(now.diff(past));
+    const seconds = duration.asSeconds();
+
+    if (seconds < 60) return 'چند لحظه پیش';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)} دقیقه پیش`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)} ساعت پیش`;
+    if (seconds < 2592000) return `${Math.floor(seconds / 86400)} روز پیش`;
+    if (seconds < 31536000) return `${Math.floor(seconds / 2592000)} ماه پیش`;
+
+    return `${Math.floor(seconds / 31536000)} سال پیش`;
+};
+
 export const toFormData = (object: any) => Object.keys(object).reduce((formData, key) => {
     if (object[key] !== undefined && object[key] !== null && object[key] !== '') {
         formData.append(key, object[key])
@@ -14,6 +35,13 @@ export async function dataURItoBlob(dataURI: string | undefined) {
 export function ObjectIsEmpty(obj: Object) {
     return obj === undefined || Object.keys(obj).length === 0;
 }
+
+export function persianToWesternNumerals(persianNum: string) {
+    const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+    const arabicDigits = '0123456789';
+    return persianNum.replace(/[۰-۹]/g, (char) => arabicDigits[persianDigits.indexOf(char)]);
+}
+
 
 export const formatNumber = (num: string) => {
     return num.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -44,6 +72,7 @@ export function convertNumberToWords(number: number) {
 
     while (number > 0) {
         const n = number % 1000;
+        console.log("🚀 ~ convertNumberToWords ~ n:", number % 1000)
         if (n !== 0) {
             const word = convertThreeDigitNumberToWords(n);
             if (thousandIndex > 0 && word !== '') {
@@ -66,7 +95,7 @@ function convertThreeDigitNumberToWords(number: number) {
     const remainder = number % 100;
 
     if (hundreds > 0) {
-        words += persianHundreds[hundreds] + ' و ' ;
+        words += persianHundreds[hundreds] + ' و ';
     }
 
     if (remainder > 0) {
