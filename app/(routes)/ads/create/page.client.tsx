@@ -8,8 +8,10 @@ import { UseAdsCategory } from '@/_components/adsSection/UseAdsCategorySelect';
 import ModalSubmit from '@/_components/adsSection/ModalSubmit';
 import { useDisclosure } from '@mantine/hooks';
 import { City, Province } from './page';
-import { convertNumberToWords, formatNumber } from '@/_utils/utils';
+import { convertNumberToWords, formatNumber, persianToWesternNumerals } from '@/_utils/utils';
 import AdsImageForm from '@/_components/adsSection/AdsImageForm';
+import { notifications } from '@mantine/notifications';
+import notifClasses from "@/_cssModules/notification.module.css";
 
 
 export default function PageClient({ token }: { token: string | undefined }) {
@@ -86,8 +88,30 @@ export default function PageClient({ token }: { token: string | undefined }) {
                     Authorization: `Bearer ${token}`, // Replace with your token
                 },
             });
-
+            if (!response.ok) {
+                // The request failed, check for specific status codes
+                const errorMessage = await response.text(); // Extract the error message
+                if (response.status === 419) {
+                    console.error('CSRF Token Mismatch: Error 419');
+                    notifications.show({
+                        color: 'red',
+                        title: 'خطایی رخ داده است لطفا دوباره تلاش کنید',
+                        message: '',
+                        classNames: notifClasses
+                    })
+                } else {
+                    console.error(`Error ${response.status}: ${errorMessage}`);
+                    notifications.show({
+                        color: 'red',
+                        title: 'خطایی رخ داده است لطفا دوباره تلاش کنید',
+                        message: '',
+                        classNames: notifClasses
+                    })
+                }
+                return; // Prevent the success flow when there's an error
+            }
             open();
+            setImages([]);
             form.reset();
         } catch (error) {
             console.error('Error uploading images:', error);
@@ -95,13 +119,14 @@ export default function PageClient({ token }: { token: string | undefined }) {
     };
 
     const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-console.log(event.target.value.replace(/,/g, ''));
+        const inputValue = event.target.value;
+        const westernValue = persianToWesternNumerals(inputValue);
+        const numericValue = parseInt(westernValue.replace(/,/g, ''), 10);
 
-        const priceWords = convertNumberToWords(parseInt(event.target.value.replace(/,/g, ''), 10));
+        const priceWords = convertNumberToWords(numericValue);
         setPriceInWords(priceWords);
 
-
-        const formattedValue = formatNumber(event.target.value);
+        const formattedValue = formatNumber(westernValue);
         form.setFieldValue('price', formattedValue);
     };
 
@@ -174,11 +199,11 @@ console.log(event.target.value.replace(/,/g, ''));
                             label="قیمت (تومان)"
                             value={form.values.price}
                             onChange={handlePriceChange}
-                           
+
                         />
                         {priceInWords && <Text c="dimmed" mt={'3px'} mb="md" fz={'xs'}> {priceInWords} تومان </Text>}
 
-                        <Textarea withAsterisk {...form.getInputProps('description')}
+                        <Textarea minRows={4} autosize mt={'lg'} withAsterisk {...form.getInputProps('description')}
                             label={'توضیحات'}></Textarea>
                         <Group w={'100%'} justify='flex-end' mt={'lg'}>
                             <Button size='md' w={'100%'} color='var(--mantine-color-kiwi-8)' px={'xl'} type="submit">ثبت</Button>

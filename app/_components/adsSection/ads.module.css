@@ -48,7 +48,7 @@
 }
 
 .successSvg {
-    max-width: 60%;
+    max-width: 40%;
     height: 100%;
 
     @media (max-width: $mantine-breakpoint-sm) {

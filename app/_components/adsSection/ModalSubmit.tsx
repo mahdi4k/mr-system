@@ -12,7 +12,8 @@ type Props = {
 const ModalSubmit: FC<Props> = ({ opened, close }) => {
     return (
         <div>
-            <Modal style={{ backgroundColor: 'var(--mantine-color-green-light)' }} styles={{ body: { padding: '0' } }} transitionProps={{ transition: 'pop' }} size={'lg'}  opened={opened} onClose={close} title="">
+            <Modal 
+              styles={{ body: { padding: '0' } }} transitionProps={{ transition: 'pop' }} size={'lg'}  opened={opened} onClose={close} title={<Text fz={'xl'}>آگهی در صف تایید</Text>}>
                 <Flex pt={'30px'} align={'center'} direction={'column'} justify={'center'}>
 
                     <SVG
@@ -24,6 +25,9 @@ const ModalSubmit: FC<Props> = ({ opened, close }) => {
                         <ThemeIcon size={'30px'} variant='transparent' color="teal">
                             <IconCircleCheckFilled size={30} />
                         </ThemeIcon>
+                    </Flex>
+                    <Flex>
+                        <Button gradient={{ from: 'teal', to: 'green', deg: 90 }} mb={'lg'} radius={'xl'} size='md' variant='gradient'>مشاهده لیست آگهی‌های من</Button>
                     </Flex>
                 </Flex>
 
