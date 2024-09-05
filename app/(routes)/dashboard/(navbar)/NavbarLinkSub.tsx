@@ -87,6 +87,14 @@ const NavbarLinkSub = ({activeLink}: { activeLink: activeLink }) => {
                     { label: 'افزودن', link: '/dashboard/case/add' },
                 ],
             },
+            {
+                label: 'آگهی‌ها',
+                initiallyOpened: activeTabBaseUrl === 'ram',
+                links: [
+                    { label: 'لیست', link: '/dashboard/ads' },
+                    { label: 'افزودن', link: '/dashboard/case/add' },
+                ],
+            },
         ]
     const linkGroup = links.map((item) => <LinksGroup {...item} key={item.label} />);
     
