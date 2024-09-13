@@ -8,6 +8,7 @@ import FanReducer from "./features/fan";
 import RamReducer from "./features/ram";
 import SsdReducer from "./features/ssd";
 import CaseReducer from "./features/case";
+import AdsReducer from "./features/ads";
 import { api } from './services/api'
 
 export const store = configureStore({
@@ -21,6 +22,7 @@ export const store = configureStore({
         graphic: graphicReducer,
         ssd: SsdReducer,
         case: CaseReducer,
+        ads:AdsReducer,
         [api.reducerPath]: api.reducer,
     },
     middleware: (getDefaultMiddleware) =>
