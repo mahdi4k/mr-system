@@ -4,11 +4,11 @@ import Image from "next/image";
 import classes from './choosePart.module.css'
 import { useDisclosure } from '@mantine/hooks';
 import CardPartPrice from '../shared/CardPartPrice';
-import CategoryImage from '../category/components/CategoryImage';
 import { CPU } from '@/_redux/services/cpuApi';
 import ShopsLink from '../pieces/shared/ShopsLink';
 import { IconX } from '@tabler/icons-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import KiwiImage from '../shared/KiwiImage';
 
 interface Props {
     svg: string
@@ -67,7 +67,7 @@ const ChoosePartItem: FC<Props> = ({ svg, title, type, itemData, partEmpty }) =>
                             <IconX size={18} />
                         </ActionIcon>
                         <Box w={'100%'} ta={'center'} className={classes.categoryImage}>
-                            {currentItemData.image && <CategoryImage img={currentItemData.image} alt={currentItemData.name ?? ''} />}
+                            {currentItemData.image && <KiwiImage width={300} height={300} img={currentItemData.image} alt={currentItemData.name ?? ''} />}
                         </Box>
                         <Text lineClamp={2} h={'43px'} ta={'center'} mt={'lg'} size='sm'>{currentItemData.name}</Text>
                         <Flex justify={'center'} align={'center'}>

@@ -7,7 +7,7 @@ import React, { FC } from 'react'
 import Link from 'next/link'
 import CardPartPrice from '../../shared/CardPartPrice'
 import classes from '../category.module.css'
-import CategoryImage from './CategoryImage'
+import KiwiImage from '@/_components/shared/KiwiImage'
 
 type Iprops = {
     items: Graphic[] | Motherboard[] | CPU[] | POWER[] | undefined
@@ -24,7 +24,7 @@ const ModalItems: FC<Iprops> = ({ title, items, type }) => {
                         <Card className={classes.categoryCard} mih={{ base: '200px', md: '375px' }} key={item.id} shadow="sm" padding="lg" radius="md" withBorder>
                             <Link className={classes.categorySection} href={`/products/${type}/${item.id}`}>
                                 <Card.Section className={classes.categoryImage} mt={'0'} ta={'center'}>
-                                    {item.image && <CategoryImage img={item.image} alt={item.name} />}
+                                    {item.image && <KiwiImage width={300} height={300} img={item.image} alt={item.name} />}
                                 </Card.Section>
 
                                 <Flex direction={'column'}>

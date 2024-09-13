@@ -2,7 +2,6 @@ import { Grid, Card, Flex, Stack, Box, Divider, Group, Tooltip, Avatar, Text } f
 import Link from 'next/link'
 import React, { FC } from 'react'
 import CardPartPrice from '../shared/CardPartPrice'
-import CategoryImage from './components/CategoryImage'
 import classes from './category.module.css'
 import { CPU } from '@/_redux/services/cpuApi'
 import { Graphic } from '@/_redux/services/graphicApi'
@@ -12,6 +11,7 @@ import { SSD } from '@/_redux/services/ssdApi'
 import { FAN } from '@/_redux/services/fanApi'
 import { CASE } from '@/_redux/services/caseApi'
 import { RAM } from '@/_redux/services/ramApi'
+import KiwiImage from '../shared/KiwiImage'
 
 type Props = {
     data: CPU | Motherboard | Graphic | POWER | SSD | FAN | CASE | RAM;
@@ -25,7 +25,7 @@ const CategoryLayout: FC<Props> = ({ data, children, type }) => {
             <Card className={classes.categoryCard} mih={{ base: '230px', md: '375px' }} miw={'250px'} key={data.id} shadow="sm" padding="lg" radius="md" withBorder>
                 <Link className={classes.categorySection} href={`/products/${type}/${data.id}`}>
                     <Card.Section className={classes.categoryImage} mt={'0'} ta={'center'}>
-                        {data.image && <CategoryImage img={data.image} alt={data.name} />}
+                        {data.image && <KiwiImage width={300} height={300} img={data.image} alt={data.name} />}
                     </Card.Section>
 
                     <Flex direction={'column'}>

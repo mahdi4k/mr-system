@@ -8,10 +8,10 @@ import { RAM } from '@/_redux/services/ramApi'
 import { SSD } from '@/_redux/services/ssdApi'
 import { Card, Modal, SimpleGrid, Skeleton, Text } from '@mantine/core'
 import React, { FC, useEffect, useState } from 'react'
-import CategoryImage from '../category/components/CategoryImage'
 import classes from './choosePart.module.css'
 import CardPartPrice from '../shared/CardPartPrice'
 import { useRouter, useSearchParams } from 'next/navigation';
+import KiwiImage from '../shared/KiwiImage'
 
 type Props = {
     opened: boolean
@@ -134,7 +134,7 @@ const ModalPart: FC<Props> = ({ opened, close, ssdList, cpuList, ramList, caseLi
                 {dataList && dataList.length > 0 ? dataList.map((item) => (
                     <Card onClick={() => handleCardClick(item.id)} key={item.id} className={classes.partItem}>
                         <Card.Section className={classes.categoryImage} mt={'0'} ta={'center'}>
-                            {item.image && <CategoryImage img={item.image} alt={item.name} />}
+                            {item.image && <KiwiImage width={300} height={300} img={item.image} alt={item.name} />}
                         </Card.Section>
 
                         <Text ta={'center'} mt={'lg'} size='md'>{item.name}</Text>
