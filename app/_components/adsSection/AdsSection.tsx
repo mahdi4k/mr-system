@@ -12,8 +12,14 @@ import LoginModal from '../loginModal/LoginModal'
 import { useRouter } from 'next/navigation'
 import { useLazyGetAdsListCategoryQuery } from '@/_redux/services/adsApi'
 import { Province } from '(routes)/ads/create/page'
-import { formatJalaliTimeAgo } from '@/_utils/utils'
+import { cityTitleHandler, formatJalaliTimeAgo, provinceTitleHandler } from '@/_utils/utils'
+import Link from 'next/link'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from "@/_redux/store";
+import { fetchCity, fetchOstan } from '@/_redux/features/ads'
+import { ThunkDispatch, AnyAction } from '@reduxjs/toolkit'
 
+type AppDispatch = ThunkDispatch<RootState, void, AnyAction>;
 
 
 const AdsSection = ({ token }: { token?: string }) => {
@@ -23,11 +29,21 @@ const AdsSection = ({ token }: { token?: string }) => {
     const parts = usePcparts();
     const [successLogin, setSuccessLogin] = useState(false);
     const [activeTab, setActiveTab] = useState<string | null>('cpu');
-    const [provinces, setProvinces] = useState<Province[]>([]);
-
 
     const [adsQuery, { data: adsData, isSuccess: isSuccessAds, isLoading, isFetching: isFetchingAds }] = useLazyGetAdsListCategoryQuery()
 
+    const dispatch: AppDispatch = useDispatch();
+    const { ostan, city, status } = useSelector((state: RootState) => state.ads);
+
+
+    useEffect(() => {
+        if (!ostan.length) {
+            dispatch(fetchOstan());
+        }
+        if (!city.length) {
+            dispatch(fetchCity());
+        }
+    }, [ostan, city, dispatch]);
 
     useEffect(() => {
         if (embla) {
@@ -46,15 +62,7 @@ const AdsSection = ({ token }: { token?: string }) => {
         if (activeTab)
             adsQuery({ category: activeTab })
     }, [activeTab])
-    useEffect(() => {
-        // Fetch provinces and cities data from public folder
-        const fetchProvincesAndCities = async () => {
-            const provincesResponse = await fetch('/provinces.json');
-            const provincesData: Province[] = await provincesResponse.json();
-            setProvinces(provincesData);
-        };
-        fetchProvincesAndCities();
-    }, []);
+
 
 
     const handleImageAds = (image: string | undefined, title: string) => {
@@ -76,15 +84,11 @@ const AdsSection = ({ token }: { token?: string }) => {
             )
         }
     }
-    const provinceTitleHandler = (item: string) => {
-        const province = provinces.find(province => province.id == Number(item))
-        return province?.name
-    }
     return (
         <Container mt={'100px'} my={'xl'} size="lg">
             <Flex justify={'space-between'}>
                 <Text>آگهی قطعات</Text>
-                <Button variant='outline'>مشاهده همه</Button>
+                <Button color='green' variant='outline'>مشاهده همه</Button>
             </Flex>
             <Tabs variant='default' color='teal' styles={{ tab: { minWidth: '90px' } }} defaultValue={activeTab} onChange={setActiveTab}>
                 <Tabs.List>
@@ -115,22 +119,27 @@ const AdsSection = ({ token }: { token?: string }) => {
                         </Carousel.Slide>
                         {adsData && !isFetchingAds && adsData.map(item => (
                             <Carousel.Slide key={item.id} mt={'sm'} >
-                                <Card withBorder shadow="sm">
-                                    <Card.Section mt={'0'} ta={'center'}>
-                                        {handleImageAds(item.image, item.title)}
-                                    </Card.Section>
-                                    <Text ta={'right'} mt={'5px'} lineClamp={1} fz={'md'}>{item.title}</Text>
-                                    <Flex align={'baseline'} justify={'space-between'}>
-                                        <CardPartPrice isAds price={item.price} />
-                                        <Flex>
-                                            <Text ml={'2px'} fz={'xs'}>{formatJalaliTimeAgo(item.created_at)}</Text>
+                                <Link href={`/ads/${item.id}`}>
+                                    <Card withBorder shadow="sm">
+                                        <Card.Section mt={'0'} ta={'center'}>
+                                            {handleImageAds(item.image, item.title)}
+                                        </Card.Section>
+                                        <Text ta={'right'} mt={'5px'} lineClamp={1} fz={'md'}>{item.title}</Text>
+                                        <Flex align={'baseline'} justify={'space-between'}>
+                                            <CardPartPrice isAds price={item.price} />
+                                            <Flex>
+                                                <Text ml={'2px'} fz={'xs'}>{formatJalaliTimeAgo(item.created_at)}</Text>
+                                            </Flex>
                                         </Flex>
-                                    </Flex>
-                                    <Flex justify={'flex-end'} mt='xs' align={'baseline'}>
-                                        <IconFlag3 size={15} />
-                                        <Text style={{ position: 'relative', bottom: '3px' }} mr={'3px'} ta={'left'} fz={'13px'}>{provinceTitleHandler(item.ostan)}</Text>
-                                    </Flex>
-                                </Card>
+                                        <Flex justify={'flex-end'} mt='xs' align={'baseline'}>
+                                            <IconFlag3 size={15} />
+                                            <Text style={{ position: 'relative', bottom: '3px' }} mr={'3px'} ta={'left'} fz={'11.5px'}>{provinceTitleHandler(status, item.ostan, ostan)}</Text>
+                                            <Text mr={'2px'}>,</Text>
+                                            <Text style={{ position: 'relative', bottom: '3px' }} mr={'3px'} ta={'left'} fz={'11.5px'}>{cityTitleHandler(status, item.city, city)}</Text>
+
+                                        </Flex>
+                                    </Card>
+                                </Link>
                             </Carousel.Slide>
                         ))}
                         {isFetchingAds && (

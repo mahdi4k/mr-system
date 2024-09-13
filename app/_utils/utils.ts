@@ -1,4 +1,5 @@
 
+import { IStatusFetch } from '@/_redux/features/ads';
 import moment from 'moment-jalaali';
 moment.locale('fa'); // Persian/Farsi locale
 moment.loadPersian({ dialect: 'persian-modern' }); // This is for Persian digits and formatting
@@ -112,4 +113,19 @@ function convertThreeDigitNumberToWords(number: number) {
     }
 
     return words.trim();
+}
+
+export const provinceTitleHandler = (status: IStatusFetch, item: string, ostan: { id: number, name: string }[]) => {
+    if (status === 'succeeded') {
+        const province = ostan.find(province => province.id == Number(item))
+        return province?.name
+    }
+    return ''
+}
+export const cityTitleHandler = (status: IStatusFetch, item: string, cities: { id: number, name: string }[]) => {
+    if (status === 'succeeded') {
+        const city = cities.find(city => city.id == Number(item))
+        return city?.name
+    }
+    return ''
 }
