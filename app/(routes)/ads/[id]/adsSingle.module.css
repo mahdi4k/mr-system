@@ -1,0 +1,12 @@
+.adsImages {
+    position: relative;
+    width: 357px;
+    height: 350px;
+
+    @mixin smaller-than $mantine-breakpoint-sm {
+        margin-left: 10px;
+        margin-right: unset;
+        width: 210px;
+        height: 220px;
+    }
+}
