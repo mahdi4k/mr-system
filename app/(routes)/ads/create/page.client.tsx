@@ -81,7 +81,7 @@ export default function PageClient({ token }: { token: string | undefined }) {
         images.forEach((file) => formData.append('image[]', file));
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/products', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products`, {
                 method: 'POST',
                 body: formData,
                 headers: {

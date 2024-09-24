@@ -16,7 +16,7 @@ export const UseAdsCategory = () => {
   useEffect(() => {
     // Fetch categories from API
     const fetchCategories = async () => {
-      const response = await fetch('http://127.0.0.1:8000/api/categories');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories`);
       const data: Category[] = await response.json();
       setCategoriesAds(data);
     };

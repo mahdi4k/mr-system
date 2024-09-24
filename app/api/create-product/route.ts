@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     const { name, description, price }: CreateProductRequest = await req.json();
 
     try {
-        const response = await fetch('http://127.0.0.1:8000/api/products', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

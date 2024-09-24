@@ -3,16 +3,16 @@ import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 
 interface VerifyOtpRequest {
-  phone: string;
-  otp: string;
-  name?: string;
+    phone: string;
+    otp: string;
+    name?: string;
 }
 
 export async function POST(req: NextRequest) {
     const { phone, otp, name }: VerifyOtpRequest = await req.json();
 
     try {
-        const response = await fetch('http://127.0.0.1:8000/api/verify-otp', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/verify-otp`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
