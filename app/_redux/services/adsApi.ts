@@ -53,16 +53,17 @@ export const AdsApi = api.injectEndpoints({
             },
             providesTags: ['ads']
         }),
-        getAdsListCategory: builder.query<Product[], { category?: string }>({
-            query: ({ category }) => {
+        getAdsListCategory: builder.query<ApiResponse, { category?: string, search?: string, price_from?: string, price_to?: string, sort?: string }>({
+            query: ({ category, search, price_from, price_to, sort }) => {
                 return {
                     url: `/products/category`,
                     method: 'GET',
-                    params: { category: category }
+                    params: { category, search, price_from, price_to, sort }
                 }
             },
             providesTags: ['ads']
         }),
+
         approveAdsItem: builder.mutation({
             query: (payload) => ({
                 url: `products/${payload.id}/approve`,
