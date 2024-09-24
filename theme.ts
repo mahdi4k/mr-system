@@ -13,8 +13,14 @@ const kiwi: MantineColorsTuple = [
   '#9ebb1d',
   '#87a10c'
 ];
+
+const green: MantineColorsTuple = [
+  '#ebfbee', '#d3f9d8', '#b2f2bb', '#8ce99a', '#69db7c',
+  '#51cf66', '#40c057', '#37b24d', '#2f9e44', '#2b8a3e'
+];
 export const theme = createTheme({
   colors: {
     kiwi,
-  }
+  },
+  primaryColor: 'green',
 });
