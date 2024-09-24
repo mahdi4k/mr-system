@@ -40,8 +40,8 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: any }) {
   return (
-    <html dir="rtl" lang="en" className={`${vazirmatn.variable} ${vibes.variable}`}>
-      <GoogleAnalytics gaId="G-0V5T3XRVPY" />
+    <html style={{height:'100%'}} dir="rtl" lang="en" className={`${vazirmatn.variable} ${vibes.variable}`}>
+      {/* <GoogleAnalytics gaId="G-0V5T3XRVPY" /> */}
       <head>
         <ColorSchemeScript />
         <link rel="shortcut icon" href="/favicon.ico" />
@@ -50,7 +50,7 @@ export default function RootLayout({ children }: { children: any }) {
           content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no"
         />
       </head>
-      <body>
+      <body style={{height:'100%'}}>
         <NextTopLoader showSpinner={false} height={5} color="#87A10C" />
 
         <DirectionProvider>
