@@ -11,7 +11,6 @@ import { useDisclosure } from '@mantine/hooks'
 import LoginModal from '../loginModal/LoginModal'
 import { useRouter } from 'next/navigation'
 import { useLazyGetAdsListCategoryQuery } from '@/_redux/services/adsApi'
-import { Province } from '(routes)/ads/create/page'
 import { cityTitleHandler, formatJalaliTimeAgo, provinceTitleHandler } from '@/_utils/utils'
 import Link from 'next/link'
 import { useDispatch, useSelector } from 'react-redux'
@@ -88,7 +87,9 @@ const AdsSection = ({ token }: { token?: string }) => {
         <Container mt={'100px'} my={'xl'} size="lg">
             <Flex justify={'space-between'}>
                 <Text>آگهی قطعات</Text>
-                <Button color='green' variant='outline'>مشاهده همه</Button>
+                <Link href={'/ads'}>
+                    <Button color='green' variant='outline'>مشاهده همه</Button>
+                </Link>
             </Flex>
             <Tabs variant='default' color='teal' styles={{ tab: { minWidth: '90px' } }} defaultValue={activeTab} onChange={setActiveTab}>
                 <Tabs.List>
@@ -108,7 +109,7 @@ const AdsSection = ({ token }: { token?: string }) => {
                         dragFree
                         withControls={false}>
                         <Carousel.Slide mt={'sm'} >
-                            <Card onClick={handleAddAdsPage} styles={{ root: { borderStyle: "dashed", cursor: 'pointer' } }} h={270} withBorder shadow="sm">
+                            <Card onClick={handleAddAdsPage} styles={{ root: { borderStyle: "dashed", cursor: 'pointer' } }} h={'340px'} withBorder>
                                 <Card.Section h={'100%'} mt={'0'} ta={'center'}>
                                     <Flex h={'100%'} align={'center'} justify={'center'} direction={'column'}>
                                         <IconSquarePlus2 style={{ marginTop: '20px' }} color='var(--mantine-color-kiwi-7)' size={77} />
@@ -117,7 +118,7 @@ const AdsSection = ({ token }: { token?: string }) => {
                                 </Card.Section>
                             </Card>
                         </Carousel.Slide>
-                        {adsData && !isFetchingAds && adsData.map(item => (
+                        {adsData && !isFetchingAds && isSuccessAds && adsData.data.map(item => (
                             <Carousel.Slide key={item.id} mt={'sm'} >
                                 <Link href={`/ads/${item.id}`}>
                                     <Card withBorder shadow="sm">
@@ -144,9 +145,9 @@ const AdsSection = ({ token }: { token?: string }) => {
                         ))}
                         {isFetchingAds && (
                             <Group mt={'md'} gap={'lg'}>
-                                <Skeleton height={'270px'} width={'220px'} />
-                                <Skeleton height={'270px'} width={'220px'} />
-                                <Skeleton height={'270px'} width={'220px'} />
+                                <Skeleton height={'340px'} width={'220px'} />
+                                <Skeleton height={'340px'} width={'220px'} />
+                                <Skeleton height={'340px'} width={'220px'} />
                             </Group>
 
                         )}

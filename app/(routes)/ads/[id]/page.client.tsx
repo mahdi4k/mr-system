@@ -1,20 +1,18 @@
 "use client"
 
 import KiwiImage from '@/_components/shared/KiwiImage';
-import { Anchor, Breadcrumbs, Container, Text, Group, Flex, Grid, Box, Card, ThemeIcon, Button, Skeleton, Divider, SimpleGrid, Modal } from '@mantine/core';
+import { Anchor, Breadcrumbs, Container, Text, Group, Flex, Grid, Box, Card, ThemeIcon, Button, Divider } from '@mantine/core';
 import React, { FC, useEffect, useState } from 'react'
 import { IAdsProps } from './page';
 import classes from './adsSingle.module.css'
 import Image from 'next/image';
-import { IconFlag3, IconPhone, IconUser } from '@tabler/icons-react';
+import { IconPhone, IconUser } from '@tabler/icons-react';
 import { cityTitleHandler, formatJalaliTimeAgo, provinceTitleHandler } from '@/_utils/utils';
 import { fetchCity, fetchOstan } from '@/_redux/features/ads';
 import { AppDispatch, RootState } from '@/_redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLazyGetAdsListCategoryQuery } from '@/_redux/services/adsApi';
 import { Carousel, Embla } from '@mantine/carousel';
-import Link from 'next/link';
-import CardPartPrice from '@/_components/shared/CardPartPrice';
 import AdsRelated from '@/_components/adsSection/AdsRelated';
 import AdsGalleryModal from '@/_components/adsSection/AdsGalleryModal';
 
@@ -29,7 +27,7 @@ const PageClient: FC<props> = ({ product }) => {
   const [adsQuery, { data: adsData, isSuccess: isSuccessAds, isLoading, isFetching: isFetchingAds }] = useLazyGetAdsListCategoryQuery()
   const [embla, setEmbla] = useState<Embla | null>(null);
   const [openedImageModal, setOpenedImageModal] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<number | null>(null);
 
   useEffect(() => {
     if (embla) {
@@ -52,10 +50,10 @@ const PageClient: FC<props> = ({ product }) => {
       adsQuery({ category: product.category.value })
   }, [product])
 
-  const filteredAds = adsData?.filter(ad => ad.id !== product.id);
+  const filteredAds = adsData?.data.filter(ad => ad.id !== product.id);
 
-  const openModal = (img: string) => {
-    setSelectedImage(`${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${img}`);
+  const openModal = (index: number) => {
+    setSelectedImage(index);
     setOpenedImageModal(true);
   };
 
@@ -73,21 +71,14 @@ const PageClient: FC<props> = ({ product }) => {
             withControls={false}>
             {images.map((img, index) => (
               <Carousel.Slide key={index} mt={'sm'} >
-                <Box onClick={() => openModal(img)}>
+                <Box onClick={() => openModal(index)}>
                   <Group wrap='nowrap' justify='center' className={classes.adsImages} key={index}>
                     <KiwiImage objectFit='cover' url={`${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${img}`} width={300} height={300} img={img} alt={title} />
                   </Group>
                 </Box>
               </Carousel.Slide>
             ))}
-            {isFetchingAds && (
-              <Group mt={'md'} gap={'lg'}>
-                <Skeleton height={'270px'} width={'220px'} />
-                <Skeleton height={'270px'} width={'220px'} />
-                <Skeleton height={'270px'} width={'220px'} />
-              </Group>
-            )}
-
+            
           </Carousel>
         </>
       );
@@ -160,7 +151,7 @@ const PageClient: FC<props> = ({ product }) => {
       {isSuccessAds && filteredAds && filteredAds.length > 0 && (
         <AdsRelated filteredAds={filteredAds} isFetchingAds={isFetchingAds} />
       )}
-       <AdsGalleryModal image={product.image} openedImageModal={openedImageModal} setOpenedImageModal={setOpenedImageModal} />
+       <AdsGalleryModal image={product.image} openedImageModal={openedImageModal} selectedImage={selectedImage} setOpenedImageModal={setOpenedImageModal} />
     </Container>
 
   )
