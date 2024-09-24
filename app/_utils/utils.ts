@@ -73,7 +73,6 @@ export function convertNumberToWords(number: number) {
 
     while (number > 0) {
         const n = number % 1000;
-        console.log("🚀 ~ convertNumberToWords ~ n:", number % 1000)
         if (n !== 0) {
             const word = convertThreeDigitNumberToWords(n);
             if (thousandIndex > 0 && word !== '') {
@@ -128,4 +127,26 @@ export const cityTitleHandler = (status: IStatusFetch, item: string, cities: { i
         return city?.name
     }
     return ''
+}
+
+export const convertToEnglishNumber = (value: string): string => {
+    // Persian/Arabic digits mapping
+    const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    const arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+
+    return value
+        .replace(/[۰-۹]/g, (char) => persianNumbers.indexOf(char).toString())
+        .replace(/[٠-٩]/g, (char) => arabicNumbers.indexOf(char).toString());
+};
+
+export const formatNumberWithCommas = (value: string): string => {
+    // Ensure the value only has numbers before formatting
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+export const currentUrlCategory = (item: string): string => {
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set('category', item.replace(/,/g, ''));
+    return `${window.location.pathname}?${searchParams.toString()}`;
+
 }
