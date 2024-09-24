@@ -8,9 +8,10 @@ type props = {
     image?: string,
     openedImageModal: boolean,
     setOpenedImageModal: React.Dispatch<React.SetStateAction<boolean>>
+    selectedImage?: number | null
 }
 
-const AdsGalleryModal: FC<props> = ({ image, openedImageModal, setOpenedImageModal }) => {
+const AdsGalleryModal: FC<props> = ({ image, openedImageModal, setOpenedImageModal, selectedImage }) => {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const emblaRef = useRef<EmblaCarouselType | null>(null); // To access embla API
     const [images, setImages] = useState<string[]>([])
@@ -20,7 +21,13 @@ const AdsGalleryModal: FC<props> = ({ image, openedImageModal, setOpenedImageMod
             const images: string[] = JSON.parse(image);
             setImages(images)
         }
+
     }, [image])
+
+    useEffect(() => {
+        setSelectedImageIndex(selectedImage ? selectedImage : 0)
+    }, [selectedImage])
+
 
 
     const handleThumbnailClick = (index: number) => {
@@ -51,8 +58,8 @@ const AdsGalleryModal: FC<props> = ({ image, openedImageModal, setOpenedImageMod
                     {images.map((img, index) => (
                         <Carousel.Slide key={index}>
                             <Image
-                                width={600}
-                                height={600}
+                                fill
+                                style={{objectFit:'contain'}}
                                 src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${img}`}
                                 alt={`Large Image ${index}`} />
                         </Carousel.Slide>
