@@ -1,3 +1,5 @@
+"use client"
+
 import React, { FC } from 'react';
 import Image from 'next/image';
 import { useMantineColorScheme } from '@mantine/core';
@@ -12,7 +14,6 @@ type Props = {
 };
 
 const KiwiImage: FC<Props> = ({ img, alt, width, height, url, objectFit }) => {
-  console.log("🚀 ~ url:", url)
   const { colorScheme } = useMantineColorScheme();
 
   const shimmer = (w: number, h: number) => `
@@ -29,7 +30,10 @@ const KiwiImage: FC<Props> = ({ img, alt, width, height, url, objectFit }) => {
       <animate attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite" />
     </svg>`;
 
-  const toBase64 = (str: string) => window.btoa(str);
+  const toBase64 = (str: string) =>
+    typeof window === "undefined"
+      ? Buffer.from(str).toString("base64")
+      : window.btoa(str);
 
   if (!img || !alt) return null;
 
