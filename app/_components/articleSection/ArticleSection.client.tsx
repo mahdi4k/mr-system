@@ -8,7 +8,6 @@ import { ArticleCard } from './ArticleCard'
 import classess from './Article.module.css'
 import { postsMO } from './ArticleSection'
 import Link from 'next/link'
-
 const ArticleSectionClient = ({ posts }: { posts: postsMO[] }) => {
     const [embla, setEmbla] = useState<Embla | null>(null);
 
