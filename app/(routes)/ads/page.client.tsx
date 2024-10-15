@@ -1,21 +1,22 @@
 'use client'
 
-import { Anchor, Badge, Breadcrumbs, Card, Container, Flex, Grid, Group, Menu, rem, SimpleGrid, Skeleton, Text, UnstyledButton } from '@mantine/core'
-import React, { useEffect, useState } from 'react'
+import { ActionIcon, Anchor, Badge, Breadcrumbs, Button, Card, Container, Drawer, Flex, Grid, Group, Loader, Menu, rem, SimpleGrid, Skeleton, Text, UnstyledButton } from '@mantine/core'
+import React, { useEffect, useRef, useState } from 'react'
 import { Category } from './[id]/page';
 import Image from 'next/image'
-import { useLazyGetAdsListCategoryQuery } from '@/_redux/services/adsApi';
+import { Product, useLazyGetAdsListCategoryQuery } from '@/_redux/services/adsApi';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import CardPartPrice from '@/_components/shared/CardPartPrice';
-import { formatJalaliTimeAgo, provinceTitleHandler, cityTitleHandler, formatNumberWithCommas } from '@/_utils/utils';
-import { IconChevronDown, IconFlag3, IconX } from '@tabler/icons-react';
+import { formatJalaliTimeAgo, provinceTitleHandler, cityTitleHandler, formatNumberWithCommas, debounce } from '@/_utils/utils';
+import { IconChevronDown, IconFilter, IconFlag3, IconX } from '@tabler/icons-react';
 import { AppDispatch, RootState } from '@/_redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchOstan, fetchCity } from '@/_redux/features/ads';
 import AdsFilter from '@/_components/adsSection/AdsFilter';
 import classes from './AdsPage.module.css'
-
+import ImgNoProduct from '../../../public/no-product.png'
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 
 
 const data = [
@@ -35,6 +36,9 @@ const PageClient = () => {
     const router = useRouter();
     const [opened, setOpened] = useState(false);
     const [selectedSort, setSelectedSort] = useState(data[0]);
+    const [page, setPage] = useState(1);
+    const [products, setProducts] = useState<Product[]>([]);
+    const observerRef = useRef(null);  // Ref for the observer target
 
     useEffect(() => {
         if (!ostan.length) {
@@ -57,7 +61,7 @@ const PageClient = () => {
     }, [searchParams]);
 
 
-
+    // check query params exist 
     useEffect(() => {
         const categoryParam = searchParams.get('category');
         const searchParam = searchParams.get('search');
@@ -65,22 +69,40 @@ const PageClient = () => {
         const priceTo = searchParams.get('price_to');
         const sort = searchParams.get('sort');
 
-        const queryParams: { category?: string; search?: string; price_from?: string; price_to?: string; sort?: string } = {};
+        const queryParams: { category?: string; search?: string; price_from?: string; price_to?: string; sort?: string; page?: string } = {};
+
 
         if (categoryParam) queryParams.category = categoryParam;
         if (searchParam) queryParams.search = searchParam;
         if (priceFrom) queryParams.price_from = priceFrom;
         if (priceTo) queryParams.price_to = priceTo;
         if (sort) queryParams.sort = sort;
-        console.log(sort, 'sort');
+        if (page) queryParams.page = `${page}`;
 
 
+        if (searchParams.get('sort')) {
+            const sortParam = searchParams.get('sort');
+            setSelectedSort(data.find(item => item.value === sortParam) as { label: string; value: string; })
+        }
         adsQuery(queryParams);
-    }, [searchParams]); // Re-run when `searchParams` changes
+    }, [searchParams, page]);
 
 
+    // set total page number in query param
     useEffect(() => {
-        // Fetch categories from API
+        const setSearchParams = new URLSearchParams(window.location.search);
+
+        if (isSuccessAds) {
+            setSearchParams.set('total_page', `${adsData.last_page}`);
+            const newUrl = `${window.location.pathname}?${setSearchParams.toString()}`;
+
+            window.history.pushState({}, '', newUrl);
+        }
+    }, [isSuccessAds])
+
+
+    // Fetch categories from API
+    useEffect(() => {
         const fetchCategories = async () => {
             const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories`);
             const data: Category[] = await response.json();
@@ -89,9 +111,71 @@ const PageClient = () => {
         fetchCategories();
     }, []);
 
-    const handleImageAds = (image: string | undefined, title: string) => {
-        if (image) {
-            const images: string[] = JSON.parse(image);
+
+    // Clear products
+    useEffect(() => {
+        if (page === 1 && (searchParams.get('category') || searchParams.get('sort'))) {
+            setProducts([]);
+        }
+    }, [page, searchParams.get('category'), searchParams.get('sort')]);
+
+
+    // set product and merge old product with new product and also checked for duplicate products
+    useEffect(() => {
+        if (isSuccessAds && adsData) {
+            const totalPages = adsData.last_page;
+
+            setTimeout(() => {
+                setProducts(prev => {
+                    const existingIds = new Set(prev.map(product => product.id));
+                    const newProducts = adsData.data.filter(product => !existingIds.has(product.id));
+                    return [...prev, ...newProducts];
+                });
+            }, 0);
+        }
+    }, [isSuccessAds, adsData, page]);
+
+
+    //observer listiner for infinite scroll
+    useEffect(() => {
+        const observer = new IntersectionObserver(debounce((entries: IntersectionObserverEntry[]) => {
+            if (entries[0].isIntersecting) {
+                setPage((prev) => {
+                    const currentTotalPage = Number(searchParams.get('total_page')); // Get the latest value as number
+
+                    if (Number(prev) <= currentTotalPage) {
+                        return prev + 1; // Increment page if current page is less than total pages
+                    } else {
+                        // Disconnect the observer when we reach or exceed the totalPage
+                        if (observerRef.current) {
+                            observer.disconnect(); // Stop observing when last page is reached
+                        }
+                    }
+                    return prev; // No page increment if we reach totalPage
+                });
+            }
+        }, 500), {
+            root: null,
+            rootMargin: '0px',
+            threshold: 1.0
+        });
+
+        if (observerRef.current) {
+            observer.observe(observerRef.current);
+        }
+
+        // Cleanup the observer on component unmount or effect re-run
+        return () => {
+            if (observerRef.current) {
+                observer.disconnect();
+            }
+        };
+    }, [page, searchParams]);
+
+    const handleImageAds = (image: string, title: string) => {
+
+        const images: string[] = JSON.parse(image);
+        if (images.length > 0) {
             return (
                 <Image
                     alt={title}
@@ -104,7 +188,7 @@ const PageClient = () => {
 
         } else {
             return (
-                <></>
+                <Image style={{ objectFit: 'contain' }} width={180} height={170} alt='no img' src={ImgNoProduct} />
             )
         }
     }
@@ -114,14 +198,22 @@ const PageClient = () => {
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.delete(paramKey);
 
-        // Update the URL by pushing new search parameters
-        router.push(`?${newParams.toString()}`);
+        // Clear products before updating the URL
+        setProducts([]);
+        setPage(1)
+
+        // Use a timeout or promise to ensure the state is cleared before routing
+        setTimeout(() => {
+            // Update the URL by pushing new search parameters
+            router.push(`?${newParams.toString()}`);
+        }, 100);
     };
 
 
     const items = data.map((item) => (
         <Menu.Item
             onClick={() => {
+                setPage(1);
                 setSelectedSort(item)
                 const searchParams = new URLSearchParams(window.location.search);
                 searchParams.set('sort', item.value.replace(/,/g, ''));
@@ -135,6 +227,40 @@ const PageClient = () => {
         </Menu.Item>
     ));
 
+    function AdsFilterWithDrawer({ setPage }: { setPage: React.Dispatch<React.SetStateAction<number>> }) {
+        // Manage drawer state
+        const [opened, { open, close }] = useDisclosure(false);
+        
+        // Detect screen size (returns true if width < 768px)
+        const isTablet = useMediaQuery('(max-width: 1200px)');
+
+        return (
+            <>
+                {isTablet ? (
+                    <>
+                        {/* Button to open the drawer */}
+                        <ActionIcon style={{position:'relative',top:'52px'}} mr={'sm'} size={'xl'} variant='light' onClick={open} >
+                            <IconFilter size={22} />
+                        </ActionIcon>
+
+
+                        {/* Drawer component */}
+                        <Drawer position='bottom' opened={opened} onClose={close} title="فیلترها" padding="md" size="sm">
+                            <AdsFilter setPage={setPage} />
+                        </Drawer>
+                    </>
+                ) : (
+                    // Render the Card with AdsFilter for larger screens
+                    <Grid.Col  className={classes.sidebar} span={3} pt={'xl'}>
+                        <Card withBorder mb={'lg'} mt={'42px'} pl={'xs'}>
+                            <AdsFilter setPage={setPage} />
+                        </Card>
+                    </Grid.Col>
+                )}
+            </>
+        );
+    }
+
     return (
         <Container styles={{ root: { flex: '1 0 auto', width: '100%' } }} size={'lg'}>
             <Breadcrumbs mb={'lg'} mt={'lg'}>
@@ -147,16 +273,12 @@ const PageClient = () => {
                 </Text>
             </Breadcrumbs>
             <Grid gutter={'lg'}>
-                <Grid.Col span={3} pt={'xl'}>
-                    <Card mb={'lg'} shadow='sm'>
-                        <AdsFilter />
-                    </Card>
-                </Grid.Col>
-                <Grid.Col span={9}>
+                <AdsFilterWithDrawer setPage={setPage} />
+                <Grid.Col span={{ base: 12, lg: 9 }}>
                     <Flex align={'center'} justify={'space-between'}>
                         {/* Render badges for each query parameter */}
                         {Object.entries(params).map(([key, value]) => {
-                            if (key !== 'sort') {
+                            if (key !== 'sort' && key !== 'total_page') {
                                 return (
                                     <Badge
                                         ml={'4px'}
@@ -192,7 +314,7 @@ const PageClient = () => {
                         </Menu>
                     </Flex>
                     <SimpleGrid spacing="xs" py={'lg'} cols={{ base: 2, md: 3, xl: 4 }} >
-                        {isFetchingAds && (
+                        {isFetchingAds && page === 1 && (
                             <>
                                 {Array.from({ length: 8 }).map((_, index) => (
                                     <Skeleton key={index} height={'340px'} />
@@ -201,15 +323,15 @@ const PageClient = () => {
                             </>
 
                         )}
-                        {adsData?.total && adsData.total > 0 && !isFetchingAds ? adsData.data.map(item => (
+                        {adsData?.total && adsData.total > 0 ? products.map(item => (
                             <Link key={item.id} href={`/ads/${item.id}`}>
                                 <Card withBorder  >
                                     <Card.Section mt={'0'} ta={'center'}>
-                                        {handleImageAds(item.image, item.title)}
+                                        {handleImageAds(item.image as string, item.title)}
                                     </Card.Section>
                                     <Text h={40} ta={'right'} mt={'5px'} lineClamp={2} fz={'sm'}>{item.title}</Text>
                                     <Flex align={'baseline'} justify={'space-between'}>
-                                        <CardPartPrice tomanHeight={17} tomanWidth={17} textSize={14} isAds price={item.price} />
+                                        {item.price ? <CardPartPrice tomanHeight={17} tomanWidth={17} textSize={14} isAds price={item.price} /> : <Text c={'#25ac9e'} mb="xs" fz={'sm'} mt={'md'}>توافقی</Text>}
                                         <Flex>
                                             <Text ml={'2px'} fz={'11px'}>{formatJalaliTimeAgo(item.created_at)}</Text>
                                         </Flex>
@@ -224,11 +346,15 @@ const PageClient = () => {
                                 </Card>
                             </Link>
                         )) : ''}
-                        {adsData?.data.length === 0 && !isFetchingAds ? <Text>آگهی یافت نشد</Text> : ''}
+                        {adsData?.data.length === 0 && products.length === 0 && !isFetchingAds ? <Text>آگهی یافت نشد</Text> : ''}
                     </SimpleGrid>
+                    {isFetchingAds ? <Flex justify={'center'} align={'center'}><Loader color="green" type="dots" /></Flex> : ''}
+
 
                 </Grid.Col>
             </Grid>
+            <div ref={observerRef} style={{ height: '20px', backgroundColor: 'transparent' }} />
+
         </Container>
 
     )

@@ -9,7 +9,7 @@ import Image from 'next/image'
 import { Category } from '(routes)/ads/[id]/page'
 import { convertToEnglishNumber, currentUrlCategory, formatNumberWithCommas } from '@/_utils/utils'
 
-const AdsFilter = () => {
+const AdsFilter = ({ setPage }: { setPage: React.Dispatch<React.SetStateAction<number>> }) => {
     const [categoriesAds, setCategoriesAds] = useState<Category[]>([]);
     const searchParams = useSearchParams();
     const [value, setValue] = useState('');
@@ -80,16 +80,16 @@ const AdsFilter = () => {
     };
     return (
         <ScrollArea scrollbars='y' pl={'xs'} offsetScrollbars type="always" scrollbarSize={3} h={560}>
-            <Accordion defaultValue="categories">
+            <Accordion styles={{ content: { padding: '0' } }} defaultValue="categories">
                 <Accordion.Item value={'categories'}>
                     <Accordion.Control >
-                        <Text fw={'bold'} fz={'md'} pr={'xs'}>دسته‌بندی‌ ها‌</Text>
+                        <Text fw={'bold'} fz={'md'} >دسته‌بندی‌ ها‌</Text>
                     </Accordion.Control>
                     <Accordion.Panel>
                         {categoriesAds.length ? (
                             categoriesAds.map(item => (
                                 <Link key={item.id} href={currentUrlCategory(item.value)}>
-                                    <NavLink component='div'
+                                    <NavLink onClick={() => { setPage(1) }} component='div'
                                         active={searchParams.get('category') === item.value}
                                         label={item.name}
                                         leftSection={<Image width={13} height={13} src={`/svg/${item.value}.svg`} alt={item.name} />}

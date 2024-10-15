@@ -32,3 +32,10 @@
         transform: rotate(180deg);
     }
 }
+
+.sidebar {
+    @mixin smaller-than $mantine-breakpoint-lg {
+        display: none;
+    }
+
+}
