@@ -1,18 +1,32 @@
 "use client"
-import { Container, Text, Group, Burger, ActionIcon, useComputedColorScheme, useMantineColorScheme, Box, Center, HoverCard, SimpleGrid, UnstyledButton, rem, ThemeIcon, Flex } from '@mantine/core';
+import { Container, Text, Group, Burger, ActionIcon, useComputedColorScheme, useMantineColorScheme, Box, Center, HoverCard, SimpleGrid, UnstyledButton, rem, ThemeIcon, Flex, Modal } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import classes from './Header.module.css';
-import { IconSun, IconMoon, IconChevronDown, IconChartPie3 } from '@tabler/icons-react';
+import { IconSun, IconMoon, IconChevronDown, IconChartPie3, IconUserCircle } from '@tabler/icons-react';
 import Link from "next/link";
 import UseLoading from "@/_utils/customHook/useLoading";
 import Image from 'next/image'
 import DrawerHeader from './Drawer';
-
-export function Header() {
+import LoginModal from '../loginModal/LoginModal';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation'
+ 
+export function Header({ token }: { token?: string }) {
     const [opened, { open, close }] = useDisclosure(false);
+    const [openedModal, { open:openModal, close: closeModal }] = useDisclosure(false);
     const { setColorScheme, colorScheme } = useMantineColorScheme();
     const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
     const isLoading = UseLoading();
+    const [successLogin, setSuccessLogin] = useState(false);
+    const router = useRouter();
+ 
+    const handleAddAdsPage = () => {
+        if (token || successLogin) {
+            router.push('/profile', { scroll: true })
+        } else {
+            openModal()
+        }
+    }
 
     return (
 
@@ -141,7 +155,7 @@ export function Header() {
                                             </Group>
                                         </UnstyledButton>
                                     </Link>
-                                    
+
 
                                 </SimpleGrid>
                             </HoverCard.Dropdown>
@@ -162,9 +176,17 @@ export function Header() {
                             {computedColorScheme === 'light' ? <IconMoon /> : <IconSun />}
                         </ActionIcon>) : ''}
                     </Group>
+                    <ActionIcon onClick={handleAddAdsPage} size={'lg'} radius={'lg'} variant='light' mr={'lg'}>
+                        <IconUserCircle size={24} />
+                    </ActionIcon>
                 </Group>
             </Container>
             <DrawerHeader opened={opened} close={close} />
+
+            <Modal opened={openedModal} onClose={closeModal} title="ورود / ثبت نام" >
+                <LoginModal setSuccessLogin={setSuccessLogin} close={closeModal} />
+            </Modal>
+
         </header>
     );
 }

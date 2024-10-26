@@ -12,6 +12,7 @@ import Providers from "./(routes)/dashboard/Provider";
 import NextTopLoader from "nextjs-toploader";
 import { GoogleAnalytics  } from '@next/third-parties/google'
 import './global.css'
+import { cookies } from 'next/headers';
 
 
 
@@ -39,6 +40,9 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }: { children: any }) {
+
+  const token = cookies().get('authToken')?.value;
+
   return (
     <html style={{height:'100%'}} dir="rtl" lang="en" className={`${vazirmatn.variable} ${vibes.variable}`}>
       {/* <GoogleAnalytics gaId="G-0V5T3XRVPY" /> */}
@@ -57,7 +61,7 @@ export default function RootLayout({ children }: { children: any }) {
           <MantineProvider theme={theme}>
             <ReduxProviders>
               <Providers>
-                <Header />
+                <Header token={token}/>
                 {children}
                 <Footer />
               </Providers>
