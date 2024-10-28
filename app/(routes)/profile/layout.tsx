@@ -17,13 +17,13 @@ export default function ProfileLayout({ children }: ProfileLayoutProps) {
     return (
         <Container mt="lg" styles={{ root: { flex: '1 0 auto', width: '100%' } }} size="lg">
             <Grid mt="xl">
-                <Grid.Col span={3}>
+                <Grid.Col span={{base:12,lg:3}}>
                     <Card withBorder>
                         <NavLink active={isActive('/profile')} component={Link} href="/profile" label="پروفایل" leftSection={<IconUser size="1rem" stroke={1.5} />} />
                         <NavLink active={isActive('/profile/ads')} component={Link} href="/profile/ads" label="آگهی‌های من" leftSection={<IconHome2 size="1rem" stroke={1.5} />} />
                     </Card>
                 </Grid.Col>
-                <Grid.Col span={8}>{children}</Grid.Col>
+                <Grid.Col span={{base:12,lg:9}}>{children}</Grid.Col>
             </Grid>
         </Container>
     );
