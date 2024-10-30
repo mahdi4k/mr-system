@@ -11,6 +11,7 @@ import Image from 'next/image';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/_redux/store';
 import { Product } from '@/_redux/services/adsApi';
+import ImgNoProduct from '../../../public/no-product.png'
 
 type props = {
     filteredAds: Product[],
@@ -22,8 +23,10 @@ const AdsRelated: FC<props> = ({ filteredAds, isFetchingAds }) => {
     const { ostan, city, status } = useSelector((state: RootState) => state.ads);
 
     const handleImageCarouselAds = (image: string | undefined, title: string) => {
-        if (image) {
-            const images: string[] = JSON.parse(image);
+
+        const images: string[] = JSON.parse(image as string);
+
+        if (images.length > 0) {
             return (
                 <Image alt={title} style={{ borderRadius: '7px' }} width={190} height={180}
                     src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${images[0]}`}
@@ -32,7 +35,7 @@ const AdsRelated: FC<props> = ({ filteredAds, isFetchingAds }) => {
 
         } else {
             return (
-                <></>
+                <Image style={{ objectFit: 'contain' }} width={190} height={180} alt='no img' src={ImgNoProduct} />
             )
         }
     }

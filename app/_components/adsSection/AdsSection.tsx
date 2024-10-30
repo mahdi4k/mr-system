@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from "@/_redux/store";
 import { fetchCity, fetchOstan } from '@/_redux/features/ads'
 import { ThunkDispatch, AnyAction } from '@reduxjs/toolkit'
+import ImgNoProduct from '../../../public/no-product.png'
 
 type AppDispatch = ThunkDispatch<RootState, void, AnyAction>;
 
@@ -26,7 +27,6 @@ const AdsSection = ({ token }: { token?: string }) => {
     const [opened, { open, close }] = useDisclosure(false);
     const router = useRouter();
     const parts = usePcparts();
-    const [successLogin, setSuccessLogin] = useState(false);
     const [activeTab, setActiveTab] = useState<string | null>('cpu');
 
     const [adsQuery, { data: adsData, isSuccess: isSuccessAds, isLoading, isFetching: isFetchingAds }] = useLazyGetAdsListCategoryQuery()
@@ -34,6 +34,7 @@ const AdsSection = ({ token }: { token?: string }) => {
     const dispatch: AppDispatch = useDispatch();
     const { ostan, city, status } = useSelector((state: RootState) => state.ads);
 
+    const success = useSelector((state: RootState) => state.auth.success);
 
     useEffect(() => {
         if (!ostan.length) {
@@ -51,7 +52,7 @@ const AdsSection = ({ token }: { token?: string }) => {
     }, [embla]);
 
     const handleAddAdsPage = () => {
-        if (token || successLogin) {
+        if (token || success) {
             router.push('/ads/create', { scroll: true })
         } else {
             open()
@@ -65,8 +66,10 @@ const AdsSection = ({ token }: { token?: string }) => {
 
 
     const handleImageAds = (image: string | undefined, title: string) => {
-        if (image) {
-            const images: string[] = JSON.parse(image);
+
+        const images: string[] = JSON.parse(image as string);
+
+        if (images.length > 0) {
             return (
                 <Image
                     alt={title}
@@ -79,7 +82,8 @@ const AdsSection = ({ token }: { token?: string }) => {
 
         } else {
             return (
-                <></>
+                <Image style={{ objectFit: 'contain' }} width={190} height={180} alt='no img' src={ImgNoProduct} />
+
             )
         }
     }
@@ -127,7 +131,7 @@ const AdsSection = ({ token }: { token?: string }) => {
                                         </Card.Section>
                                         <Text ta={'right'} mt={'5px'} lineClamp={1} fz={'md'}>{item.title}</Text>
                                         <Flex align={'baseline'} justify={'space-between'}>
-                                            <CardPartPrice isAds price={item.price} />
+                                            {item.price ? <CardPartPrice isAds price={item.price} /> : <Text fz={'md'} c={'#25ac9e'} mb="xs" mt="md" >توافقی</Text>}
                                             <Flex>
                                                 <Text ml={'2px'} fz={'xs'}>{formatJalaliTimeAgo(item.created_at)}</Text>
                                             </Flex>
@@ -165,7 +169,7 @@ const AdsSection = ({ token }: { token?: string }) => {
             </Tabs>
 
             <Modal opened={opened} onClose={close} title="ورود / ثبت نام" >
-                <LoginModal setSuccessLogin={setSuccessLogin} close={close} />
+                <LoginModal close={close} />
             </Modal>
         </Container>
     )
