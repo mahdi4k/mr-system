@@ -8,7 +8,11 @@ import { useForm } from '@mantine/form';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import classes from '@/_components/adsSection/ads.module.css'
-export default function LoginModal({ close, setSuccessLogin }: { close: () => void, setSuccessLogin: React.Dispatch<React.SetStateAction<boolean>> }) {
+import { useDispatch } from 'react-redux';
+import { setSuccessLogin } from '@/_redux/features/auth';
+
+
+export default function LoginModal({ close }: { close: () => void }) {
     const [otpSent, setOtpSent] = useState<boolean>(false);
     const [showErrorOtp, setShowErrorOtp] = useState<boolean>(false);
     const router = useRouter();
@@ -17,6 +21,7 @@ export default function LoginModal({ close, setSuccessLogin }: { close: () => vo
 
     const [timeLeft, setTimeLeft] = useState(OTP_RESEND_TIME);
     const [canResend, setCanResend] = useState(false);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (otpSent && timeLeft > 0) {
@@ -72,7 +77,7 @@ export default function LoginModal({ close, setSuccessLogin }: { close: () => vo
                     message: 'کد با موفقیت ارسال شد',
                     classNames: classes
                 })
-                setSuccessLogin(true)
+
             } else {
                 const data = await response.json();
                 notifications.show({
@@ -108,6 +113,7 @@ export default function LoginModal({ close, setSuccessLogin }: { close: () => vo
                     message: 'با موفقیت وارد شدید',
                     classNames: classes
                 })
+                dispatch(setSuccessLogin(true));
                 close()
             } else {
                 setShowErrorOtp(true)
