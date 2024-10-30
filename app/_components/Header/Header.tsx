@@ -10,18 +10,21 @@ import DrawerHeader from './Drawer';
 import LoginModal from '../loginModal/LoginModal';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'
- 
+import { useSelector } from 'react-redux';
+import { RootState } from '@/_redux/store';
+
 export function Header({ token }: { token?: string }) {
     const [opened, { open, close }] = useDisclosure(false);
-    const [openedModal, { open:openModal, close: closeModal }] = useDisclosure(false);
+    const [openedModal, { open: openModal, close: closeModal }] = useDisclosure(false);
     const { setColorScheme, colorScheme } = useMantineColorScheme();
     const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
     const isLoading = UseLoading();
-    const [successLogin, setSuccessLogin] = useState(false);
     const router = useRouter();
- 
+    const success = useSelector((state: RootState) => state.auth.success);
+
     const handleAddAdsPage = () => {
-        if (token || successLogin) {
+
+        if (token || success) {
             router.push('/profile', { scroll: true })
         } else {
             openModal()
@@ -184,7 +187,7 @@ export function Header({ token }: { token?: string }) {
             <DrawerHeader opened={opened} close={close} />
 
             <Modal opened={openedModal} onClose={closeModal} title="ورود / ثبت نام" >
-                <LoginModal setSuccessLogin={setSuccessLogin} close={closeModal} />
+                <LoginModal close={closeModal} />
             </Modal>
 
         </header>

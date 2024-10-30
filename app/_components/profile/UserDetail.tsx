@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react'
 import NameEdit from './edit/NameEdit';
 import { useDisclosure } from '@mantine/hooks';
 import EmailEdit from './edit/EmailEdit';
+import { useRouter } from 'next/navigation';
 
 
 
@@ -30,6 +31,8 @@ const UserDetail = ({ token }: { token?: string }) => {
     const [error, setError] = useState(null);
     const [opened, { open, close }] = useDisclosure(false);
     const [openedEmail, { open: openEmail, close: closeEmail }] = useDisclosure(false);
+    const router = useRouter();
+    const [loading, setLoading] = useState(true); // Add a loading state
 
     const fetchUserData = async () => {
         try {
@@ -52,10 +55,22 @@ const UserDetail = ({ token }: { token?: string }) => {
             // setError(error.message || 'An error occurred');
         }
     };
+    useEffect(() => {
+        if (!token) {
+            router.replace('/'); // Use `replace` to avoid adding to history
+        } else {
+            setLoading(false); // Set loading to false once the token is confirmed
+        }
+    }, [token, router]);
 
     useEffect(() => {
         fetchUserData();
     }, []);
+
+    if (loading) {
+        return null; // Render nothing or a loading indicator
+    }
+
 
     return (
         <Card shadow='sm'>

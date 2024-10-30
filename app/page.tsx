@@ -67,11 +67,11 @@ const page = () => {
 
       <HeroHeader />
       <CardParts />
+      <AdsSection token={token} />
       <CpuMotherboard />
       <CpuGraphic />
       <GraphicPower />
       <SuggestSection />
-      <AdsSection token={token} />
       <BannerSection />
       {/* <CardService /> */}
       <ArticleSection />
