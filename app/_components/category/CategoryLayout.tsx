@@ -22,7 +22,7 @@ const CategoryLayout: FC<Props> = ({ data, children, type }) => {
     return (
 
         <Grid.Col key={data.id} span={{ base: 12, sm: 6, lg: 3 }}>
-            <Card className={classes.categoryCard} mih={{ base: '230px', md: '375px' }} miw={'250px'} key={data.id} shadow="sm" padding="lg" radius="md" withBorder>
+            <Card className={classes.categoryCard} mih={{ base: '230px', md: '375px' }} miw={'250px'} key={data.id} padding="lg" radius="md" withBorder>
                 <Link className={classes.categorySection} href={`/products/${type}/${data.id}`}>
                     <Card.Section className={classes.categoryImage} mt={'0'} ta={'center'}>
                         {data.image && <KiwiImage width={300} height={300} img={data.image} alt={data.name} />}
@@ -30,7 +30,7 @@ const CategoryLayout: FC<Props> = ({ data, children, type }) => {
 
                     <Flex direction={'column'}>
                         <Stack h={{ md: 50 }} justify="start" align='center' mt="md" mb="xs">
-                            <Text pt={{ base: 'md', md: 'xs' }} className={classes.ProductTitle} fw={500}>{data.name}</Text>
+                            <Text lineClamp={2} pt={{ base: 'md', md: 'xs' }} className={classes.ProductTitle} fw={500}>{data.name}</Text>
                         </Stack>
                         <CardPartPrice price={data.price} />
                     </Flex>
