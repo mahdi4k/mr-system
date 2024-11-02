@@ -23,12 +23,12 @@ export type CASE = {
 export const CaseApi = api.injectEndpoints({
 
     endpoints: (builder) => ({
-        getCases: builder.query<CASE[], { modular?: string[] | never[] }>({
-            query: ({ modular }) => {
+        getCases: builder.query<CASE[], { search?: string }>({
+            query: ({ search }) => {
                 return {
                     url: `/cases`,
                     method: 'GET',
-                    params: { modular: modular }
+                    params: { search: search }
                 }
             },
             providesTags: ['case']

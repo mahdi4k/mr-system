@@ -1,5 +1,5 @@
-import { Flex, Popover, Button, Group, Divider, Grid, Avatar, Tooltip, Modal, Box } from '@mantine/core'
-import { IconChevronDown } from '@tabler/icons-react'
+import { Flex, Popover, Button, Group, Divider, Grid, Avatar, Tooltip, Modal, Box, TextInput, ActionIcon, rem } from '@mantine/core'
+import { IconArrowRight, IconChevronDown, IconSearch } from '@tabler/icons-react'
 import React, { useState } from 'react'
 import Image from 'next/image'
 import LoadingCategorySkeleton from './components/LoadingCategorySkeleton'
@@ -10,9 +10,12 @@ import { CPU } from '@/_redux/services/cpuApi'
 import { POWER } from '@/_redux/services/powerApi'
 import AmdOrNvidiaFilter from '../filters/AmdOrNvidiaFilter'
 import CategoryLayout from './CategoryLayout'
+import { theme } from '../../../theme'
 const GraphicCardCategory = () => {
   const [value, setValue] = useState<string[]>([]);
-  const { isSuccess, data = [], error, isLoading } = useGetGraphicsQuery({ manufacturer: value })
+  const [searchValue, setSearchValue] = useState<string>('');
+  const [searchSubmit, setSearchSubmit] = useState<string>('');
+  const { isSuccess, data = [], error, isLoading } = useGetGraphicsQuery({ manufacturer: value, search: searchSubmit })
   const [opened, { open, close }] = useDisclosure(false);
   const [modalData, setModalData] = useState<CPU[] | POWER[]>()
   const [modalTitle, setModalTitle] = useState<string>('')
@@ -29,7 +32,25 @@ const GraphicCardCategory = () => {
   return (
     <>
 
-      <Flex my={'md'} justify={'flex-end'}>
+      <Flex wrap={'wrap'} my={'md'} justify={'space-between'}>
+
+        <TextInput mt={'2px'}
+          mb={{ base: 'lg', lg: '0' }}
+          radius="xl"
+          w={260}
+          onKeyDown={e => e.key === 'Enter' ? setSearchSubmit(searchValue) : ''}
+          size="sm"
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          placeholder="جستجو در نتایج"
+          rightSectionWidth={42}
+          rightSection={
+            <ActionIcon onClick={() => setSearchSubmit(searchValue)} size={32} radius="xl" color={theme.primaryColor} variant="light">
+              <IconSearch style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
+            </ActionIcon>
+          }
+        />
+
         <Popover width={200} position="bottom" withArrow shadow="md">
           <Popover.Target>
             <Button variant='outline' styles={{ section: { marginLeft: '5px' } }} radius={'xl'} color="gray" leftSection={<IconChevronDown size={16} />} px='xl'>سازنده پردازنده گرافیکی</Button>
@@ -39,6 +60,7 @@ const GraphicCardCategory = () => {
           </Popover.Dropdown>
         </Popover>
       </Flex>
+
       <Divider color='#d2d2d269' mb={'md'} />
 
       {isLoading ? <>

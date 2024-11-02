@@ -20,12 +20,12 @@ export type FAN = {
 export const FanApi = api.injectEndpoints({
 
     endpoints: (builder) => ({
-        getFans: builder.query<FAN[], { modular?: string[] | never[] }>({
-            query: ({ modular }) => {
+        getFans: builder.query<FAN[], { search?: string  }>({
+            query: ({ search }) => {
                 return {
                     url: `/fans`,
                     method: 'GET',
-                    params: { modular: modular }
+                    params: { search: search }
                 }
             },
             providesTags: ['fan']

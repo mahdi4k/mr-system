@@ -19,12 +19,12 @@ export type POWER = {
 export const PowerApi = api.injectEndpoints({
 
     endpoints: (builder) => ({
-        getPowers: builder.query<POWER[], { modular?: string[] | never[] }>({
-            query: ({ modular }) => {
+        getPowers: builder.query<POWER[], { modular?: string[] | never[], eighty_plus?: string[] | never[], search?: string }>({
+            query: ({ modular, eighty_plus, search }) => {
                 return {
                     url: `/powers`,
                     method: 'GET',
-                    params: { modular: modular }
+                    params: { modular: modular, eighty_plus, search }
                 }
             },
             providesTags: ['power']

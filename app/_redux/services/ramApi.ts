@@ -16,12 +16,12 @@ export type RAM = {
 export const RamApi = api.injectEndpoints({
 
     endpoints: (builder) => ({
-        getRams: builder.query<RAM[], { modular?: string[] | never[] }>({
-            query: ({ modular }) => {
+        getRams: builder.query<RAM[], { search?: string }>({
+            query: ({ search }) => {
                 return {
                     url: `/rams`,
                     method: 'GET',
-                    params: { modular: modular }
+                    params: { search: search }
                 }
             },
             providesTags: ['ram']

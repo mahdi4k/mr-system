@@ -1,6 +1,6 @@
 import { api } from './api'
 import { IResult } from './caseApi';
- 
+
 
 export type SSD = {
     id: number
@@ -22,12 +22,12 @@ export type SSD = {
 export const SsdApi = api.injectEndpoints({
 
     endpoints: (builder) => ({
-        getSsds: builder.query<SSD[], { modular?: string[] | never[] }>({
-            query: ({ modular }) => {
+        getSsds: builder.query<SSD[], { search?: string }>({
+            query: ({ search }) => {
                 return {
                     url: `/ssds`,
                     method: 'GET',
-                    params: { modular: modular }
+                    params: { search: search }
                 }
             },
             providesTags: ['ssd']
@@ -79,4 +79,4 @@ export const SsdApi = api.injectEndpoints({
     }),
 });
 
-export const { useGetSsdsQuery, useLazyGetSsdsQuery , useLazyGetSsdQuery, useCreateSsdMutation, useAddSsdImageMutation, useRemoveSsdMutation, useUpdateSsdMutation, useGetSsdQuery } = SsdApi;
+export const { useGetSsdsQuery, useLazyGetSsdsQuery, useLazyGetSsdQuery, useCreateSsdMutation, useAddSsdImageMutation, useRemoveSsdMutation, useUpdateSsdMutation, useGetSsdQuery } = SsdApi;

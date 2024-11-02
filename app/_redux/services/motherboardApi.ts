@@ -30,12 +30,12 @@ type authTokenDTO = {
 export const motherboardApi = api.injectEndpoints({
 
     endpoints: (builder) => ({
-        getMotherboards: builder.query<Motherboard[], { manufacturer?: string[] | never[] }>({
-            query: ({ manufacturer }) => {
+        getMotherboards: builder.query<Motherboard[], { manufacturer?: string[] | never[], search?: string }>({
+            query: ({ manufacturer, search }) => {
                 return {
                     url: `/motherboards`,
                     method: 'GET',
-                    params: { manufacturer: manufacturer }
+                    params: { manufacturer: manufacturer, search }
                 }
             },
             providesTags: ['motherboards']

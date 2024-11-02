@@ -23,12 +23,12 @@ export type Graphic = {
 export const graphicApi = api.injectEndpoints({
 
     endpoints: (builder) => ({
-        getGraphics: builder.query<Graphic[], { manufacturer?: string[] | never[] }>({
-            query: ({ manufacturer }) => {
+        getGraphics: builder.query<Graphic[], { manufacturer?: string[] | never[], search?: string }>({
+            query: ({ manufacturer, search }) => {
                 return {
                     url: `/graphics`,
                     method: 'GET',
-                    params: { manufacturer: manufacturer }
+                    params: { manufacturer: manufacturer, search: search }
                 }
             },
             providesTags: ['graphic']

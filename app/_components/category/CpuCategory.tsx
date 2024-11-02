@@ -1,5 +1,5 @@
-import { Flex, Popover, Button, Group, Divider, Grid, Avatar, Tooltip, Modal, Box } from '@mantine/core'
-import { IconChevronDown } from '@tabler/icons-react'
+import { Flex, Popover, Button, Group, Divider, Grid, Avatar, Tooltip, Modal, Box, ActionIcon, rem, TextInput } from '@mantine/core'
+import { IconChevronDown, IconSearch } from '@tabler/icons-react'
 import React, { useState } from 'react'
 import AmdOrIntelFilter from '../filters/AmdOrIntelFilter'
 import { useGetCpusQuery } from '@/_redux/services/cpuApi'
@@ -10,9 +10,13 @@ import { Graphic } from '@/_redux/services/graphicApi'
 import ModalItems from './components/modalItems'
 import { Motherboard } from '@/_redux/services/motherboardApi'
 import CategoryLayout from './CategoryLayout'
+import { theme } from '../../../theme'
 const CpuCategory = () => {
     const [value, setValue] = useState<string[]>([]);
-    const { isSuccess, data = [], error, isLoading } = useGetCpusQuery({ manufacturer: value })
+    const [searchValue, setSearchValue] = useState<string>('');
+    const [searchSubmit, setSearchSubmit] = useState<string>('');
+  
+    const { isSuccess, data = [], error, isLoading } = useGetCpusQuery({ manufacturer: value ,search:searchSubmit})
     const [opened, { open, close }] = useDisclosure(false);
     const [modalData, setModalData] = useState<Graphic[] | Motherboard[]>()
     const [modalTitle, setModalTitle] = useState<string>('')
@@ -31,7 +35,24 @@ const CpuCategory = () => {
     return (
         <>
 
-            <Flex my={'md'} justify={'flex-end'}>
+            <Flex my={'md'} justify={'space-between'}>
+                <TextInput mt={'2px'}
+                    mb={{ base: 'lg', lg: '0' }}
+                    radius="xl"
+                    w={260}
+                    onKeyDown={e => e.key === 'Enter' ? setSearchSubmit(searchValue) : ''}
+                    size="sm"
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    placeholder="جستجو در نتایج"
+                    rightSectionWidth={42}
+                    rightSection={
+                        <ActionIcon onClick={() => setSearchSubmit(searchValue)} size={32} radius="xl" color={theme.primaryColor} variant="light">
+                            <IconSearch style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
+                        </ActionIcon>
+                    }
+                />
+
                 <Popover width={200} position="bottom" withArrow shadow="md">
                     <Popover.Target>
                         <Button variant='outline' styles={{ section: { marginLeft: '5px' } }} radius={'xl'} color="gray" leftSection={<IconChevronDown size={16} />} px='xl'>سازنده</Button>

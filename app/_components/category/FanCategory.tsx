@@ -1,5 +1,5 @@
-import { Flex, Popover, Button, Card, Group, Badge, Text, Divider, Stack, Grid, Avatar, Tooltip, Modal, Box } from '@mantine/core'
-import { IconChevronDown } from '@tabler/icons-react'
+import { Flex, Popover, Button, Card, Group, Badge, Text, Divider, Stack, Grid, Avatar, Tooltip, Modal, Box, ActionIcon, rem, TextInput } from '@mantine/core'
+import { IconChevronDown, IconSearch } from '@tabler/icons-react'
 import React, { useState } from 'react'
 import Image from 'next/image'
 import LoadingCategorySkeleton from './components/LoadingCategorySkeleton'
@@ -9,10 +9,13 @@ import { useGetFansQuery } from '@/_redux/services/fanApi'
 import PowerModularFilter from '../filters/PowerModularFilter'
 import CategoryLayout from './CategoryLayout'
 import { CPU } from '@/_redux/services/cpuApi'
+import { theme } from '../../../theme'
 
 const FanCategory = () => {
-    const [value, setValue] = useState<string[]>([]);
-    const { isSuccess, data = [], error, isLoading } = useGetFansQuery({ modular: value })
+    const [searchValue, setSearchValue] = useState<string>('');
+    const [searchSubmit, setSearchSubmit] = useState<string>('');
+
+    const { isSuccess, data = [], error, isLoading } = useGetFansQuery({ search: searchSubmit })
     const [opened, { open, close }] = useDisclosure(false);
     const [modalData, setModalData] = useState<CPU[]>()
     const [modalTitle, setModalTitle] = useState<string>('')
@@ -30,15 +33,23 @@ const FanCategory = () => {
     return (
         <>
 
-            <Flex my={'md'} justify={'flex-end'}>
-                <Popover width={350} position="bottom" withArrow shadow="md">
-                    <Popover.Target>
-                        <Button variant='outline' styles={{ section: { marginLeft: '5px' } }} radius={'xl'} color="gray" leftSection={<IconChevronDown size={16} />} px='xl'>نوع کابل کشی</Button>
-                    </Popover.Target>
-                    <Popover.Dropdown>
-                        <PowerModularFilter value={value} setValue={setValue} />
-                    </Popover.Dropdown>
-                </Popover>
+            <Flex my={'md'} justify={'space-between'}>
+                <TextInput mt={'2px'}
+                    mb={{ base: 'lg', lg: '0' }}
+                    radius="xl"
+                    w={260}
+                    onKeyDown={e => e.key === 'Enter' ? setSearchSubmit(searchValue) : ''}
+                    size="sm"
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    placeholder="جستجو در نتایج"
+                    rightSectionWidth={42}
+                    rightSection={
+                        <ActionIcon onClick={() => setSearchSubmit(searchValue)} size={32} radius="xl" color={theme.primaryColor} variant="light">
+                            <IconSearch style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
+                        </ActionIcon>
+                    }
+                />
             </Flex>
             <Divider color='#d2d2d269' mb={'md'} />
 
