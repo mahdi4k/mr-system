@@ -24,6 +24,7 @@ import notifCalsses from "@/_cssModules/notification.module.css";
 import {currentMotherboardOnSave} from "@/_redux/features/motherboard";
 import {useDispatch} from "react-redux";
 import {ActiveStepDTO} from "./page";
+import { useGetCpusQuery } from '@/_redux/services';
 
 export type StepProps = {
     setActiveStep: React.Dispatch<React.SetStateAction<ActiveStepDTO>>
@@ -31,6 +32,8 @@ export type StepProps = {
 }
 const Step1Form = (props: StepProps) => {
     const [createMotherboard, response] = useCreateMotherboardMutation();
+    const {isSuccess, data = [], error} = useGetCpusQuery({})
+
     const dispatch = useDispatch()
     const form = useForm({
         initialValues: {
@@ -44,6 +47,7 @@ const Step1Form = (props: StepProps) => {
             manufacturer: '',
             total_slot_ram: 1,
             ddr3: false,
+            cpus: [],
             ddr4: false,
             ddr5: false,
             hdmi_support: false,
@@ -80,6 +84,7 @@ const Step1Form = (props: StepProps) => {
                 cpu_socket: form.values.cpu_socket,
                 brand: form.values.brand,
                 size: form.values.size,
+                cpus:form.values.cpus,
                 price: form.values.price,
                 manufacturer: form.values.manufacturer,
                 total_slot_ram: form.values.total_slot_ram,
@@ -161,6 +166,17 @@ const Step1Form = (props: StepProps) => {
                             data={['micro', 'mini', 'normal']}
                             {...form.getInputProps('size')}
 
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={{base: 12, md: 6}}>
+                        <MultiSelect
+                            styles={{
+                                pill: {direction: 'ltr'}
+                            }}
+                            label="cpu مرتبط"
+                            placeholder=""
+                             {...form.getInputProps('cpus')}
+                            data={data.map(el => ({value:`${el.id}`,label:el.name}))}
                         />
                     </Grid.Col>
                     <Grid.Col span={{base: 12, md: 6}}>
