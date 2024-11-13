@@ -108,7 +108,7 @@ const Step1Form = (props: StepProps) => {
                             label="برند"
                             placeholder=""
                             {...form.getInputProps('brand')}
-                            data={['green','Cooler Master']}
+                            data={['green','Cooler Master','DeepCool','MSI']}
                         />
                     </Grid.Col>
                     <Grid.Col style={{ display: 'flex', alignItems: 'flex-end' }} span={{ base: 12, md: 6 }}>
