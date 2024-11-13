@@ -28,8 +28,8 @@ const ModalItems: FC<Iprops> = ({ title, items, type }) => {
                                 </Card.Section>
 
                                 <Flex direction={'column'}>
-                                    <Stack h={{ md: 50 }} justify="start" align='center' mt="md" mb="xs">
-                                        <Text pt={{ base: 'md', md: 'xs' }} className={classes.ProductTitle} fw={500}>{item.name}</Text>
+                                    <Stack mah={{ md: 75.5 }} justify="start" align='center' mt="md" mb="xs">
+                                        <Text lineClamp={3} pt={{ base: 'md', md: 'xs' }}  className={classes.ProductTitle} fw={500}>{item.name}</Text>
                                     </Stack>
                                     <CardPartPrice price={item.price} />
                                 </Flex>

@@ -54,7 +54,7 @@ const FormFields: FC<props> = ({ form }) => {
                     label="برند"
                     placeholder=""
                     {...form.getInputProps('brand')}
-                    data={['Green', 'Crucial', 'Awest', 'MSI']}
+                    data={['Green', 'Crucial', 'Awest', 'MSI','GameMax']}
                 />
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 6 }}>

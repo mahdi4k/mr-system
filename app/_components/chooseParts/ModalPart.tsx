@@ -17,8 +17,8 @@ type Props = {
     opened: boolean
     close: () => void
     ssdList: { data: SSD[] | undefined, isSuccessSsdList: boolean }
-    cpuList: { data: CPU[] | undefined, isSuccessCpuList: boolean, motherboardData: CPU[] | undefined }
-    ramList: { data: RAM[] | undefined, isSuccessRamList: boolean }
+    cpuList: { data: CPU[] | undefined, isSuccessCpuList: boolean, motherboardData: CPU[] | undefined, ramData: CPU[] | undefined }
+    ramList: { data: RAM[] | undefined, isSuccessRamList: boolean, motherboardData: RAM[] | undefined, cpuData: RAM[] | undefined }
     caseList: { data: CASE[] | undefined, isSuccessCaseList: boolean }
     powerList: { data: POWER[] | undefined, isSuccessPowerList: boolean, graphicData: POWER[] | undefined }
     graphicList: { data: Graphic[] | undefined, isSuccessGraphicList: boolean, cpuData: Graphic[] | undefined }
@@ -60,14 +60,21 @@ const ModalPart: FC<Props> = ({ opened, close, ssdList, cpuList, ramList, caseLi
                 case 'cpu':
                     if (cpuList.motherboardData) {
                         setDataList(cpuList.motherboardData)
+                    } else if (cpuList.ramData) {
+                        setDataList(cpuList.ramData)
                     } else if (cpuList.isSuccessCpuList) {
                         setDataList(cpuList.data)
                     }
                     setModalTitle('انتخاب cpu')
                     break
                 case 'ram':
-                    if (ramList.isSuccessRamList)
+                    if (ramList.motherboardData) {
+                        setDataList(ramList.motherboardData)
+                    } else if (ramList.cpuData) {
+                        setDataList(ramList.cpuData)
+                    } else if (ramList.isSuccessRamList) {
                         setDataList(ramList.data)
+                    }
                     setModalTitle('انتخاب رم')
                     break
                 case 'case':

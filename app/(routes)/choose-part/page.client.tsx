@@ -154,8 +154,8 @@ const PageClient: React.FC = () => {
 
                 <ModalPart
                     type={selectedType}
-                    cpuList={{ data: cpuList, isSuccessCpuList, motherboardData: motherboardData?.data.cpus }}
-                    ramList={{ data: ramList, isSuccessRamList }}
+                    cpuList={{ data: cpuList, isSuccessCpuList, motherboardData: motherboardData?.data.cpus, ramData: ramData?.data.cpus }}
+                    ramList={{ data: ramList, isSuccessRamList ,motherboardData: motherboardData?.data.rams, cpuData: cpuData?.data.rams}}
                     caseList={{ data: caseList, isSuccessCaseList }}
                     powerList={{ data: powerList, isSuccessPowerList, graphicData: graphicData?.data.powers }}
                     graphicList={{ data: graphicList, isSuccessGraphicList, cpuData: cpuData?.data.graphics }}
