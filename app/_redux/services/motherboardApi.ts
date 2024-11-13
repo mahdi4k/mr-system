@@ -1,6 +1,7 @@
 import { api } from './api'
 import { IResult } from './caseApi';
 import { CPU } from './cpuApi';
+import { RAM } from './ramApi';
 
 export type Motherboard = {
     id: number
@@ -17,6 +18,7 @@ export type Motherboard = {
     links: string
     image: string
     cpus: CPU[]
+    rams: RAM[]
     attributes?: string[]
 };
 

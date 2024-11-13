@@ -3,6 +3,7 @@ import { IResult } from './caseApi';
 import { FAN } from './fanApi';
 import { Graphic } from './graphicApi';
 import { Motherboard } from './motherboardApi';
+import { RAM } from './ramApi';
 
 export type CPU = {
     id: number
@@ -18,18 +19,19 @@ export type CPU = {
     graphics: Graphic[]
     links: string
     brand?: string
+    rams: RAM[]
 };
 
 
 export const cpuApi = api.injectEndpoints({
 
     endpoints: (builder) => ({
-        getCpus: builder.query<CPU[], { manufacturer?: string[] | never[],search?:string }>({
-            query: ({ manufacturer ,search}) => {
+        getCpus: builder.query<CPU[], { manufacturer?: string[] | never[], search?: string }>({
+            query: ({ manufacturer, search }) => {
                 return {
                     url: `/cpus`,
                     method: 'GET',
-                    params: { manufacturer: manufacturer ,search}
+                    params: { manufacturer: manufacturer, search }
                 }
             },
 

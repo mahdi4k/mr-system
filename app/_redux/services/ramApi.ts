@@ -1,5 +1,7 @@
 import { api } from './api'
 import { IResult } from './caseApi';
+import { CPU } from './cpuApi';
+import { Motherboard } from './motherboardApi';
 
 export type RAM = {
     id: number
@@ -10,6 +12,8 @@ export type RAM = {
     image: string
     price?: string
     links: string
+    cpus: CPU[]
+    motherboards: Motherboard[]
 };
 
 
