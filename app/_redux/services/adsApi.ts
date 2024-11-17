@@ -53,12 +53,12 @@ export const AdsApi = api.injectEndpoints({
             },
             providesTags: ['ads']
         }),
-        getAdsListCategory: builder.query<ApiResponse, { category?: string, search?: string, price_from?: string, price_to?: string, sort?: string , page?: string }>({
-            query: ({ category, search, price_from, price_to, sort, page  }) => {
+        getAdsListCategory: builder.query<ApiResponse, { category?: string, search?: string, price_from?: string, price_to?: string, sort?: string, page?: string, ostan?: string }>({
+            query: ({ category, search, price_from, price_to, sort, page, ostan }) => {
                 return {
                     url: `/products/category`,
                     method: 'GET',
-                    params: { category, search, price_from, price_to, sort, page  }
+                    params: { category, search, price_from, price_to, sort, page, ostan }
                 }
             },
             providesTags: ['ads']

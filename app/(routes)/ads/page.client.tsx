@@ -17,6 +17,7 @@ import AdsFilter from '@/_components/adsSection/AdsFilter';
 import classes from './AdsPage.module.css'
 import ImgNoProduct from '../../../public/no-product.png'
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import { Province } from './create/page';
 
 
 const data = [
@@ -39,6 +40,7 @@ const PageClient = () => {
     const [page, setPage] = useState(1);
     const [products, setProducts] = useState<Product[]>([]);
     const observerRef = useRef(null);  // Ref for the observer target
+    const [provinces, setProvinces] = useState<Province[]>([]);
 
     useEffect(() => {
         if (!ostan.length) {
@@ -62,30 +64,58 @@ const PageClient = () => {
 
 
     // check query params exist 
+ 
     useEffect(() => {
         const categoryParam = searchParams.get('category');
         const searchParam = searchParams.get('search');
         const priceFrom = searchParams.get('price_from');
         const priceTo = searchParams.get('price_to');
         const sort = searchParams.get('sort');
-
-        const queryParams: { category?: string; search?: string; price_from?: string; price_to?: string; sort?: string; page?: string } = {};
-
-
+        const ostanParams = searchParams.getAll('ostan'); // Retrieve all 'ostan' values
+    
+        const queryParams: {
+            ostan?: string; // Array for multiple 'ostan' values
+            category?: string;
+            search?: string;
+            price_from?: string;
+            price_to?: string;
+            sort?: string;
+            page?: string;
+        } = {};
+    
+        if (ostanParams.length > 0) queryParams.ostan = ostanParams.join(','); // Add 'ostan' array to query
         if (categoryParam) queryParams.category = categoryParam;
         if (searchParam) queryParams.search = searchParam;
         if (priceFrom) queryParams.price_from = priceFrom;
         if (priceTo) queryParams.price_to = priceTo;
         if (sort) queryParams.sort = sort;
         if (page) queryParams.page = `${page}`;
-
-
-        if (searchParams.get('sort')) {
-            const sortParam = searchParams.get('sort');
-            setSelectedSort(data.find(item => item.value === sortParam) as { label: string; value: string; })
+    
+        if (sort) {
+            const sortParam = sort;
+            setSelectedSort(
+                data.find((item) => item.value === sortParam) as { label: string; value: string }
+            );
         }
-        adsQuery(queryParams);
+    
+        adsQuery(queryParams); // Call your API with the constructed queryParams
     }, [searchParams, page]);
+    
+
+
+    useEffect(() => {
+        // Fetch provinces and cities data from public folder
+        const fetchProvincesAndCities = async () => {
+            const provincesResponse = await fetch('/provinces.json');
+            const provincesData: Province[] = await provincesResponse.json();
+
+            setProvinces(provincesData);
+        };
+
+        fetchProvincesAndCities();
+    }, []);
+
+
 
 
     // set total page number in query param
@@ -93,7 +123,7 @@ const PageClient = () => {
         const setSearchParams = new URLSearchParams(window.location.search);
 
         if (isSuccessAds) {
-            setSearchParams.set('total_page', `${adsData.last_page}`);
+            setSearchParams.set('total_page', `${adsData ? adsData.last_page : 0}`);
             const newUrl = `${window.location.pathname}?${setSearchParams.toString()}`;
 
             window.history.pushState({}, '', newUrl);
@@ -246,14 +276,14 @@ const PageClient = () => {
 
                         {/* Drawer component */}
                         <Drawer position='bottom' opened={opened} onClose={close} title="فیلترها" padding="md" size="sm">
-                            <AdsFilter setPage={setPage} />
+                            <AdsFilter provinces={provinces} setPage={setPage} />
                         </Drawer>
                     </>
                 ) : (
                     // Render the Card with AdsFilter for larger screens
                     <Grid.Col  className={classes.sidebar} span={3} pt={'xl'}>
                         <Card withBorder mb={'lg'} mt={'42px'} pl={'xs'}>
-                            <AdsFilter setPage={setPage} />
+                            <AdsFilter provinces={provinces} setPage={setPage} />
                         </Card>
                     </Grid.Col>
                 )}

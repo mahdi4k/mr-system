@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Accordion, NavLink, Stack, Skeleton, TextInput, ActionIcon, Text, ScrollArea, Button, Flex, Group, Divider } from '@mantine/core'
+import { Box, Accordion, NavLink, Stack, Skeleton, TextInput, ActionIcon, Text, ScrollArea, Button, Flex, Group, Divider, Select, MultiSelect } from '@mantine/core'
 import { IconSearch } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
@@ -8,14 +8,17 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Category } from '(routes)/ads/[id]/page'
 import { convertToEnglishNumber, currentUrlCategory, formatNumberWithCommas } from '@/_utils/utils'
+import classes from './scroll.module.css'
+import { Province } from '(routes)/ads/create/page'
 
-const AdsFilter = ({ setPage }: { setPage: React.Dispatch<React.SetStateAction<number>> }) => {
+const AdsFilter = ({ setPage, provinces }: { provinces: Province[], setPage: React.Dispatch<React.SetStateAction<number>> }) => {
     const [categoriesAds, setCategoriesAds] = useState<Category[]>([]);
     const searchParams = useSearchParams();
     const [value, setValue] = useState('');
     const [price_from, setPriceFrom] = useState('');
     const [price_to, setPriceTo] = useState('');
     const router = useRouter();
+    const [selectedProvince, setSelectedProvince] = useState<string[] | null>([]);
 
     useEffect(() => {
         // Fetch categories from API
@@ -26,6 +29,8 @@ const AdsFilter = ({ setPage }: { setPage: React.Dispatch<React.SetStateAction<n
         };
         fetchCategories();
     }, []);
+
+
 
     const handleSearch = () => {
         const searchParams = new URLSearchParams(window.location.search);
@@ -54,6 +59,26 @@ const AdsFilter = ({ setPage }: { setPage: React.Dispatch<React.SetStateAction<n
         }
     };
 
+    const handleOstanFilter = () => {
+        const searchParams = new URLSearchParams(window.location.search);
+
+        // Remove the existing 'ostan' parameter
+        searchParams.delete('ostan');
+
+        // Add each selected province as a separate 'ostan' parameter
+        if (selectedProvince && selectedProvince.length > 0) {
+            selectedProvince.forEach((province) => {
+                searchParams.append('ostan', province);
+            });
+        }
+
+        const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
+
+        // Update the browser's URL without reloading the page
+        window.history.pushState({}, '', newUrl);
+    };
+
+
 
 
     const handleNumberChange = (value: string, setValue: React.Dispatch<React.SetStateAction<string>>) => {
@@ -78,8 +103,16 @@ const AdsFilter = ({ setPage }: { setPage: React.Dispatch<React.SetStateAction<n
         // Update the URL by pushing new search parameters
         router.push(`?${newParams.toString()}`);
     };
+
+    const handleProvinceChange = (provinceId: string[] | null) => {
+        if (provinceId) {
+            setSelectedProvince(provinceId);
+        }
+    };
+
+
     return (
-        <ScrollArea scrollbars='y' pl={'xs'} offsetScrollbars type="always" scrollbarSize={3} h={560}>
+        <ScrollArea classNames={classes} scrollbars='y' pl={'xs'} offsetScrollbars type="always" scrollbarSize={3} h={560}>
             <Accordion styles={{ content: { padding: '0' } }} defaultValue="categories">
                 <Accordion.Item value={'categories'}>
                     <Accordion.Control >
@@ -108,8 +141,24 @@ const AdsFilter = ({ setPage }: { setPage: React.Dispatch<React.SetStateAction<n
                     </Accordion.Panel>
                 </Accordion.Item>
             </Accordion>
+            <Box mt={'xl'}>
+                <MultiSelect searchable
+                    label="استان"
+                    value={selectedProvince ? selectedProvince : []}
+                    onChange={handleProvinceChange}
+                    data={provinces.map((province) => ({
+                        value: province.id.toString(),
+                        label: province.name,
+                    }))}
+                />
+                <Group mt={'md'} justify='flex-end' wrap='nowrap' >
+                    <Button size='xs' onClick={handleOstanFilter} ><Text fz={'xs'}>اعمال فیلتر استان</Text></Button>
+                    <Button size='xs' onClick={(e) => handleRemoveParam(e)} variant='outline'><Text fz={'xs'}>حذف</Text></Button>
+                </Group>
 
-            <Text mt={'lg'} fw={'bold'} fz={'md'} pr={'xs'}> جستجو در نتایج</Text>
+            </Box>
+
+            <Text mt={'xl'} fw={'bold'} fz={'sm'}> جستجو در نتایج</Text>
             <TextInput mt='xs'
                 onKeyDown={handleKeyDown}
                 value={value}
@@ -117,7 +166,7 @@ const AdsFilter = ({ setPage }: { setPage: React.Dispatch<React.SetStateAction<n
                     <IconSearch size={13} />
                 </ActionIcon>} />
             <Divider mt={'xl'} />
-            <Text mt={'lg'} fw={'bold'} fz={'md'} pr={'xs'}> قیمت</Text>
+            <Text mt={'lg'} fw={'bold'} fz={'sm'}> قیمت</Text>
 
             {/* price filter */}
             <TextInput mt='xs' styles={{ input: { textAlign: 'left', direction: 'ltr' } }}
@@ -134,9 +183,9 @@ const AdsFilter = ({ setPage }: { setPage: React.Dispatch<React.SetStateAction<n
                 onChange={(event) => handleNumberChange(event.currentTarget.value, setPriceTo)}
                 rightSection={<Image src={'/svg/toman.svg'} alt='kiwi part price to' width={18} height={18} />} />
 
-            <Group mt={'md'} wrap='nowrap' >
-                <Button onClick={handlePrice} >اعمال فیلتر قیمت</Button>
-                <Button onClick={(e) => handleRemoveParam(e)} variant='outline'>حذف</Button>
+            <Group mt={'md'} justify='flex-end' wrap='nowrap' >
+                <Button size='xs' onClick={handlePrice} ><Text fz={'xs'}>اعمال فیلتر قیمت</Text></Button>
+                <Button size='xs' onClick={(e) => handleRemoveParam(e)} variant='outline'><Text fz={'xs'}>حذف</Text></Button>
             </Group>
 
         </ScrollArea>
