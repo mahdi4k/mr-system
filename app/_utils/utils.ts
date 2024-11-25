@@ -1,3 +1,4 @@
+"use client"
 
 import { IStatusFetch } from '@/_redux/features/ads';
 import moment from 'moment-jalaali';
@@ -145,6 +146,11 @@ export const formatNumberWithCommas = (value: string): string => {
 };
 
 export const currentUrlCategory = (item: string): string => {
+    if (typeof window === 'undefined') {
+        // Return a fallback value or handle the case where window is not available
+        return '';
+    }
+
     const searchParams = new URLSearchParams(window.location.search);
     searchParams.set('category', item.replace(/,/g, ''));
     return `${window.location.pathname}?${searchParams.toString()}`;
