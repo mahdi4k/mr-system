@@ -18,12 +18,12 @@ export function HeroHeader() {
         /> */}
         <SVG
           className={classes.heroSvg}
-          loader={<Box component='div' w={{base:300,sm:507}} h={{base:360,md:478}}></Box>}
+          loader={<Box component='div' w={{ base: 300, sm: 507 }} h={{ base: 360, md: 478 }}></Box>}
 
           src='/svg/hero.svg' />
         <div className={classes.content}>
           <Title className={classes.title}>
-            سیستمی <span className={classes.highlight}> که دوست داری</span> خیلی راحت  رو هم کن
+            سیستمی که دوست داری، با خیال راحت<span className={classes.highlight}> اسمبل </span>  کن
             <IconMoodSmile className={classes.IconSmile} size={50} color='var(--mantine-color-kiwi-8)' />
           </Title>
           <ListItem />

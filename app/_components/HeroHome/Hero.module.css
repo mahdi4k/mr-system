@@ -31,7 +31,7 @@
   .title {
     color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
     font-family: Vazirmatn, var(--mantine-font-family);
-    font-size: rem(44px);
+    font-size: rem(40px);
     line-height: 1.6;
     font-weight: 700;
 
@@ -62,7 +62,7 @@
     position: relative;
     background-color: var(--mantine-color-kiwi-2);
     border-radius: var(--mantine-radius-sm);
-    padding: rem(4px) rem(12px);
+    margin: rem(7px) rem(7px);
     color: white;
     background-image: 
     linear-gradient(#7ea300, #7ea300), 
