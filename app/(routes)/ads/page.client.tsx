@@ -2,7 +2,6 @@
 
 import { ActionIcon, Anchor, Badge, Breadcrumbs, Button, Card, Container, Drawer, Flex, Grid, Group, Loader, Menu, rem, SimpleGrid, Skeleton, Text, UnstyledButton } from '@mantine/core'
 import React, { useEffect, useRef, useState } from 'react'
-import { Category } from './[id]/page';
 import Image from 'next/image'
 import { Product, useLazyGetAdsListCategoryQuery } from '@/_redux/services/adsApi';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -18,6 +17,7 @@ import classes from './AdsPage.module.css'
 import ImgNoProduct from '../../../public/no-product.png'
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { Province } from './create/page';
+import { CategoryProdcut } from './page';
 
 
 const data = [
@@ -27,8 +27,7 @@ const data = [
 ];
 
 
-const PageClient = () => {
-    const [categoriesAds, setCategoriesAds] = useState<Category[]>([]);
+const PageClient = ({ categories }: { categories: CategoryProdcut[] }) => {
     const [adsQuery, { data: adsData, isSuccess: isSuccessAds, isLoading, isFetching: isFetchingAds }] = useLazyGetAdsListCategoryQuery();
     const searchParams = useSearchParams();
     const dispatch: AppDispatch = useDispatch();
@@ -58,13 +57,14 @@ const PageClient = () => {
         searchParams.forEach((value, key) => {
             paramObj[key] = value;
         });
+        console.log("🚀 ~ searchParams.forEach ~ paramObj:", paramObj)
 
         setParams(paramObj);
     }, [searchParams]);
 
 
     // check query params exist 
- 
+
     useEffect(() => {
         const categoryParam = searchParams.get('category');
         const searchParam = searchParams.get('search');
@@ -72,7 +72,7 @@ const PageClient = () => {
         const priceTo = searchParams.get('price_to');
         const sort = searchParams.get('sort');
         const ostanParams = searchParams.getAll('ostan'); // Retrieve all 'ostan' values
-    
+
         const queryParams: {
             ostan?: string; // Array for multiple 'ostan' values
             category?: string;
@@ -82,7 +82,7 @@ const PageClient = () => {
             sort?: string;
             page?: string;
         } = {};
-    
+
         if (ostanParams.length > 0) queryParams.ostan = ostanParams.join(','); // Add 'ostan' array to query
         if (categoryParam) queryParams.category = categoryParam;
         if (searchParam) queryParams.search = searchParam;
@@ -90,17 +90,18 @@ const PageClient = () => {
         if (priceTo) queryParams.price_to = priceTo;
         if (sort) queryParams.sort = sort;
         if (page) queryParams.page = `${page}`;
-    
+
         if (sort) {
             const sortParam = sort;
             setSelectedSort(
                 data.find((item) => item.value === sortParam) as { label: string; value: string }
             );
         }
-    
+
         adsQuery(queryParams); // Call your API with the constructed queryParams
+
     }, [searchParams, page]);
-    
+
 
 
     useEffect(() => {
@@ -123,23 +124,14 @@ const PageClient = () => {
         const setSearchParams = new URLSearchParams(window.location.search);
 
         if (isSuccessAds) {
+            console.log('here');
+
             setSearchParams.set('total_page', `${adsData ? adsData.last_page : 0}`);
             const newUrl = `${window.location.pathname}?${setSearchParams.toString()}`;
-
             window.history.pushState({}, '', newUrl);
         }
-    }, [isSuccessAds])
+    }, [isSuccessAds, adsData, searchParams])
 
-
-    // Fetch categories from API
-    useEffect(() => {
-        const fetchCategories = async () => {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories`);
-            const data: Category[] = await response.json();
-            setCategoriesAds(data);
-        };
-        fetchCategories();
-    }, []);
 
 
     // Clear products
@@ -156,14 +148,22 @@ const PageClient = () => {
             const totalPages = adsData.last_page;
 
             setTimeout(() => {
-                setProducts(prev => {
-                    const existingIds = new Set(prev.map(product => product.id));
-                    const newProducts = adsData.data.filter(product => !existingIds.has(product.id));
+                setProducts((prev) => {
+                    const existingIds = new Set(prev.map((product) => product.id));
+
+                    // Check if we are resetting or appending
+                    if (page === 1) {
+                        // On search reset, replace products entirely
+                        return adsData.data;
+                    }
+
+                    // For pagination, append only new products
+                    const newProducts = adsData.data.filter((product) => !existingIds.has(product.id));
                     return [...prev, ...newProducts];
                 });
             }, 0);
         }
-    }, [isSuccessAds, adsData, page]);
+    }, [isSuccessAds, adsData, page, searchParams]);
 
 
     //observer listiner for infinite scroll
@@ -260,7 +260,7 @@ const PageClient = () => {
     function AdsFilterWithDrawer({ setPage }: { setPage: React.Dispatch<React.SetStateAction<number>> }) {
         // Manage drawer state
         const [opened, { open, close }] = useDisclosure(false);
-        
+
         // Detect screen size (returns true if width < 768px)
         const isTablet = useMediaQuery('(max-width: 1200px)');
 
@@ -269,21 +269,21 @@ const PageClient = () => {
                 {isTablet ? (
                     <>
                         {/* Button to open the drawer */}
-                        <ActionIcon style={{position:'relative',top:'52px'}} mr={'sm'} size={'xl'} variant='light' onClick={open} >
+                        <ActionIcon style={{ position: 'relative', top: '52px' }} mr={'sm'} size={'xl'} variant='light' onClick={open} >
                             <IconFilter size={22} />
                         </ActionIcon>
 
 
                         {/* Drawer component */}
                         <Drawer position='bottom' opened={opened} onClose={close} title="فیلترها" padding="md" size="sm">
-                            <AdsFilter provinces={provinces} setPage={setPage} />
+                            <AdsFilter categories={categories} provinces={provinces} setPage={setPage} />
                         </Drawer>
                     </>
                 ) : (
                     // Render the Card with AdsFilter for larger screens
-                    <Grid.Col  className={classes.sidebar} span={3} pt={'xl'}>
+                    <Grid.Col className={classes.sidebar} span={3} pt={'xl'}>
                         <Card withBorder mb={'lg'} mt={'42px'} pl={'xs'}>
-                            <AdsFilter provinces={provinces} setPage={setPage} />
+                            <AdsFilter categories={categories} provinces={provinces} setPage={setPage} />
                         </Card>
                     </Grid.Col>
                 )}
@@ -307,23 +307,53 @@ const PageClient = () => {
                 <Grid.Col span={{ base: 12, lg: 9 }}>
                     <Flex align={'center'} justify={'space-between'}>
                         {/* Render badges for each query parameter */}
-                        {Object.entries(params).map(([key, value]) => {
-                            if (key !== 'sort' && key !== 'total_page') {
+                        {Object.entries(params)
+                            .filter(([key]) => key !== 'sort' && key !== 'total_page') // Exclude irrelevant keys
+                            .map(([key, value]) => {
+                                const category = categories.find(item => item.value === value)?.name;
+
                                 return (
                                     <Badge
                                         ml={'4px'}
-                                        color='var(--mantine-color-kiwi-3)'
-                                        key={key}
-                                        rightSection={<IconX onClick={() => handleRemoveParam(key)} color='var(--mantine-color-gray-8)' style={{ width: rem(12), height: rem(12), cursor: 'pointer', marginLeft: '3px' }} />}
+                                        color="var(--mantine-color-kiwi-3)"
+                                        key={`${key}-${value}`}
+                                        rightSection={
+                                            <IconX
+                                                onClick={() => handleRemoveParam(key)}
+                                                color="var(--mantine-color-gray-8)"
+                                                style={{
+                                                    width: rem(12),
+                                                    height: rem(12),
+                                                    cursor: 'pointer',
+                                                    marginLeft: '3px',
+                                                }}
+                                            />
+                                        }
                                     >
-                                        <Text c={'var(--mantine-color-gray-8)'} fz={'12px'}>{categoriesAds.find(item => item.value === value)?.name}</Text>
-                                        {key === 'search' ? <Text c={'var(--mantine-color-gray-8)'} fz={'12px'}>{value}</Text> : ''}
-                                        {key === 'price_from' ? <Text c={'var(--mantine-color-gray-8)'} fz={'12px'}> از {formatNumberWithCommas(value)}</Text> : ''}
-                                        {key === 'price_to' ? <Text c={'var(--mantine-color-gray-8)'} fz={'12px'}> تا {formatNumberWithCommas(value)}</Text> : ''}
+                                        {key === 'search' && (
+                                            <Text c="var(--mantine-color-gray-8)" fz="12px">
+                                                جستجو: {value}
+                                            </Text>
+                                        )}
+                                        {category && key !== 'search' && (
+                                            <Text c="var(--mantine-color-gray-8)" fz="12px">
+                                                {category}
+                                            </Text>
+                                        )}
+                                        {key === 'price_from' && (
+                                            <Text c="var(--mantine-color-gray-8)" fz="12px">
+                                                از {formatNumberWithCommas(value)}
+                                            </Text>
+                                        )}
+                                        {key === 'price_to' && (
+                                            <Text c="var(--mantine-color-gray-8)" fz="12px">
+                                                تا {formatNumberWithCommas(value)}
+                                            </Text>
+                                        )}
                                     </Badge>
-                                )
-                            }
-                        })}
+                                );
+                            })}
+
 
                         <Menu
                             onOpen={() => setOpened(true)}

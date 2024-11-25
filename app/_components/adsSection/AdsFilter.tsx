@@ -10,9 +10,9 @@ import { Category } from '(routes)/ads/[id]/page'
 import { convertToEnglishNumber, currentUrlCategory, formatNumberWithCommas } from '@/_utils/utils'
 import classes from './scroll.module.css'
 import { Province } from '(routes)/ads/create/page'
+import { CategoryProdcut } from '(routes)/ads/page'
 
-const AdsFilter = ({ setPage, provinces }: { provinces: Province[], setPage: React.Dispatch<React.SetStateAction<number>> }) => {
-    const [categoriesAds, setCategoriesAds] = useState<Category[]>([]);
+const AdsFilter = ({ setPage, provinces, categories }: { categories: CategoryProdcut[], provinces: Province[], setPage: React.Dispatch<React.SetStateAction<number>> }) => {
     const searchParams = useSearchParams();
     const [value, setValue] = useState('');
     const [price_from, setPriceFrom] = useState('');
@@ -20,19 +20,9 @@ const AdsFilter = ({ setPage, provinces }: { provinces: Province[], setPage: Rea
     const router = useRouter();
     const [selectedProvince, setSelectedProvince] = useState<string[] | null>([]);
 
-    useEffect(() => {
-        // Fetch categories from API
-        const fetchCategories = async () => {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories`);
-            const data: Category[] = await response.json();
-            setCategoriesAds(data);
-        };
-        fetchCategories();
-    }, []);
-
-
 
     const handleSearch = () => {
+        setPage(1)
         const searchParams = new URLSearchParams(window.location.search);
         searchParams.set('search', value); // Set or update the 'search' query param
         const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
@@ -43,6 +33,7 @@ const AdsFilter = ({ setPage, provinces }: { provinces: Province[], setPage: Rea
 
     const handlePrice = () => {
         const searchParams = new URLSearchParams(window.location.search);
+        setPage(1)
         if (price_from)
             searchParams.set('price_from', price_from.replace(/,/g, ''));
         if (price_to)
@@ -61,12 +52,13 @@ const AdsFilter = ({ setPage, provinces }: { provinces: Province[], setPage: Rea
 
     const handleOstanFilter = () => {
         const searchParams = new URLSearchParams(window.location.search);
-
         // Remove the existing 'ostan' parameter
         searchParams.delete('ostan');
 
         // Add each selected province as a separate 'ostan' parameter
         if (selectedProvince && selectedProvince.length > 0) {
+            setPage(1);
+
             selectedProvince.forEach((province) => {
                 searchParams.append('ostan', province);
             });
@@ -110,17 +102,30 @@ const AdsFilter = ({ setPage, provinces }: { provinces: Province[], setPage: Rea
         }
     };
 
+    useEffect(() => {
+        const searchValue = searchParams.get('search');
+        if (searchValue) {
+            setValue(searchValue);
+        }
+
+        const ostanValues = searchParams.getAll('ostan');
+        if (ostanValues.length) {
+            setSelectedProvince(ostanValues); // Update the MultiSelect state
+        }
+    }, [searchParams]);
+
+
 
     return (
         <ScrollArea classNames={classes} scrollbars='y' pl={'xs'} offsetScrollbars type="always" scrollbarSize={3} h={560}>
             <Accordion styles={{ content: { padding: '0' } }} defaultValue="categories">
                 <Accordion.Item value={'categories'}>
                     <Accordion.Control >
-                        <Text fw={'bold'} fz={'md'} >دسته‌بندی‌ ها‌</Text>
+                        <Text fw={'bold'} fz={'md'} >دسته‌بندی‌ ها</Text>
                     </Accordion.Control>
                     <Accordion.Panel>
-                        {categoriesAds.length ? (
-                            categoriesAds.map(item => (
+                        {categories.length ? (
+                            categories.map(item => (
                                 <Link key={item.id} href={currentUrlCategory(item.value)}>
                                     <NavLink onClick={() => { setPage(1) }} component='div'
                                         active={searchParams.get('category') === item.value}
