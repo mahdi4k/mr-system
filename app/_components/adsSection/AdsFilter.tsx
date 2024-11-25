@@ -108,6 +108,16 @@ const AdsFilter = ({ setPage, provinces, categories }: { categories: CategoryPro
             setValue(searchValue);
         }
 
+        const priceFromValue = searchParams.get('price_from');
+        if (priceFromValue) {
+            setPriceFrom(priceFromValue);
+        }
+
+        const priceToValue = searchParams.get('price_to');
+        if (priceToValue) {
+            setPriceTo(priceToValue);
+        }
+
         const ostanValues = searchParams.getAll('ostan');
         if (ostanValues.length) {
             setSelectedProvince(ostanValues); // Update the MultiSelect state
