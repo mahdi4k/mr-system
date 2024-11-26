@@ -1,7 +1,8 @@
 
 "use client"
-import { List, ThemeIcon } from '@mantine/core'
+import { Group, List, Text, ThemeIcon } from '@mantine/core'
 import { IconCheck } from '@tabler/icons-react'
+import Link from 'next/link'
 import React from 'react'
 
 const ListItem = () => {
@@ -24,7 +25,9 @@ const ListItem = () => {
                 به راحتی آگهی ثبت کن و قطعات مورد نیازت رو با بهترین قیمت پیدا کن!
             </List.Item>
             <List.Item>
-             قبل از خرید، بهترین گزینه و قیمت رو از ترب و ایمالز بررسی کن! 
+                <Group gap={'2px'}>
+                    قبل از خرید، بهترین گزینه <Text fz={'xs'}><Link href={''}>cpu</Link>,<Link href={''}>مادربرد</Link>,<Link href={''}>کارت گرافیک</Link>,...</Text>و قیمت رو از ترب و ایمالز بررسی کن!
+                </Group>
             </List.Item>
         </List>
     )
