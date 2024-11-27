@@ -335,6 +335,11 @@ const PageClient = ({ categories }: { categories: CategoryProdcut[] }) => {
                                                 جستجو: {value}
                                             </Text>
                                         )}
+                                        {key === 'ostan' && (
+                                            <Text c="var(--mantine-color-gray-8)" fz="12px">
+                                                استان: 
+                                            </Text>
+                                        )}
                                         {category && key !== 'search' && (
                                             <Text c="var(--mantine-color-gray-8)" fz="12px">
                                                 {category}
@@ -342,12 +347,12 @@ const PageClient = ({ categories }: { categories: CategoryProdcut[] }) => {
                                         )}
                                         {key === 'price_from' && (
                                             <Text c="var(--mantine-color-gray-8)" fz="12px">
-                                                از {formatNumberWithCommas(value)}
+                                                قیمت از : {formatNumberWithCommas(value)} تومان
                                             </Text>
                                         )}
                                         {key === 'price_to' && (
                                             <Text c="var(--mantine-color-gray-8)" fz="12px">
-                                                تا {formatNumberWithCommas(value)}
+                                                قیمت تا : {formatNumberWithCommas(value)} تومان
                                             </Text>
                                         )}
                                     </Badge>

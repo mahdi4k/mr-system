@@ -89,7 +89,7 @@
 }
 
 .title {
-    color: var(--mantine-color-white);
+    color: var(--mantine-color-white) !important;
     margin-bottom: rem(5px);
 }
 

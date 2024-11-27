@@ -5,7 +5,7 @@
     flex: none;
     width: 232px;
     height: 209px;
-    border-radius: 100%;
+    border-radius: 100% !important;
     text-align: center;
     align-items: center;
     justify-content: center;
@@ -16,7 +16,7 @@
 }
 
 .cardTitle {
-    text-align: center;
+    text-align: center !important;
     height: 57px;
     display: flex;
     align-items: center;
@@ -27,7 +27,7 @@
     bottom: 30px;
     background: light-dark(white, #1c2c3d);
     width: 80%;
-    margin: auto;
+    margin: auto !important;
     color: light-dark(black, white);
     font-size: 15pt;
 }
