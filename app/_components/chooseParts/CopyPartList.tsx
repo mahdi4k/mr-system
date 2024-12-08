@@ -1,4 +1,4 @@
-import { Card, CopyButton, Tooltip, ActionIcon, rem, Stack, Text, Box, Flex } from '@mantine/core';
+import { Card, CopyButton, Tooltip, ActionIcon, rem, Stack, Text, Box, Flex, Skeleton } from '@mantine/core';
 import { IconCheck, IconCopy } from '@tabler/icons-react';
 import React from 'react';
 import { TelegramShareButton, TelegramIcon } from 'react-share';
@@ -76,12 +76,12 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
         <div>
             {(hasParts) && (
                 <Card maw={'380px'} bg={'var(--mantine-color-body)'} mt={'lg'} shadow='sm' radius={'md'}>
-                    <Flex align={'baseline'} style={{ position: 'absolute', left: '20px', top: '10px' }}>
+                    <Flex justify={'flex-end'} align={'center'}>
                         <CopyButton value={`${typeof window !== 'undefined' ? window.location.href : ''}\n\n${generateTitle()}`} timeout={2000}>
                             {({ copied, copy }) => (
                                 <Tooltip label={copied ? 'کپی شد' : 'کپی'} withArrow position="top">
                                     <ActionIcon color={copied ? 'teal' : 'gray'} variant="subtle" onClick={copy}>
-                                          {copied ? (
+                                        {copied ? (
                                             <IconCheck style={{ width: rem(16) }} />
                                         ) : (
                                             <IconCopy style={{ width: rem(16) }} />
@@ -90,8 +90,8 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                                 </Tooltip>
                             )}
                         </CopyButton>
-                        <Box pos={'relative'} bottom={'3px'} mr={'sm'}>
-                            <TelegramShareButton
+                        <Box mr={'sm'}>
+                            <TelegramShareButton style={{display:'flex'}}
                                 url={typeof window !== 'undefined' ? window.location.href : ''}
                                 title={generateTitle()}
                             >
@@ -100,30 +100,30 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                         </Box>
                     </Flex>
                     <Stack gap={'sm'}>
-                        {isSuccessMotherboardData && (
+                        {isSuccessMotherboardData ? (
                             <Text hidden={!searchParams.has('motherboard')} fz={'sm'} fw={'bold'}>{removePersianWords(motherboardData?.data.name as string)}</Text>
-                        )}
-                        {isSuccessCpu && (
+                        ) : <Skeleton height={15} mt={16} radius="md" />}
+                        {isSuccessCpu ? (
                             <Text hidden={!searchParams.has('cpu')} fz={'sm'} fw={'bold'}>{removePersianWords(cpuData?.data.name as string)}</Text>
-                        )}
-                        {isSuccessGraphic && (
+                        ) : <Skeleton height={15} mt={10} radius="md" />}
+                        {isSuccessGraphic ? (
                             <Text hidden={!searchParams.has('graphic')} fz={'sm'} fw={'bold'}>{removePersianWords(graphicData?.data.name as string)}</Text>
-                        )}
-                        {isSuccessPower && (
+                        ) : <Skeleton height={15} mt={10} radius="md" />}
+                        {isSuccessPower ? (
                             <Text hidden={!searchParams.has('power')} fz={'sm'} fw={'bold'}>{removePersianWords(powerData?.data.name as string)}</Text>
-                        )}
-                        {isSuccessRam && (
+                        ) : <Skeleton height={15} mt={10} radius="md" />}
+                        {isSuccessRam ? (
                             <Text hidden={!searchParams.has('ram')} fz={'sm'} fw={'bold'}>{removePersianWords(ramData?.data.name as string)}</Text>
-                        )}
-                        {isSuccessFan && (
+                        ) : <Skeleton height={15} mt={10} radius="md" />}
+                        {isSuccessFan ? (
                             <Text hidden={!searchParams.has('fan')} fz={'sm'} fw={'bold'}>{removePersianWords(fanData?.data.name as string)}</Text>
-                        )}
-                        {isSuccessSsd && (
+                        ) : <Skeleton height={15} mt={10} radius="md" />}
+                        {isSuccessSsd ? (
                             <Text hidden={!searchParams.has('ssd')} fz={'sm'} fw={'bold'}>{removePersianWords(ssdData?.data.name as string)}</Text>
-                        )}
-                        {isSuccessCase && (
+                        ) : <Skeleton height={15} mt={10} radius="md" />}
+                        {isSuccessCase ? (
                             <Text hidden={!searchParams.has('case')} fz={'sm'} fw={'bold'}>{removePersianWords(caseData?.data.name as string)}</Text>
-                        )}
+                        ) : <Skeleton height={15} mt={10} radius="md" />}
                     </Stack>
                 </Card>
             )}
