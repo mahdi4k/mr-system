@@ -10,7 +10,7 @@ export function Footer() {
                 <Text c="dimmed" size="sm">
                     © 2024 kiwi part. All rights reserved
                 </Text>
-                <Group gap={0} className={classes.links} justify="flex-end" wrap="nowrap">
+                {/* <Group gap={0} className={classes.links} justify="flex-end" wrap="nowrap">
                     <ActionIcon size="lg" color="gray" variant="subtle">
                         <IconBrandTwitter style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
                     </ActionIcon>
@@ -20,7 +20,7 @@ export function Footer() {
                     <ActionIcon size="lg" color="gray" variant="subtle">
                         <IconBrandInstagram style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
                     </ActionIcon>
-                </Group>
+                </Group> */}
             </Container>
         </div>
     );
