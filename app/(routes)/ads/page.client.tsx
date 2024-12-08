@@ -124,8 +124,6 @@ const PageClient = ({ categories }: { categories: CategoryProdcut[] }) => {
         const setSearchParams = new URLSearchParams(window.location.search);
 
         if (isSuccessAds) {
-            console.log('here');
-
             setSearchParams.set('total_page', `${adsData ? adsData.last_page : 0}`);
             const newUrl = `${window.location.pathname}?${setSearchParams.toString()}`;
             window.history.pushState({}, '', newUrl);
@@ -147,29 +145,27 @@ const PageClient = ({ categories }: { categories: CategoryProdcut[] }) => {
         if (isSuccessAds && adsData) {
             const totalPages = adsData.last_page;
 
-            setTimeout(() => {
-                setProducts((prev) => {
-                    const existingIds = new Set(prev.map((product) => product.id));
+            setProducts((prev) => {
+                const existingIds = new Set(prev.map((product) => product.id));
 
-                    // Check if we are resetting or appending
-                    if (page === 1) {
-                        // On search reset, replace products entirely
-                        return adsData.data;
-                    }
+                // Check if we are resetting or appending
+                if (page === 1) {
+                    // On search reset, replace products entirely
+                    return adsData.data;
+                }
 
-                    // For pagination, append only new products
-                    const newProducts = adsData.data.filter((product) => !existingIds.has(product.id));
-                    return [...prev, ...newProducts];
-                });
-            }, 0);
+                // For pagination, append only new products
+                const newProducts = adsData.data.filter((product) => !existingIds.has(product.id));
+                return [...prev, ...newProducts];
+            });
         }
     }, [isSuccessAds, adsData, page, searchParams]);
 
 
-    //observer listiner for infinite scroll
     useEffect(() => {
-        const observer = new IntersectionObserver(debounce((entries: IntersectionObserverEntry[]) => {
-            if (entries[0].isIntersecting) {
+        const observer = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
+            if (entries[0].isIntersecting && !isFetchingAds) {
+
                 setPage((prev) => {
                     const currentTotalPage = Number(searchParams.get('total_page')); // Get the latest value as number
 
@@ -184,7 +180,7 @@ const PageClient = ({ categories }: { categories: CategoryProdcut[] }) => {
                     return prev; // No page increment if we reach totalPage
                 });
             }
-        }, 500), {
+        }, {
             root: null,
             rootMargin: '0px',
             threshold: 1.0
@@ -212,7 +208,7 @@ const PageClient = ({ categories }: { categories: CategoryProdcut[] }) => {
                     style={{ borderRadius: '7px' }}
                     width={180}
                     height={170}
-                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${images[0]}`}
+                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/storage/${images[0]}`}
                 />
             );
 
@@ -337,7 +333,7 @@ const PageClient = ({ categories }: { categories: CategoryProdcut[] }) => {
                                         )}
                                         {key === 'ostan' && (
                                             <Text c="var(--mantine-color-gray-8)" fz="12px">
-                                                استان: 
+                                                استان:
                                             </Text>
                                         )}
                                         {category && key !== 'search' && (
@@ -413,7 +409,7 @@ const PageClient = ({ categories }: { categories: CategoryProdcut[] }) => {
                         )) : ''}
                         {adsData?.data.length === 0 && products.length === 0 && !isFetchingAds ? <Text>آگهی یافت نشد</Text> : ''}
                     </SimpleGrid>
-                    {isFetchingAds ? <Flex justify={'center'} align={'center'}><Loader color="green" type="dots" /></Flex> : ''}
+                    {isFetchingAds ? <Flex justify={'center'} align={'center'}><Loader styles={{root:{alignItems:'flex-start'}}} h={400} color="green" type="dots" />                    </Flex> : ''}
 
 
                 </Grid.Col>
@@ -424,5 +420,4 @@ const PageClient = ({ categories }: { categories: CategoryProdcut[] }) => {
 
     )
 }
-
 export default PageClient

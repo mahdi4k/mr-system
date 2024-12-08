@@ -81,7 +81,7 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
                     <Card style={{ padding: '0 35px', marginTop: '20px', width: '200px' }} radius="md" shadow='xs' >
                         <IconX onClick={removeSelected} size={18} style={{ position: 'absolute', right: '4px', top: '3px' }} />
                         <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
-                            {currentMotherboard.image && <Image alt={currentMotherboard.name ? currentMotherboard.name : ''} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${currentMotherboard.image}`} />}
+                            {currentMotherboard.image && <Image alt={currentMotherboard.name ? currentMotherboard.name : ''} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${currentMotherboard.image}`} />}
                         </Card.Section>
                         <Flex direction={'column'} justify="center" align={'center'} mt="sm" mb="xs">
                             <Badge color="pink" variant="light">
@@ -183,7 +183,7 @@ const Motherboard: FC<ImotherboardProps> = ({ activeMotherboard, setActiveMother
                                 <Card onClick={() => selectedMotherboard(el.id)} className={cardClasses.hoverCard}
                                     style={{ padding: '0  10px' }} radius="md" withBorder>
                                     <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
-                                        {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${el.image}`} />}
+                                        {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${el.image}`} />}
                                     </Card.Section>
                                     <Flex direction={'column'} justify="center" align={'center'} mt="sm" mb="xs">
                                         <Text h={40} ta={'center'} fz={"sm"}>{el.name}</Text>

@@ -5,22 +5,15 @@ import Image from 'next/image';
 import classes from '@/_cssModules/PcSection.module.css'
 import Link from 'next/link';
 import TabsSection from './components/TabsSection';
+import SingleProductImage from './components/SingleProductImage';
 
 const GraphicCardSingle = ({ product }: { product: Graphic }) => {
  
     return (
         <>
             <Grid mt={'xl'}>
-                <Grid.Col span={{ base: 12, lg: 4 }}>
-                    {product.image && <Image alt={product.name} width={250} height={250} sizes="100vw"
-                        style={{
-                            width: '100%',
-                            height: 'revert-layer',
-                            objectFit: 'contain'
+            <SingleProductImage product={product} />
 
-                        }}
-                        src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${product.image}`} />}
-                </Grid.Col>
                 <Grid.Col pr={{ base: 'xs', lg: 'xl' }} span={{ base: 12, lg: 8 }}>
                     <Text fz={{ base: '18pt', lg: '28pt' }} fw={'bold'}> {product.name}</Text>
                     <Flex mt={'xl'}>

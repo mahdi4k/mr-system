@@ -6,6 +6,7 @@ import React from 'react'
 import TabsSection from './components/TabsSection';
 import { CASE } from '@/_redux/services/caseApi';
 import { useGetGraphicsQuery } from '@/_redux/services/graphicApi';
+import SingleProductImage from './components/SingleProductImage';
 
 const CaseSingle = ({ product }: { product: CASE }) => {
     const torobLink = JSON.parse(product.links)[0];
@@ -15,15 +16,8 @@ const CaseSingle = ({ product }: { product: CASE }) => {
     return (
         <>
             <Grid mt={'xl'}>
-                <Grid.Col span={{ base: 12, lg: 4 }}>
-                    {product.image && <Image alt={product.name} width={450} height={450} sizes="100vw"
-                        style={{
-                            width: '100%',
-                            height: 'revert-layer',
-                            objectFit: 'contain'
-                        }}
-                        src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${product.image}`} />}
-                </Grid.Col>
+            <SingleProductImage product={product} />
+
                 <Grid.Col pr={{ base: 'xs', lg: 'xl' }} span={{ base: 12, lg: 8 }}>
                     <Text fz={{ base: '18pt', lg: '28pt' }} fw={'bold'}> {product.name}</Text>
                     <Flex mt={'xl'}>

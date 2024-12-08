@@ -76,7 +76,7 @@ const AdsSection = ({ token }: { token?: string }) => {
                     style={{ borderRadius: '7px' }}
                     width={190}
                     height={180}
-                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${images[0]}`}
+                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/storage/${images[0]}`}
                 />
             );
 

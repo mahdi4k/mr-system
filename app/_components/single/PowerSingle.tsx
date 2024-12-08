@@ -6,6 +6,7 @@ import classes from '@/_cssModules/PcSection.module.css'
 import React from 'react'
 import CardPartPrice from '../shared/CardPartPrice';
 import TabsSection from './components/TabsSection';
+import SingleProductImage from './components/SingleProductImage';
 
 const PowerSingle = ({ product }: { product: POWER }) => {
   const torobLink = JSON.parse(product.links)[0];
@@ -13,15 +14,8 @@ const PowerSingle = ({ product }: { product: POWER }) => {
   return (
     <>
       <Grid mt={'xl'}>
-        <Grid.Col span={{ base: 12, lg: 4 }}>
-          {product.image && <Image alt={product.name} width={450} height={450} sizes="100vw"
-            style={{
-              width: '100%',
-              height: 'revert-layer',
-              objectFit: 'contain'
-            }}
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${product.image}`} />}
-        </Grid.Col>
+      <SingleProductImage product={product} />
+
         <Grid.Col pr={{ base: 'xs', lg: 'xl' }} span={{ base: 12, lg: 8 }}>
           <Text fz={{ base: '18pt', lg: '28pt' }} fw={'bold'}> {product.name}</Text>
           <Flex mt={'xl'}>

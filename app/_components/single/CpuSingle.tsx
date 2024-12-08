@@ -5,20 +5,14 @@ import Image from 'next/image';
 import { CPU } from '@/_redux/services/cpuApi';
 import classes from '@/_cssModules/PcSection.module.css'
 import TabsSection from './components/TabsSection';
+import SingleProductImage from './components/SingleProductImage';
 
 const CpuSingle = ({ product }: { product: CPU }) => {
   return (
     <>
       <Grid mt={'xl'}>
-        <Grid.Col className={classes.imgSingleProduct} span={{ base: 12, sm: 4 }}>
-          {product.image && <Image alt={product.name} width={400} height={250} sizes="100vw"
-            style={{
-              width: 'auto',
-              height: 'revert-layer',
-              objectFit: 'cover'
-            }}
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${product.image}`} />}
-        </Grid.Col>
+      <SingleProductImage product={product} />
+
         <Grid.Col pr={{ base: 'xs', lg: 'xl' }} span={{ base: 12, sm: 8 }}>
           <Text fz={{ base: '18pt', lg: '28pt' }} fw={'bold'}> {product.name}</Text>
           <Flex mt={'xl'}>

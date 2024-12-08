@@ -97,7 +97,7 @@ const Cpu: FC<IcpuProps> = ({ setActiveCpu, activeCpu }) => {
                     <Card style={{ padding: '0 35px', marginTop: '20px', width: '200px' }} radius="md" shadow='xs'>
                         <IconX onClick={removeSelected} size={18} style={{ position: 'absolute', right: '4px', top: '3px' }} />
                         <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
-                            {currentCpu.image && <Image alt={currentCpu.name ? currentCpu.name : ''} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${currentCpu.image}`} />}
+                            {currentCpu.image && <Image alt={currentCpu.name ? currentCpu.name : ''} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${currentCpu.image}`} />}
                         </Card.Section>
                         <Flex direction={'column'} justify="center" align={'center'} mt="sm" mb="xs">
                             <Badge color="pink" variant="light">
@@ -157,7 +157,7 @@ const Cpu: FC<IcpuProps> = ({ setActiveCpu, activeCpu }) => {
                                 <Card onClick={() => selectedCpu(el.id)} key={el.id} className={cardClasses.hoverCard}
                                     style={{ padding: '0 20px' }} radius="md" withBorder>
                                     <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
-                                        {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${el.image}`} />}
+                                        {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${el.image}`} />}
                                     </Card.Section>
 
                                     <Flex direction={'column'} justify="center" align={'center'} mt="xs" mb="xs">

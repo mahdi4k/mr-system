@@ -92,7 +92,7 @@ const ClientAds = () => {
               width={30}
               onClick={() => openModal(img)} // Opens modal on click
               height={30}
-              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${img}`}
+              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/storage/${img}`}
             />
           ))}
         </>
@@ -106,7 +106,7 @@ const ClientAds = () => {
   }
 
   const openModal = (img: string) => {
-    setSelectedImage(`${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${img}`);
+    setSelectedImage(`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/storage/${img}`);
     setOpenedImageModal(true);
   };
 

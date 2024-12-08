@@ -105,7 +105,7 @@ const GraphicCard: FC<IgraphicProps> = ({ setActiveGraphic, activeGraphic }) => 
                     <Card style={{ padding: '0 35px', marginTop: '20px', width: '200px' }} radius="md" shadow='xs'>
                         <IconX onClick={removeSelected} size={18} style={{ position: 'absolute', right: '4px', top: '3px' }} />
                         <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
-                            {currentGraphic.image && <Image alt={currentGraphic.name ? currentGraphic.name : ''} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${currentGraphic.image}`} />}
+                            {currentGraphic.image && <Image alt={currentGraphic.name ? currentGraphic.name : ''} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${currentGraphic.image}`} />}
                         </Card.Section>
                         <Flex direction={'column'} justify="center" align={'center'} mb="xs">
 
@@ -172,7 +172,7 @@ const GraphicCard: FC<IgraphicProps> = ({ setActiveGraphic, activeGraphic }) => 
                                     style={{ padding: '0 25x' }} radius="md" withBorder>
                                     <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
 
-                                        {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${el.image}`} />}
+                                        {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${el.image}`} />}
 
                                     </Card.Section>
 

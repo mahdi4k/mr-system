@@ -73,7 +73,7 @@ const PageClient: FC<props> = ({ product }) => {
               <Carousel.Slide key={index} mt={'sm'} >
                 <Box onClick={() => openModal(index)}>
                   <Group wrap='nowrap' justify='center' className={classes.adsImages} key={index}>
-                    <KiwiImage objectFit='cover' url={`${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${img}`} width={300} height={300} img={img} alt={title} />
+                    <KiwiImage objectFit='cover' url={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/storage/${img}`} width={300} height={300} img={img} alt={title} />
                   </Group>
                 </Box>
               </Carousel.Slide>
@@ -108,7 +108,7 @@ const PageClient: FC<props> = ({ product }) => {
 
       {handleImageAds(product.image, product.title)}
 
-      <Grid gutter={'xl'} mt={'lg'} mb={'xl'}>
+      <Grid gutter={'xl'} mt={{base:'lg',md:'60px'}} mb={'xl'}>
         <Grid.Col span={{ base: 12, lg: 8 }}>
           <Text mt={'calc(var(--mantine-spacing-lg) * 2)'} fw={'bold'} fz={'h1'}>{product.title}</Text>
 

@@ -60,7 +60,7 @@ const AdsGalleryModal: FC<props> = ({ image, openedImageModal, setOpenedImageMod
                             <Image
                                 fill
                                 style={{objectFit:'contain'}}
-                                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${img}`}
+                                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/storage/${img}`}
                                 alt={`Large Image ${index}`} />
                         </Carousel.Slide>
                     ))}
@@ -71,7 +71,7 @@ const AdsGalleryModal: FC<props> = ({ image, openedImageModal, setOpenedImageMod
                     {images.map((img, index) => (
                         <Image
                             key={index}
-                            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${img}`}
+                            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/storage/${img}`}
                             alt={`Thumbnail ${index}`}
                             width={80}
                             height={80}

@@ -53,7 +53,7 @@ const TabsSection: FC<Props> = ({ tabLists, tabPanels, defaultValue }) => {
                                     <Link  href={`/products/${tab.value}/${data.id}`}>
                                         <Card className={classes.CardItem} miw={20} mih={312} key={data.id} shadow="sm" padding="lg" radius="md" withBorder>
                                             <Card.Section mt={'0'} ta={'center'}>
-                                                {data.image && <Image alt={data.name} width={170} height={160} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${data.image}`} />}
+                                                {data.image && <Image alt={data.name} width={170} height={160} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${data.image}`} />}
                                             </Card.Section>
 
                                             <Flex align={'center'} justify={'center'} direction={'column'}>

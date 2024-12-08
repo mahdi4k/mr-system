@@ -6,6 +6,7 @@ import React from 'react'
 import TabsSection from './components/TabsSection';
 import { FAN } from '@/_redux/services/fanApi';
 import { IconCheck, IconX } from '@tabler/icons-react';
+import SingleProductImage from './components/SingleProductImage';
 
 const FanSingle = ({ product }: { product: FAN }) => {
     const torobLink = JSON.parse(product.links)[0];
@@ -14,15 +15,8 @@ const FanSingle = ({ product }: { product: FAN }) => {
     return (
         <>
             <Grid mt={'xl'}>
-                <Grid.Col span={{ base: 12, lg: 4 }}>
-                    {product.image && <Image alt={product.name} width={450} height={450} sizes="100vw"
-                        style={{
-                            width: '100%',
-                            height: 'revert-layer',
-                            objectFit: 'contain'
-                        }}
-                        src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${product.image}`} />}
-                </Grid.Col>
+            <SingleProductImage product={product} />
+
                 <Grid.Col pr={{ base: 'xs', lg: 'xl' }} span={{ base: 12, lg: 8 }}>
                     <Text fz={{ base: '18pt', lg: '28pt' }} fw={'bold'}> {product.name}</Text>
 

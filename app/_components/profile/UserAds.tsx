@@ -53,7 +53,7 @@ const UserAds = () => {
                                 alt={title}
                                 width={100}
                                 height={100}
-                                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${img}`}
+                                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/storage/${img}`}
                             />
                         </Carousel.Slide>
                     ))}

@@ -44,7 +44,7 @@ const KiwiImage: FC<Props> = ({ img, alt, width, height, url, objectFit }) => {
       style={{ objectFit: objectFit ? objectFit : 'contain' }}
       alt={alt}
       fill
-      src={url ? url : `${process.env.NEXT_PUBLIC_BACKEND_URL}/${img}`}
+      src={url ? url : `${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${img}`}
     />
   );
 };

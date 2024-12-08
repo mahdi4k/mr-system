@@ -48,7 +48,7 @@ const ClientMotherBoard = () => {
         <Table.Tr key={element.name}>
             <Table.Td>
                 <Flex align={'end'}>
-                    {element.image && <Image alt={element.name} width={30} height={30} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${element.image}`} />}
+                    {element.image && <Image alt={element.name} width={30} height={30} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${element.image}`} />}
                     <Text fz={'sm'} mr={'xs'}>{element.name}</Text>
                 </Flex>
             </Table.Td>

@@ -83,7 +83,7 @@ const Power: FC<IPowerProps> = ({ setActivePower, activePower }) => {
                     <Card style={{ padding: '0 35px', marginTop: '20px', width: '200px' }} radius="md" shadow='xs'>
                         <IconX onClick={removeSelected} size={18} style={{ position: 'absolute', right: '4px', top: '3px' }} />
                         <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
-                            {currentPower.image && <Image alt={currentPower.name ? currentPower.name : ''} width={75} height={85} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${currentPower.image}`} />}
+                            {currentPower.image && <Image alt={currentPower.name ? currentPower.name : ''} width={75} height={85} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${currentPower.image}`} />}
                         </Card.Section>
                         <Flex direction={'column'} justify="center" align={'center'} mb="xs">
 
@@ -139,7 +139,7 @@ const Power: FC<IPowerProps> = ({ setActivePower, activePower }) => {
                                     style={{ padding: '0 20px' }} radius="md" withBorder>
                                     <Card.Section style={{ textAlign: 'center' }} mt={'md'}>
 
-                                        {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${el.image}`} />}
+                                        {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${el.image}`} />}
 
                                     </Card.Section>
 

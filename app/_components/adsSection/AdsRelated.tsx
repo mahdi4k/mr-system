@@ -29,7 +29,7 @@ const AdsRelated: FC<props> = ({ filteredAds, isFetchingAds }) => {
         if (images.length > 0) {
             return (
                 <Image alt={title} style={{ borderRadius: '7px' }} width={190} height={180}
-                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${images[0]}`}
+                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/storage/${images[0]}`}
                 />
             );
 
@@ -59,7 +59,11 @@ const AdsRelated: FC<props> = ({ filteredAds, isFetchingAds }) => {
                                 </Card.Section>
                                 <Text ta={'right'} mt={'5px'} lineClamp={1} fz={'md'}>{item.title}</Text>
                                 <Flex align={'baseline'} justify={'space-between'}>
-                                    <CardPartPrice isAds price={item.price} />
+                                    
+                                    {item.price ?
+                                     <CardPartPrice tomanHeight={17} tomanWidth={17} textSize={16} isAds price={item.price} /> : 
+                                     <Text c={'#25ac9e'} mb="xs" fz={'sm'} mt={'md'}>توافقی</Text>}
+
                                     <Flex>
                                         <Text ml={'2px'} fz={'xs'}>{formatJalaliTimeAgo(item.created_at)}</Text>
                                     </Flex>
