@@ -4,6 +4,7 @@ import { Flex, Group, Box, ActionIcon, Text } from '@mantine/core'
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { IconPlus, IconTrash } from '@tabler/icons-react'
 import React, { Dispatch, FC, SetStateAction, useState } from 'react'
+import imageCompression from 'browser-image-compression';
 import Image from "next/image";
 import classes from './ads.module.css'
 
@@ -13,23 +14,60 @@ type props = {
 }
 
 const AdsImageForm: FC<props> = ({ images, setImages }) => {
+  const [error, setError] = useState<string | null>(null);
 
 
-  const handleImageUpload = (files: File[]) => {
-    setImages((current) => [...current, ...files]);
+  const compressImage = async (file: File) => {
+    try {
+      const options = {
+        maxSizeMB: 1, // Maximum compressed size in MB
+        maxWidthOrHeight: 1920, // Resize images to fit within these dimensions
+        useWebWorker: true, // Use a web worker for faster compression
+      };
+      return await imageCompression(file, options);
+    } catch (err) {
+      console.error('Compression error:', err);
+      setError('خطا در فشرده‌سازی عکس');
+      return null;
+    }
   };
+
+  const handleImageUpload = async (files: File[]) => {
+    if (images.length + files.length > 3) {
+      setError('حداکثر تعداد عکس ۳ است.');
+      return;
+    }
+
+    setError(null);
+
+    const compressedFiles: File[] = [];
+    for (const file of files) {
+      if (file.size > 1 * 1024 ** 2) {
+        const compressedFile = await compressImage(file);
+        if (compressedFile) {
+          compressedFiles.push(compressedFile);
+        }
+      } else {
+        compressedFiles.push(file);
+      }
+    }
+
+    setImages((current) => [...current, ...compressedFiles]);
+  }
+
+
   const handleRemoveImage = (index: number) => {
     setImages((current) => current.filter((_, i) => i !== index));
   };
   return (
     <>
-      <Text fz={'sm'} mb={'3px'} mt={'xl'}>عکس‌های آگهی <span style={{fontSize:'12px',color:'gray'}}>(حداکثر ۳ عکس)</span></Text>
+      <Text fz={'sm'} mb={'3px'} mt={'xl'}>عکس‌های آگهی <span style={{ fontSize: '12px', color: 'gray' }}>(حداکثر ۳ عکس)</span></Text>
 
       <Flex mb={'xl'}>
         <Dropzone
           onDrop={handleImageUpload}
           onReject={(files) => console.log('rejected files', files)}
-          maxSize={3 * 1024 ** 2}
+          maxSize={10 * 1024 ** 2}
           accept={IMAGE_MIME_TYPE}
         >
           <Flex direction={'column'} align={'center'} justify={'center'} h={'90px'} w={'110px'}

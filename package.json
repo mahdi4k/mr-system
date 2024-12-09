@@ -29,6 +29,7 @@
     "@reduxjs/toolkit": "^1.9.7",
     "@tabler/icons": "^2.34.0",
     "@tabler/icons-react": "^2.40.0",
+    "browser-image-compression": "^2.0.2",
     "embla-carousel-react": "7.1.0",
     "moment-jalaali": "^0.10.1",
     "next": "14.2.3",

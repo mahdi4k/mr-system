@@ -26,6 +26,7 @@ const withPWA = withPWAInit({
 // Compose the configurations
 export default withPWA(withBundleAnalyzer({
   reactStrictMode: false,
+  output:'standalone',
   experimental: {
     optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
     webpackBuildWorker: true
@@ -33,8 +34,9 @@ export default withPWA(withBundleAnalyzer({
   images: {
     remotePatterns: [ 
       {
-        protocol: 'http',
-        hostname: '127.0.0.1',
+        protocol: 'https',
+        // hostname: '127.0.0.1',
+        hostname: 'app.kiwipart.ir',
         pathname: '**',
       },
     ],
