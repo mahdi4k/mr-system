@@ -8,6 +8,7 @@ import { ArticleCard } from './ArticleCard'
 import classess from './Article.module.css'
 import { postsMO } from './ArticleSection'
 import Link from 'next/link'
+import Image from 'next/image'
 const ArticleSectionClient = ({ posts }: { posts: postsMO[] }) => {
     const [embla, setEmbla] = useState<Embla | null>(null);
 
@@ -27,10 +28,17 @@ const ArticleSectionClient = ({ posts }: { posts: postsMO[] }) => {
             <Grid classNames={{ inner: classess.articleGrid }} w={'100%'}>
                 <Grid.Col span={{ base: 12, md: 5 }}>
 
-                    <SVG
+                    {/* <SVG
                         className={classess.articleSvg}
                         loader={<Box component='div'></Box>}
-                        src='/svg/article.svg' />
+                        src='/svg/article.svg' /> */}
+                    <Image
+                        className={classess.articleSvg}
+                        alt=''
+                        width={100}
+                        height={100}
+                        src={'/svg/article.svg'}
+                    />
 
                     <Flex align={'center'} justify={'center'} mt={'sm'}>
                         <Link href={'/blog/category'}>
