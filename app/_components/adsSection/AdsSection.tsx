@@ -148,7 +148,7 @@ const AdsSection = ({ token }: { token?: string }) => {
                             </Carousel.Slide>
                         ))}
                         {isFetchingAds && (
-                            <Group mt={'md'} gap={'lg'}>
+                            <Group wrap='nowrap' mt={'md'} gap={'lg'}>
                                 <Skeleton height={'340px'} width={'220px'} />
                                 <Skeleton height={'340px'} width={'220px'} />
                                 <Skeleton height={'340px'} width={'220px'} />
