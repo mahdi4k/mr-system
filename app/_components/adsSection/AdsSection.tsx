@@ -95,7 +95,7 @@ const AdsSection = ({ token }: { token?: string }) => {
                     <Button color='green' variant='outline'>مشاهده همه</Button>
                 </Link>
             </Flex>
-            <Tabs variant='default' color='teal' styles={{ tab: { minWidth: '90px' } }} defaultValue={activeTab} onChange={setActiveTab}>
+            <Tabs mt={'lg'} variant='outline' color='teal' styles={{ list:{flexWrap:'nowrap',overflow:'auto'} }} defaultValue={activeTab} onChange={setActiveTab}>
                 <Tabs.List>
                     {parts.map(part => (
                         <Tabs.Tab key={part.name} value={part.name} leftSection={<Image width={20} height={20} src={part.svg} alt={part.title} />}>
