@@ -47,7 +47,7 @@ const SuggestSection = () => {
                 <Grid gutter="md">
                     <Grid.Col span={12}>
                         <Card p="lg" shadow="lg" className={classes.card} radius="md" component="a"
-                            href="http://localhost:3000/choose-part?cpu=3&graphic=21&motherboard=2&power=12&ram=1&fan=5&ssd=3&case=2"
+                            href="https://kiwipart.ir/choose-part?cpu=3&graphic=21&motherboard=2&power=12&ram=1&fan=5&ssd=3&case=2"
                             target="_blank"
                         >
                             <div className={classes.image}
@@ -68,7 +68,7 @@ const SuggestSection = () => {
                     </Grid.Col>
                     <Grid.Col span={12}>
                         <Card p="lg" shadow="lg" className={classes.card} radius="md" component="a"
-                            href="http://localhost:3000/choose-part?cpu=7&graphic=26&motherboard=7&power=13&ram=7&fan=6&ssd=3&case=5"
+                            href="https://kiwipart.ir/choose-part?cpu=7&graphic=26&motherboard=7&power=13&ram=7&fan=6&ssd=3&case=5"
                             target="_blank"
                         >
                             <div className={classes.image}
@@ -92,7 +92,7 @@ const SuggestSection = () => {
 
                     <Grid.Col span={12}>
                         <Card p="lg" shadow="lg" className={classes.card} radius="md" component="a"
-                            href="http://localhost:3000/choose-part?cpu=3&graphic=22&motherboard=2&power=9&ram=1&fan=5&ssd=3&case=2"
+                            href="https://kiwipart.ir/choose-part?cpu=3&graphic=22&motherboard=2&power=9&ram=1&fan=5&ssd=3&case=2"
                             target="_blank"
                         >
                             <div className={classes.image}
@@ -113,7 +113,7 @@ const SuggestSection = () => {
                     </Grid.Col>
                     <Grid.Col span={12}>
                         <Card p="lg" shadow="lg" className={classes.card} radius="md" component="a"
-                            href="http://localhost:3000/choose-part?cpu=8&graphic=22&motherboard=9&power=9&ram=8&fan=7&ssd=1&case=4"
+                            href="https://kiwipart.ir/choose-part?cpu=8&graphic=22&motherboard=9&power=9&ram=8&fan=7&ssd=1&case=4"
                             target="_blank"
                         >
                             <div className={classes.image}
