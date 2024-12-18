@@ -265,7 +265,7 @@ const PageClient = ({ categories }: { categories: CategoryProdcut[] }) => {
                 {isTablet ? (
                     <>
                         {/* Button to open the drawer */}
-                        <ActionIcon style={{ position: 'relative', top: '52px' }} mr={'sm'} size={'xl'} variant='light' onClick={open} >
+                        <ActionIcon style={{ position: 'relative', top: '54px',left:'10px' }} mr={'auto'} size={'xl'} variant='light' onClick={open} >
                             <IconFilter size={22} />
                         </ActionIcon>
 
