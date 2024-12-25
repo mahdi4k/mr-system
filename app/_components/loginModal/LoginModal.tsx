@@ -68,7 +68,7 @@ export default function LoginModal({ close }: { close: () => void }) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ phone: form.values.phone.replace(/^0/, '') }),
+                body: JSON.stringify({ phone: form.values.phone }),
             });
 
             if (response.ok) {
@@ -104,7 +104,7 @@ export default function LoginModal({ close }: { close: () => void }) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ phone: form.values.phone.replace(/^0/, ''), otp: form.values.code ? form.values.code : undefined }),
+                body: JSON.stringify({ phone: form.values.phone, otp: form.values.code ? form.values.code : undefined }),
             });
 
             if (response.ok) {

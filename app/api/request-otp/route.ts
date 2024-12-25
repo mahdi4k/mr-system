@@ -18,13 +18,17 @@ export async function POST(req: NextRequest) {
         });
 
         if (!response.ok) {
-            return NextResponse.json({ message: 'Failed to send OTP' }, { status: 500 });
+            console.error('Error from Laravel:', response.status, response.statusText);
+            return NextResponse.json(
+                { message: 'Failed to send OTP', error: response.statusText },
+                { status: response.status }
+            );
         }
 
-        const data = await response.json();
 
-        return NextResponse.json({ message: 'OTP sent successfully', data });
+        return NextResponse.json({ message: 'OTP sent successfully' }, { status: 200 });
     } catch (error) {
+        console.error('Server error:', error);
         return NextResponse.json({ message: 'Server error' }, { status: 500 });
     }
 }
