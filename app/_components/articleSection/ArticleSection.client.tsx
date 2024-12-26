@@ -32,24 +32,26 @@ const ArticleSectionClient = ({ posts }: { posts: postsMO[] }) => {
                         className={classess.articleSvg}
                         loader={<Box component='div'></Box>}
                         src='/svg/article.svg' /> */}
-                    <Image
-                        className={classess.articleSvg}
-                        alt=''
-                        width={100}
-                        height={100}
-                        src={'/svg/article.svg'}
-                    />
+                    <Flex mt={{base:'xl',md:'0'}} align={'center'} justify={'center'} h={'100%'} direction={'column'}>
+                        <Image
+                            className={classess.articleSvg}
+                            alt=''
+                            width={100}
+                            height={100}
+                            src={'/svg/article.svg'}
+                        />
 
-                    <Flex align={'center'} justify={'center'} mt={'sm'}>
-                        <Link href={'/blog/category'}>
+                        <Flex align={'center'} justify={'center'} mt={'sm'}>
+                            <Link href={'/blog/category'}>
 
-                            <Button variant='gradient'
-                                gradient={{ from: ' rgb(14,163,93)', to: ' rgb(12,119,115)', deg: 90 }}>
-                                مشاهده تمام مقالات
-                            </Button>
-                        </Link>
+                                <Button mt={'md'} variant='gradient'
+                                    gradient={{ from: ' rgb(14,163,93)', to: ' rgb(12,119,115)', deg: 90 }}>
+                                    مشاهده تمام مقالات
+                                </Button>
+                            </Link>
+                        </Flex>
+
                     </Flex>
-
                 </Grid.Col>
                 <Grid.Col pb={'lg'} span={{ base: 12, md: 7 }}>
                     <div style={{ direction: 'rtl' }}>

@@ -1,27 +1,84 @@
 "use client"
-import { Container, Group, ActionIcon, rem, Text } from '@mantine/core';
+import { Container, Group, ActionIcon, rem, Text, useMantineColorScheme } from '@mantine/core';
 import { IconBrandTwitter, IconBrandYoutube, IconBrandInstagram } from '@tabler/icons-react';
 import classes from './footer.module.css';
+import Image from 'next/image'
+import Link from 'next/link';
+
+
+const data = [
+    {
+        title: 'آگهی قطعات',
+        links: [
+            { label: 'cpu', link: '/ads?total_page=1&category=cpu' },
+            { label: 'مادربرد', link: '/ads?total_page=1&category=motherboard' },
+            { label: 'کارت گرافیک', link: '/ads?total_page=2&category=graphic' },
+            { label: 'پاور', link: '/ads?total_page=2&category=power' },
+        ],
+    },
+    {
+        title: 'قیمت قطعات',
+        links: [
+            { label: 'cpu', link: '/category/cpu' },
+            { label: 'مادربرد', link: '/category/motherboard' },
+            { label: 'گرافیک', link: '/category/graphic' },
+            { label: 'پاور', link: '/category/power' },
+        ],
+    },
+
+];
 
 export function Footer() {
+    const { setColorScheme, colorScheme } = useMantineColorScheme();
+
+    const groups = data.map((group) => {
+        const links = group.links.map((link, index) => (
+            <Link
+                key={index}
+                className={classes.link}
+                href={link.link}
+            >
+                {link.label}
+            </Link>
+        ));
+
+        return (
+            <div className={classes.wrapper} key={group.title}>
+                <Text mb={'xs'} fw={'bolder'} className={classes.title}>{group.title}</Text>
+                {links}
+            </div>
+        );
+    });
     return (
-        <div className={`${classes.footer} main-footer`}>
-            <Container size="lg" className={classes.inner}>
+        <footer className={classes.footer}>
+            <Container size={'lg'} className={classes.inner}>
+                <div className={classes.logo}>
+                    <Image style={{ objectFit: 'contain' }} alt='kiwi part' src={colorScheme === 'dark' ? '/logo-dark.png' : '/logo.png'} width={80} height={40} />
+
+                    <Text size="sm" c="dimmed" className={classes.description}>
+                        هوشمندانه انتخاب کن، قیمت‌ها رو مقایسه کن و با خیال راحت سیستمت اسمبل کن!
+                    </Text>
+                </div>
+                <div className={classes.groups}>{groups}</div>
+            </Container>
+            <Container className={classes.afterFooter}>
                 <Text c="dimmed" size="sm">
                     © 2024 kiwi part. All rights reserved
                 </Text>
-                {/* <Group gap={0} className={classes.links} justify="flex-end" wrap="nowrap">
+
+                <Group gap={0} className={classes.social} justify="flex-end" wrap="nowrap">
                     <ActionIcon size="lg" color="gray" variant="subtle">
-                        <IconBrandTwitter style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
+                        <IconBrandTwitter size={18} stroke={1.5} />
                     </ActionIcon>
                     <ActionIcon size="lg" color="gray" variant="subtle">
-                        <IconBrandYoutube style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
+                        <IconBrandYoutube size={18} stroke={1.5} />
                     </ActionIcon>
                     <ActionIcon size="lg" color="gray" variant="subtle">
-                        <IconBrandInstagram style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
+                        <IconBrandInstagram size={18} stroke={1.5} />
                     </ActionIcon>
-                </Group> */}
+                </Group>
             </Container>
-        </div>
+        </footer>
+
     );
 }

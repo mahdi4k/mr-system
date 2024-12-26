@@ -145,7 +145,7 @@ export default function LoginModal({ close }: { close: () => void }) {
                     </Group>
                 </form>
             ) : (
-                <form onSubmit={handleOtpSubmit}>
+                <form onSubmit={form.onSubmit(handleOtpSubmit)}>
                     <Text fz={'xl'}>کُد تایید را وارد کنید: </Text>
                     <Text c="dimmed" mt={'xs'} fz={'sm'}>این کُد برای شماره {form.values.phone} پیامک شده است.</Text>
                     <Button onClick={() => setOtpSent(false)} color='var(--mantine-color-kiwi-9)' size='xs' variant='transparent' pr={'0'} rightSection={<IconArrowLeft size={15} />}>تغییر شماره موبایل</Button>
