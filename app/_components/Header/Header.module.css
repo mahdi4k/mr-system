@@ -2,11 +2,15 @@
     height: rem(56px);
     background-color: var(--mantine-color-body);
     border-bottom: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
-    @mixin smaller-than $mantine-breakpoint-md {
-      
-    }
   }
+  .mobileHeader{
+    @media (max-width: $mantine-breakpoint-sm) {
+      align-items: center;
+      margin-left: auto;
+      margin-right: 25px;
+    }
   
+  }
   .inner {
     height: rem(56px);
     display: flex;

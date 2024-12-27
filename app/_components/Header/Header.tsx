@@ -37,7 +37,7 @@ export function Header({ token }: { token?: string }) {
             <Container size="lg" className={classes.inner}>
                 <Burger opened={opened} onClick={open} hiddenFrom="xs" size="sm" />
 
-                <Flex align={'center'}>
+                <Flex className={classes.mobileHeader} align={'center'}>
                     <Link style={{ height: 40 }} className={'text-decoration-none'} href={'/'}>
                         <Image style={{ objectFit: 'contain' }} alt='kiwi part' src={colorScheme === 'dark' ? '/logo-dark.png' : '/logo.png'} width={80} height={40} />
                     </Link>
