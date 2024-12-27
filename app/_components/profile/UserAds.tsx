@@ -5,6 +5,8 @@ import { Product } from "@/_redux/services/adsApi";
 import CardPartPrice from "../shared/CardPartPrice";
 import classes from './UserProfile.module.css'
 import { Carousel, Embla } from "@mantine/carousel";
+import ImgNoProduct from '../../../public/no-product.png'
+import Link from "next/link";
 
 type prop = {
     message: string
@@ -42,9 +44,10 @@ const UserAds = () => {
         fetchUserData();
     }, []);
 
-    const handleImageAds = (image: string | undefined, title: string) => {
-        if (image) {
-            const images: string[] = JSON.parse(image);
+    const handleImageAds = (image: string, title: string) => {
+        const images: string[] = JSON.parse(image);
+
+        if (images.length > 0) {
             return (
                 <>
                     {images.map((img, index) => (
@@ -62,7 +65,7 @@ const UserAds = () => {
 
         } else {
             return (
-                <></>
+                <Image style={{ objectFit: 'contain' }} width={90} height={80} alt='no img' src={ImgNoProduct} />
             )
         }
     }
@@ -78,32 +81,38 @@ const UserAds = () => {
         <div>
             <SimpleGrid cols={{ base: 1, lg: 2 }}>
                 {userAds && userAds.length > 0 ? userAds.map(item => (
-                    <Card key={item.id} withBorder>
-                        <Group wrap="nowrap">
-                            <Carousel
-                                w={100}
-                                getEmblaApi={setEmbla}
-                                withIndicators
-                                loop={false}
-                                classNames={{
-                                    root: classes.carousel,
-                                    controls: classes.carouselControls,
-                                    indicator: classes.carouselIndicator,
-                                }}
-                            >
-                                {handleImageAds(item.image, item.title)}
-                            </Carousel>
-                            <Flex w={'100%'} direction={'column'}>
-                                <Text fz='sm'>{item.title}</Text>
-                                <Flex mt={'md'} justify={'space-between'} align={'center'} w={'100%'}>
-                                    <CardPartPrice tomanHeight={17} tomanWidth={17} textSize={14} isAds price={item.price} />
-                                    <Badge>{item.status === 'approved' ? 'منتشر شده' : 'در حال بررسی'}</Badge>
+                    <Link href={`/ads/${item.id}`}>
+                        <Card key={item.id} withBorder>
+                            <Group wrap="nowrap">
+                                <Carousel
+                                    w={100}
+                                    getEmblaApi={setEmbla}
+                                    withIndicators
+                                    loop={false}
+                                    classNames={{
+                                        root: classes.carousel,
+                                        controls: classes.carouselControls,
+                                        indicator: classes.carouselIndicator,
+                                    }}
+                                >
+                                    {handleImageAds(item.image as string, item.title)}
+                                </Carousel>
+                                <Flex w={'100%'} direction={'column'}>
+                                    <Text fz='sm'>{item.title}</Text>
+                                    <Flex mt={'md'} justify={'space-between'} align={'center'} w={'100%'}>
+                                        <CardPartPrice tomanHeight={17} tomanWidth={17} textSize={14} isAds price={item.price} />
+                                        <Badge>{item.status === 'approved' ? 'منتشر شده' : 'در حال بررسی'}</Badge>
+                                    </Flex>
                                 </Flex>
-                            </Flex>
-                        </Group>
-
+                            </Group>
+                        </Card>
+                    </Link>
+                )) : (
+                    <Card>
+                        <Text w={'100%'} ta={'center'} fw={'bold'}>{'آگهی یافت نشد'}</Text>
                     </Card>
-                )) : <Text w={'100%'} ta={'center'} fw={'bold'}>{'آگهی یافت نشد'}</Text>}
+                )
+                }
             </SimpleGrid>
         </div>
     )
