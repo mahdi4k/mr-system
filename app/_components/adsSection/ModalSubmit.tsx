@@ -6,6 +6,7 @@ import React, { FC, useEffect } from 'react'
 import SVG from "react-inlinesvg"
 import classess from './ads.module.css'
 import anime from 'animejs';
+import Link from 'next/link'
 
 type Props = {
     opened: boolean
@@ -61,12 +62,12 @@ const ModalSubmit: FC<Props> = ({ opened, close }) => {
 
                 .add({
                     targets: '#checkmark_group',
-                     transformOrigin: ['50% 50% 0px', '50% 50% 0px'],
+                    transformOrigin: ['50% 50% 0px', '50% 50% 0px'],
                     scale: [0, 1],
                     rotate: [190, 0],
                     opacity: [0, 1],
-                     easing: 'easeOutExpo',
-                    translateY: 50, 
+                    easing: 'easeOutExpo',
+                    translateY: 50,
                     duration: 3000
 
                 }, checkmark_delay)
@@ -440,7 +441,7 @@ const ModalSubmit: FC<Props> = ({ opened, close }) => {
             <Modal
                 styles={{ body: { padding: '0' } }} transitionProps={{ transition: 'pop' }} size={'lg'} opened={opened} onClose={close} title={<Text fz={'xl'}>آگهی در صف تایید</Text>}>
                 <Flex pt={'30px'} align={'center'} direction={'column'} justify={'center'}>
-                    
+
                     <SVG
                         className={classess.successSvg}
                         loader={<Box component='div'></Box>}
@@ -452,7 +453,9 @@ const ModalSubmit: FC<Props> = ({ opened, close }) => {
                         </ThemeIcon>
                     </Flex>
                     <Flex mt={'sm'} mb={'xl'}>
-                        <Button gradient={{ from: 'teal', to: 'green', deg: 90 }} mb={'lg'} radius={'xl'} size='md' variant='gradient'>مشاهده لیست آگهی‌های من</Button>
+                        <Link href={'/profile/ads'}>
+                            <Button gradient={{ from: 'teal', to: 'green', deg: 90 }} mb={'lg'} radius={'xl'} size='md' variant='gradient'>مشاهده لیست آگهی‌های من</Button>
+                        </Link>
                     </Flex>
                 </Flex>
 

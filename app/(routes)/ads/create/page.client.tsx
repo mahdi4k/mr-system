@@ -24,7 +24,7 @@ export default function PageClient({ token }: { token: string | undefined }) {
     const [showErrorOstan, setShowErrorOstan] = useState(false)
     const [showErrorCategory, setShowErrorCategory] = useState(false)
     const [priceInWords, setPriceInWords] = useState('');
-
+    const [loading, setLoading] = useState(false)
     const { items, activeCategory } = UseAdsCategory();
 
     const form = useForm({
@@ -71,6 +71,7 @@ export default function PageClient({ token }: { token: string | undefined }) {
     }, []);
 
     const handleSubmit = async (values: typeof form.values) => {
+        setLoading(true)
         const formData = new FormData();
         formData.append('title', values.title);
         formData.append('category_id', `${activeCategory}`);
@@ -108,7 +109,10 @@ export default function PageClient({ token }: { token: string | undefined }) {
                         classNames: notifClasses
                     })
                 }
+                setLoading(false)
                 return; // Prevent the success flow when there's an error
+            }else{
+                setLoading(false)
             }
             open();
             setImages([]);
@@ -206,7 +210,7 @@ export default function PageClient({ token }: { token: string | undefined }) {
                         <Textarea minRows={4} autosize mt={'lg'} withAsterisk {...form.getInputProps('description')}
                             label={'توضیحات'}></Textarea>
                         <Group w={'100%'} justify='flex-end' mt={'lg'}>
-                            <Button size='md' w={'100%'} color='var(--mantine-color-kiwi-8)' px={'xl'} type="submit">ثبت</Button>
+                            <Button loading={loading} size='md' w={'100%'} color='var(--mantine-color-kiwi-8)' px={'xl'} type="submit">ثبت</Button>
                         </Group>
                     </form>
                 </Box>

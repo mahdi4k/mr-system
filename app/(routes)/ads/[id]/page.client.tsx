@@ -1,12 +1,12 @@
 "use client"
 
 import KiwiImage from '@/_components/shared/KiwiImage';
-import { Anchor, Breadcrumbs, Container, Text, Group, Flex, Grid, Box, Card, ThemeIcon, Button, Divider } from '@mantine/core';
+import { Anchor, Breadcrumbs, Container, Text, Group, Flex, Grid, Box, Card, ThemeIcon, Button, Divider, Badge, rem } from '@mantine/core';
 import React, { FC, useEffect, useState } from 'react'
 import { IAdsProps } from './page';
 import classes from './adsSingle.module.css'
 import Image from 'next/image';
-import { IconPhone, IconUser } from '@tabler/icons-react';
+import { IconDiscountCheckFilled, IconPhone, IconUser } from '@tabler/icons-react';
 import { cityTitleHandler, formatJalaliTimeAgo, provinceTitleHandler } from '@/_utils/utils';
 import { fetchCity, fetchOstan } from '@/_redux/features/ads';
 import { AppDispatch, RootState } from '@/_redux/store';
@@ -63,7 +63,7 @@ const PageClient: FC<props> = ({ product }) => {
       return (
         <>
           <Carousel
-            slideSize={{ base: images.length === 1 ? '100%': '62%', lg: '21%' }}
+            slideSize={{ base: images.length === 1 ? '100%' : '62%', lg: '21%' }}
             slideGap={{ base: 'sm', sm: 'md' }}
             getEmblaApi={setEmbla}
             align="start"
@@ -78,7 +78,7 @@ const PageClient: FC<props> = ({ product }) => {
                 </Box>
               </Carousel.Slide>
             ))}
-            
+
           </Carousel>
         </>
       );
@@ -89,7 +89,6 @@ const PageClient: FC<props> = ({ product }) => {
       )
     }
   }
-
 
 
   return (
@@ -108,10 +107,15 @@ const PageClient: FC<props> = ({ product }) => {
 
       {handleImageAds(product.image, product.title)}
 
-      <Grid gutter={'xl'} mt={{base:'lg',md:'60px'}} mb={'xl'}>
+      <Grid gutter={'xl'} mt={{ base: 'lg', md: '60px' }} mb={'xl'}>
         <Grid.Col span={{ base: 12, lg: 8 }}>
-          <Text mt={'calc(var(--mantine-spacing-lg) * 2)'} fw={'bold'} fz={'h1'}>{product.title}</Text>
-
+          <Group mt={'calc(var(--mantine-spacing-lg) * 2)'} align='center'>
+            <Text fw={'bold'} fz={'h1'}>{product.title}</Text>
+            <Badge
+              rightSection={product.status === 'approved' ? <IconDiscountCheckFilled style={{ width: rem(17), height: rem(17) }}/> : ''}
+              color={product.status === 'approved' ? 'green' : 'orange'}>
+              {product.status === 'approved' ? 'منتشر شده' : 'در انتظار تایید'}</Badge>
+          </Group>
           <Flex justify={'space-between'} align={'baseline'} mt={'calc(var(--mantine-spacing-lg) * 2)'}>
             {product.price ? <>
               <Group gap={3} justify="end" align='center' mb="xs">
@@ -151,7 +155,7 @@ const PageClient: FC<props> = ({ product }) => {
       {isSuccessAds && filteredAds && filteredAds.length > 0 && (
         <AdsRelated filteredAds={filteredAds} isFetchingAds={isFetchingAds} />
       )}
-       <AdsGalleryModal image={product.image} openedImageModal={openedImageModal} selectedImage={selectedImage} setOpenedImageModal={setOpenedImageModal} />
+      <AdsGalleryModal image={product.image} openedImageModal={openedImageModal} selectedImage={selectedImage} setOpenedImageModal={setOpenedImageModal} />
     </Container>
 
   )

@@ -272,14 +272,14 @@ const PageClient = ({ categories }: { categories: CategoryProdcut[] }) => {
 
                         {/* Drawer component */}
                         <Drawer position='bottom' opened={opened} onClose={close} title="فیلترها" padding="md" size="sm">
-                            <AdsFilter categories={categories} provinces={provinces} setPage={setPage} />
+                            <AdsFilter isTablet={true} categories={categories} provinces={provinces} setPage={setPage} />
                         </Drawer>
                     </>
                 ) : (
                     // Render the Card with AdsFilter for larger screens
                     <Grid.Col className={classes.sidebar} span={3} pt={'xl'}>
                         <Card withBorder mb={'lg'} mt={'42px'} pl={'xs'}>
-                            <AdsFilter categories={categories} provinces={provinces} setPage={setPage} />
+                            <AdsFilter isTablet={false} categories={categories} provinces={provinces} setPage={setPage} />
                         </Card>
                     </Grid.Col>
                 )}
@@ -409,7 +409,7 @@ const PageClient = ({ categories }: { categories: CategoryProdcut[] }) => {
                         )) : ''}
                         {adsData?.data.length === 0 && products.length === 0 && !isFetchingAds ? <Text>آگهی یافت نشد</Text> : ''}
                     </SimpleGrid>
-                    {isFetchingAds ? <Flex justify={'center'} align={'center'}><Loader styles={{root:{alignItems:'flex-start'}}} h={400} color="green" type="dots" />                    </Flex> : ''}
+                    {isFetchingAds ? <Flex justify={'center'} align={'center'}><Loader styles={{root:{alignItems:'flex-start'}}} h={5400} color="green" type="dots" />                    </Flex> : ''}
 
 
                 </Grid.Col>

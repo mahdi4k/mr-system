@@ -12,7 +12,7 @@ import classes from './scroll.module.css'
 import { Province } from '(routes)/ads/create/page'
 import { CategoryProdcut } from '(routes)/ads/page'
 
-const AdsFilter = ({ setPage, provinces, categories }: { categories: CategoryProdcut[], provinces: Province[], setPage: React.Dispatch<React.SetStateAction<number>> }) => {
+const AdsFilter = ({ isTablet, setPage, provinces, categories }: { isTablet: boolean, categories: CategoryProdcut[], provinces: Province[], setPage: React.Dispatch<React.SetStateAction<number>> }) => {
     const searchParams = useSearchParams();
     const [value, setValue] = useState('');
     const [price_from, setPriceFrom] = useState('');
@@ -127,7 +127,8 @@ const AdsFilter = ({ setPage, provinces, categories }: { categories: CategoryPro
 
 
     return (
-        <ScrollArea classNames={classes} scrollbars='y' pl={'xs'} offsetScrollbars type="always" scrollbarSize={3} h={560}>
+        <ScrollArea classNames={classes} scrollbars='y' pl={'xs'} offsetScrollbars type="always" scrollbarSize={3}
+            h={isTablet ? 310 : 560}>
             <Accordion styles={{ content: { padding: '0' } }} defaultValue="categories">
                 <Accordion.Item value={'categories'}>
                     <Accordion.Control >
