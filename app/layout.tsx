@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: any }) {
 
   return (
     <html style={{height:'100%'}} dir="rtl" lang="en" className={`${vazirmatn.variable} ${vibes.variable}`}>
-      {/* <GoogleAnalytics gaId="G-0V5T3XRVPY" /> */}
+      <GoogleAnalytics gaId="G-0V5T3XRVPY" />
       <head>
         <ColorSchemeScript />
         <link rel="shortcut icon" href="/favicon.ico" />
