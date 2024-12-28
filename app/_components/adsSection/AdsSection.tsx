@@ -35,6 +35,9 @@ const AdsSection = ({ token }: { token?: string }) => {
     const { ostan, city, status } = useSelector((state: RootState) => state.ads);
 
     const success = useSelector((state: RootState) => state.auth.success);
+    useEffect(() => {
+        router.prefetch('/ads/create'); 
+    }, [router]);
 
     useEffect(() => {
         if (!ostan.length) {

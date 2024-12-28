@@ -73,7 +73,7 @@ const UserDetail = ({ token }: { token?: string }) => {
 
 
     return (
-        <Card shadow='sm'>
+        <Card mb={'xl'} shadow='sm'>
             <SimpleGrid p={'lg'} verticalSpacing="xl" cols={2}>
                 <Flex justify={'space-between'} style={{ borderLeft: '1px solid var(--mantine-color-gray-4)' }} pl={'lg'}>
                     <Flex direction={'column'}>

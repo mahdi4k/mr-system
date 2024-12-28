@@ -8,7 +8,7 @@ import UseLoading from "@/_utils/customHook/useLoading";
 import Image from 'next/image'
 import DrawerHeader from './Drawer';
 import LoginModal from '../loginModal/LoginModal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux';
 import { RootState } from '@/_redux/store';
@@ -21,6 +21,11 @@ export function Header({ token }: { token?: string }) {
     const isLoading = UseLoading();
     const router = useRouter();
     const success = useSelector((state: RootState) => state.auth.success);
+
+    
+    useEffect(() => {
+        router.prefetch('/profile'); 
+    }, [router]);
 
     const handleAddAdsPage = () => {
 
