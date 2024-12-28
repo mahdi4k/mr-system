@@ -5,7 +5,7 @@ import ListItem from './ListItem';
 import Image from 'next/image'
 import SVG from "react-inlinesvg"
 
-export function HeroHeader() {
+export function HeroHeader({ token }: { token?: string }) {
   return (
     <Container size="lg">
       <div className={classes.inner}>
@@ -26,7 +26,7 @@ export function HeroHeader() {
             سیستمی که دوست داری، با خیال راحت<span className={classes.highlight}> اسمبل </span>  کن
             <IconMoodSmile className={classes.IconSmile} size={50} color='var(--mantine-color-kiwi-8)' />
           </Title>
-          <ListItem />
+          <ListItem token={token}/>
         </div>
       </div>
     </Container>

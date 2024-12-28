@@ -65,7 +65,7 @@ const page = () => {
   return (
     <div>
 
-      <HeroHeader />
+      <HeroHeader token={token}/>
       <CardParts />
       <AdsSection token={token} />
       <CpuMotherboard />
