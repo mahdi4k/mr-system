@@ -91,7 +91,7 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                             )}
                         </CopyButton>
                         <Box mr={'sm'}>
-                            <TelegramShareButton style={{display:'flex'}}
+                            <TelegramShareButton style={{ display: 'flex' }}
                                 url={typeof window !== 'undefined' ? window.location.href : ''}
                                 title={generateTitle()}
                             >
@@ -101,13 +101,40 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                     </Flex>
                     <Stack gap={'sm'}>
                         {isSuccessMotherboardData ? (
-                            <Text hidden={!searchParams.has('motherboard')} fz={'sm'} fw={'bold'}>{removePersianWords(motherboardData?.data.name as string)}</Text>
+                            <Flex
+                                hidden={!searchParams.has('motherboard')}
+                                justify="space-between"
+                                align="center"
+                                fz="sm"
+                                fw="bold"
+                            >
+                                <Text fw={'bold'} fz={'sm'}>{motherboardData?.data.price ? `${Intl.NumberFormat('fa', {}).format(Number(motherboardData.data.price))} تومان` : ''}</Text>
+                                <Text fw={'bold'} fz={'sm'}>{removePersianWords(motherboardData?.data.name as string)}</Text>
+                            </Flex>
                         ) : <Skeleton height={15} mt={16} radius="md" />}
                         {isSuccessCpu ? (
-                            <Text hidden={!searchParams.has('cpu')} fz={'sm'} fw={'bold'}>{removePersianWords(cpuData?.data.name as string)}</Text>
+                            <Flex
+                                hidden={!searchParams.has('cpu')}
+                                justify="space-between"
+                                align="center"
+                                fz="sm"
+                                fw="bold"
+                            >
+                                <Text fw={'bold'} fz={'sm'}>{cpuData?.data.price ? `${Intl.NumberFormat('fa', {}).format(Number(cpuData.data.price))} تومان` : ''}</Text>
+                                <Text fw={'bold'} fz={'sm'}>{removePersianWords(cpuData?.data.name as string)}</Text>
+                            </Flex>
                         ) : <Skeleton height={15} mt={10} radius="md" />}
                         {isSuccessGraphic ? (
-                            <Text hidden={!searchParams.has('graphic')} fz={'sm'} fw={'bold'}>{removePersianWords(graphicData?.data.name as string)}</Text>
+                            <Flex
+                                hidden={!searchParams.has('graphic')}
+                                justify="space-between"
+                                align="center"
+                                fz="sm"
+                                fw="bold"
+                            >
+                                <Text fw={'bold'} fz={'sm'}>{graphicData?.data.price ? `${Intl.NumberFormat('fa', {}).format(Number(graphicData.data.price))} تومان` : ''}</Text>
+                                <Text fw={'bold'} fz={'sm'}>{removePersianWords(graphicData?.data.name as string)}</Text>
+                            </Flex>
                         ) : <Skeleton height={15} mt={10} radius="md" />}
                         {isSuccessPower ? (
                             <Text hidden={!searchParams.has('power')} fz={'sm'} fw={'bold'}>{removePersianWords(powerData?.data.name as string)}</Text>
