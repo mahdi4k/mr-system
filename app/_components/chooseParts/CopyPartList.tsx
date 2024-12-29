@@ -60,18 +60,30 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
 
     const generateTitle = () => {
         let title = "\n";
-        if (isSuccessMotherboardData && searchParams.has('motherboard')) title += removePersianWords(motherboardData?.data.name as string) + "\n";
-        if (isSuccessCpu && searchParams.has('cpu')) title += removePersianWords(cpuData?.data.name as string) + "\n";
-        if (isSuccessGraphic && searchParams.has('graphic')) title += removePersianWords(graphicData?.data.name as string) + "\n";
-        if (isSuccessPower && searchParams.has('power')) title += removePersianWords(powerData?.data.name as string) + "\n";
-        if (isSuccessRam && searchParams.has('ram')) title += removePersianWords(ramData?.data.name as string) + "\n";
-        if (isSuccessFan && searchParams.has('fan')) title += removePersianWords(fanData?.data.name as string) + "\n";
-        if (isSuccessSsd && searchParams.has('ssd')) title += removePersianWords(ssdData?.data.name as string) + "\n";
-        if (isSuccessCase && searchParams.has('case')) title += removePersianWords(caseData?.data.name as string) + "\n";
-        if (Number(totalPrice) > 0) title += ` تومان ${Intl.NumberFormat('fa', {}).format(Number(totalPrice))}`;
-        return title  // Remove any trailing newline
-    };
 
+        const addItemToTitle = (isSuccess: boolean, paramKey: string, data?: { name: string; price?: string }) => {
+            if (isSuccess && searchParams.has(paramKey) && data) {
+                const itemName = removePersianWords(data.name);
+                const itemPrice = data.price ? ` ||  ${Intl.NumberFormat('fa', {}).format(Number(data.price))} تومان` : '';
+                title += `${itemName}${itemPrice}\n`;
+            }
+        };
+
+        addItemToTitle(isSuccessMotherboardData, 'motherboard', motherboardData?.data);
+        addItemToTitle(isSuccessCpu, 'cpu', cpuData?.data);
+        addItemToTitle(isSuccessGraphic, 'graphic', graphicData?.data);
+        addItemToTitle(isSuccessPower, 'power', powerData?.data);
+        addItemToTitle(isSuccessRam, 'ram', ramData?.data);
+        addItemToTitle(isSuccessFan, 'fan', fanData?.data);
+        addItemToTitle(isSuccessSsd, 'ssd', ssdData?.data);
+        addItemToTitle(isSuccessCase, 'case', caseData?.data);
+
+        if (Number(totalPrice) > 0) {
+            title += ` مجموع: ${Intl.NumberFormat('fa', {}).format(Number(totalPrice))} تومان`;
+        }
+
+        return title;
+    };
     return (
         <div>
             {(hasParts) && (
@@ -99,7 +111,7 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                             </TelegramShareButton>
                         </Box>
                     </Flex>
-                    <Stack gap={'sm'}>
+                    <Stack mt={'sm'} gap={'sm'}>
                         {isSuccessMotherboardData ? (
                             <Flex
                                 hidden={!searchParams.has('motherboard')}
@@ -108,8 +120,10 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                                 fz="sm"
                                 fw="bold"
                             >
-                                <Text fw={'bold'} fz={'sm'}>{motherboardData?.data.price ? `${Intl.NumberFormat('fa', {}).format(Number(motherboardData.data.price))} تومان` : ''}</Text>
-                                <Text fw={'bold'} fz={'sm'}>{removePersianWords(motherboardData?.data.name as string)}</Text>
+                                <Text fw={'bold'} fz={'xs'}>{motherboardData?.data.price ? `${Intl.NumberFormat('fa', {}).format(Number(motherboardData.data.price))} تومان` : ''}</Text>
+                                <Box w={215}>
+                                    <Text truncate="start" fw={'bold'} fz={'xs'}>{removePersianWords(motherboardData?.data.name as string)}</Text>
+                                </Box>
                             </Flex>
                         ) : <Skeleton height={15} mt={16} radius="md" />}
                         {isSuccessCpu ? (
@@ -120,8 +134,10 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                                 fz="sm"
                                 fw="bold"
                             >
-                                <Text fw={'bold'} fz={'sm'}>{cpuData?.data.price ? `${Intl.NumberFormat('fa', {}).format(Number(cpuData.data.price))} تومان` : ''}</Text>
-                                <Text fw={'bold'} fz={'sm'}>{removePersianWords(cpuData?.data.name as string)}</Text>
+                                <Text fw={'bold'} fz={'xs'}>{cpuData?.data.price ? `${Intl.NumberFormat('fa', {}).format(Number(cpuData.data.price))} تومان` : ''}</Text>
+                                <Box w={215}>
+                                    <Text truncate="start" fw={'bold'} fz={'xs'}>{removePersianWords(cpuData?.data.name as string)}</Text>
+                                </Box>
                             </Flex>
                         ) : <Skeleton height={15} mt={10} radius="md" />}
                         {isSuccessGraphic ? (
@@ -132,25 +148,81 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                                 fz="sm"
                                 fw="bold"
                             >
-                                <Text fw={'bold'} fz={'sm'}>{graphicData?.data.price ? `${Intl.NumberFormat('fa', {}).format(Number(graphicData.data.price))} تومان` : ''}</Text>
-                                <Text fw={'bold'} fz={'sm'}>{removePersianWords(graphicData?.data.name as string)}</Text>
+                                <Text fw={'bold'} fz={'xs'}>{graphicData?.data.price ? `${Intl.NumberFormat('fa', {}).format(Number(graphicData.data.price))} تومان` : ''}</Text>
+                                <Box w={215}>
+                                    <Text truncate="start" fw={'bold'} fz={'xs'}>{removePersianWords(graphicData?.data.name as string)}</Text>
+                                </Box>
                             </Flex>
                         ) : <Skeleton height={15} mt={10} radius="md" />}
                         {isSuccessPower ? (
-                            <Text hidden={!searchParams.has('power')} fz={'sm'} fw={'bold'}>{removePersianWords(powerData?.data.name as string)}</Text>
+                            <Flex
+                                hidden={!searchParams.has('power')}
+                                justify="space-between"
+                                align="center"
+                                fz="sm"
+                                fw="bold"
+                            >
+                                <Text fw={'bold'} fz={'xs'}>{powerData?.data.price ? `${Intl.NumberFormat('fa', {}).format(Number(powerData.data.price))} تومان` : ''}</Text>
+                                <Box w={215}>
+                                    <Text truncate="start" fz={'xs'} fw={'bold'}>{removePersianWords(powerData?.data.name as string)}</Text>
+                                </Box>
+                            </Flex>
                         ) : <Skeleton height={15} mt={10} radius="md" />}
                         {isSuccessRam ? (
-                            <Text hidden={!searchParams.has('ram')} fz={'sm'} fw={'bold'}>{removePersianWords(ramData?.data.name as string)}</Text>
+                            <Flex
+                                hidden={!searchParams.has('ram')}
+                                justify="space-between"
+                                align="center"
+                                fz="sm"
+                                fw="bold"
+                            >
+                                <Text fw={'bold'} fz={'xs'}>{ramData?.data.price ? `${Intl.NumberFormat('fa', {}).format(Number(ramData.data.price))} تومان` : ''}</Text>
+                                <Box w={215}>
+                                    <Text truncate="start" fz={'xs'} fw={'bold'}>{removePersianWords(ramData?.data.name as string)}</Text>
+                                </Box>
+                            </Flex>
                         ) : <Skeleton height={15} mt={10} radius="md" />}
                         {isSuccessFan ? (
-                            <Text hidden={!searchParams.has('fan')} fz={'sm'} fw={'bold'}>{removePersianWords(fanData?.data.name as string)}</Text>
+                            <Flex
+                                hidden={!searchParams.has('fan')}
+                                justify="space-between"
+                                align="center"
+                                fz="sm"
+                                fw="bold"
+                            >
+                                <Text fw={'bold'} fz={'xs'}>{fanData?.data.price ? `${Intl.NumberFormat('fa', {}).format(Number(fanData.data.price))} تومان` : ''}</Text>
+                                <Box w={215}>
+                                    <Text truncate="start" hidden={!searchParams.has('fan')} fz={'xs'} fw={'bold'}>{removePersianWords(fanData?.data.name as string)}</Text>
+                                </Box>
+                            </Flex>
                         ) : <Skeleton height={15} mt={10} radius="md" />}
                         {isSuccessSsd ? (
-                            <Text hidden={!searchParams.has('ssd')} fz={'sm'} fw={'bold'}>{removePersianWords(ssdData?.data.name as string)}</Text>
+                            <Flex
+                                hidden={!searchParams.has('ssd')}
+                                justify="space-between"
+                                align="center"
+                                fz="sm"
+                                fw="bold"
+                            >
+                                <Text fw={'bold'} fz={'xs'}>{ssdData?.data.price ? `${Intl.NumberFormat('fa', {}).format(Number(ssdData.data.price))} تومان` : ''}</Text>
+                                <Box w={215}>
+                                    <Text truncate="start" fz={'xs'} fw={'bold'}>{removePersianWords(ssdData?.data.name as string)}</Text>
+                                </Box>
+                            </Flex>
                         ) : <Skeleton height={15} mt={10} radius="md" />}
                         {isSuccessCase ? (
-                            <Text hidden={!searchParams.has('case')} fz={'sm'} fw={'bold'}>{removePersianWords(caseData?.data.name as string)}</Text>
-                        ) : <Skeleton height={15} mt={10} radius="md" />}
+                            <Flex
+                                hidden={!searchParams.has('case')}
+                                justify="space-between"
+                                align="center"
+                                fz="sm"
+                                fw="bold"
+                            >
+                                <Text fw={'bold'} fz={'xs'}>{caseData?.data.price ? `${Intl.NumberFormat('fa', {}).format(Number(caseData.data.price))} تومان` : ''}</Text>
+                                <Box w={215}>
+                                    <Text truncate="start" fz={'xs'} fw={'bold'}>{removePersianWords(caseData?.data.name as string)}</Text>
+                                </Box>
+                            </Flex>) : <Skeleton height={15} mt={10} radius="md" />}
                     </Stack>
                 </Card>
             )}
