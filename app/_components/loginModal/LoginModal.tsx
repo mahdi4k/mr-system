@@ -115,6 +115,16 @@ export default function LoginModal({ close }: { close: () => void }) {
                 })
                 dispatch(setSuccessLogin(true));
                 close()
+                setTimeout(() => {
+                    const redirectPath = sessionStorage.getItem('redirectPath');
+                    if (redirectPath) {
+                        router.push(redirectPath); // Redirect after login
+                        sessionStorage.removeItem('redirectPath'); // Clear redirect path
+                    } else {
+                        router.push('/'); // Default redirection
+                    }
+        
+                }, 700);
             } else {
                 setShowErrorOtp(true)
                 const data = await response.json();

@@ -36,7 +36,7 @@ const AdsSection = ({ token }: { token?: string }) => {
 
     const success = useSelector((state: RootState) => state.auth.success);
     useEffect(() => {
-        router.prefetch('/ads/create'); 
+        router.prefetch('/ads/create');
     }, [router]);
 
     useEffect(() => {
@@ -58,6 +58,7 @@ const AdsSection = ({ token }: { token?: string }) => {
         if (token || success) {
             router.push('/ads/create', { scroll: true })
         } else {
+            sessionStorage.setItem('redirectPath', '/ads/create'); // Save redirect path
             open()
         }
     }
@@ -98,7 +99,7 @@ const AdsSection = ({ token }: { token?: string }) => {
                     <Button color='green' variant='outline'>مشاهده همه</Button>
                 </Link>
             </Flex>
-            <Tabs mt={'lg'} variant='outline' color='teal' styles={{ list:{flexWrap:'nowrap',overflow:'auto'} }} defaultValue={activeTab} onChange={setActiveTab}>
+            <Tabs mt={'lg'} variant='outline' color='teal' styles={{ list: { flexWrap: 'nowrap', overflow: 'auto' } }} defaultValue={activeTab} onChange={setActiveTab}>
                 <Tabs.List>
                     {parts.map(part => (
                         <Tabs.Tab key={part.name} value={part.name} leftSection={<Image width={20} height={20} src={part.svg} alt={part.title} />}>
