@@ -29,7 +29,7 @@
 }
 
 .activeItem {
-    background-color: light-dark(var(--mantine-color-kiwi-5), var(--mantine-color-dark-9)) ;
+    background-color: light-dark(var(--mantine-color-kiwi-5), var(--mantine-color-dark-9)) !important ;
     transform: scale(1.05);
     box-shadow: var(--mantine-shadow-md);
 
