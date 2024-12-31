@@ -57,7 +57,6 @@ const PageClient = ({ categories }: { categories: CategoryProdcut[] }) => {
         searchParams.forEach((value, key) => {
             paramObj[key] = value;
         });
-        console.log("🚀 ~ searchParams.forEach ~ paramObj:", paramObj)
 
         setParams(paramObj);
     }, [searchParams]);
