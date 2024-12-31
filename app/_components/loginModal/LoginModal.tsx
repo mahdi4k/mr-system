@@ -115,16 +115,22 @@ export default function LoginModal({ close }: { close: () => void }) {
                 })
                 dispatch(setSuccessLogin(true));
                 close()
-                setTimeout(() => {
-                    const redirectPath = sessionStorage.getItem('redirectPath');
-                    if (redirectPath) {
-                        router.push(redirectPath); // Redirect after login
-                        sessionStorage.removeItem('redirectPath'); // Clear redirect path
+                setTimeout(async () => {
+                    const authResponse = await fetch('/api/check-auth');
+                    const { token } = await authResponse.json();
+
+                    if (token) {
+                        const redirectPath = sessionStorage.getItem('redirectPath');
+                        if (redirectPath) {
+                            router.push(redirectPath);
+                            sessionStorage.removeItem('redirectPath');
+                        } else {
+                            router.push('/');
+                        }
                     } else {
-                        router.push('/'); // Default redirection
+                        router.push('/'); // Redirect to home if no token
                     }
-        
-                }, 700);
+                }, 1000);
             } else {
                 setShowErrorOtp(true)
                 const data = await response.json();
