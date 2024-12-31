@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, TextInput, Group, Button, useMantineColorScheme, Flex, PinInput, Text } from '@mantine/core';
+import { Box, TextInput, Group, Button, useMantineColorScheme, Flex, PinInput, Text, Alert, ActionIcon } from '@mantine/core';
 import Image from 'next/image'
 import { useForm } from '@mantine/form';
 import { IconArrowLeft } from '@tabler/icons-react';
@@ -12,7 +12,9 @@ import { useDispatch } from 'react-redux';
 import { setSuccessLogin } from '@/_redux/features/auth';
 
 
-export default function LoginModal({ close }: { close: () => void }) {
+export default function LoginModal({ close, isAdsSection, setIsModalOpen }: {
+    close: () => void, isAdsSection?: boolean, setIsModalOpen?: Dispatch<SetStateAction<boolean>>
+}) {
     const [otpSent, setOtpSent] = useState<boolean>(false);
     const [showErrorOtp, setShowErrorOtp] = useState<boolean>(false);
     const router = useRouter();
@@ -41,7 +43,7 @@ export default function LoginModal({ close }: { close: () => void }) {
         setTimeLeft(OTP_RESEND_TIME);  // Reset the countdown timer
 
         // Call your OTP resend API here
-        console.log('OTP resent!');
+
         handlePhoneSubmit();
         // Reset the timer and start countdown
     };
@@ -108,6 +110,11 @@ export default function LoginModal({ close }: { close: () => void }) {
             });
 
             if (response.ok) {
+
+                if (setIsModalOpen) {
+                    setIsModalOpen(false)
+                }
+
                 setShowErrorOtp(false)
                 notifications.show({
                     message: 'با موفقیت وارد شدید',
@@ -120,13 +127,13 @@ export default function LoginModal({ close }: { close: () => void }) {
                     const { token } = await authResponse.json();
 
                     if (token) {
-                        const redirectPath = sessionStorage.getItem('redirectPath');
-                        if (redirectPath) {
-                            router.push(redirectPath);
-                            sessionStorage.removeItem('redirectPath');
-                        } else {
-                            router.push('/');
-                        }
+                        // const redirectPath = sessionStorage.getItem('redirectPath');
+                        // if (redirectPath) {
+                        //     router.push(redirectPath);
+                        //     sessionStorage.removeItem('redirectPath');
+                        // } else {
+                        //     router.push('/');
+                        // }
                     } else {
                         router.push('/'); // Redirect to home if no token
                     }
@@ -141,10 +148,16 @@ export default function LoginModal({ close }: { close: () => void }) {
     };
 
     return (
-        <Box mb={'xs'} mx="auto" >
+        <Box pos={'relative'} mb={'xs'} mx="auto" >
+            
             {!otpSent && <Flex pos={'relative'} top={'-3px'} mb={'lg'} align={'center'} justify={'center'}>
                 <Image style={{ objectFit: 'contain' }} alt='kiwi part' src={colorScheme === 'dark' ? '/logo-dark.png' : '/logo.png'} width={180} height={60} />
             </Flex>}
+            {isAdsSection ? (
+                <Alert mb={'lg'} p={'xs'} color="green" variant="light" >
+                    <Text fz={'xs'}>لطفاً برای ثبت آگهی ابتدا وارد سایت شوید</Text>
+                </Alert>
+            ) : ''}
             {!otpSent ? (
                 <form onSubmit={form.onSubmit(handlePhoneSubmit)}>
                     <TextInput
