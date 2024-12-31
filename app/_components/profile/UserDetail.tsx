@@ -26,13 +26,35 @@ interface UserData {
     updated_at: string;
 }
 
-const UserDetail = ({ token }: { token?: string }) => {
+const UserDetail = () => {
     const [userData, setUserData] = useState<UserResponse>();
     const [error, setError] = useState(null);
     const [opened, { open, close }] = useDisclosure(false);
     const [openedEmail, { open: openEmail, close: closeEmail }] = useDisclosure(false);
     const router = useRouter();
     const [loading, setLoading] = useState(true); // Add a loading state
+    const [token, setToken] = useState<string | null>(null);
+
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const authResponse = await fetch('/api/check-auth'); // Call your API to check the token
+                const { token } = await authResponse.json();
+
+                if (!token.value) {
+                    // router.push('/'); // Redirect if no token
+                } else {
+                    setToken(token.value); // Set the token
+                }
+            } catch (error) {
+                router.push('/'); // Redirect on error
+            }
+        };
+
+        checkAuth();
+    }, [router]);
+
 
     const fetchUserData = async () => {
         try {
@@ -55,21 +77,18 @@ const UserDetail = ({ token }: { token?: string }) => {
             // setError(error.message || 'An error occurred');
         }
     };
-    useEffect(() => {
-        if (!token) {
-            router.replace('/'); // Use `replace` to avoid adding to history
-        } else {
-            setLoading(false); // Set loading to false once the token is confirmed
-        }
-    }, [token, router]);
+    // useEffect(() => {
+    //     if (!token) {
+    //         router.replace('/'); // Use `replace` to avoid adding to history
+    //     } else {
+    //         setLoading(false); // Set loading to false once the token is confirmed
+    //     }
+    // }, [token, router]);
 
     useEffect(() => {
         fetchUserData();
     }, []);
 
-    if (loading) {
-        return null; // Render nothing or a loading indicator
-    }
 
 
     return (
@@ -103,8 +122,13 @@ const UserDetail = ({ token }: { token?: string }) => {
                         <IconEdit size={20} />
                     </ActionIcon> */}
                 </Flex>
-                <NameEdit fetchUserData={fetchUserData} close={close} opened={opened} token={token} />
-                <EmailEdit fetchUserData={fetchUserData} close={closeEmail} opened={openedEmail} token={token} />
+                {token ? (
+                    <>
+                        <NameEdit fetchUserData={fetchUserData} close={close} opened={opened} token={token} />
+                        <EmailEdit fetchUserData={fetchUserData} close={closeEmail} opened={openedEmail} token={token} />
+
+                    </>
+                ) : ''}
             </SimpleGrid>
         </Card>
     )
