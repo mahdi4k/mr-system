@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { TextInput, Text, Button, Box, Title, Group, Container, Paper, Card, SimpleGrid, Select, Textarea } from '@mantine/core';
+import { TextInput, Text, Button, Box, Title, Group, Container, Paper, Card, SimpleGrid, Select, Textarea, Modal, Flex, ActionIcon } from '@mantine/core';
 import classes from './ActionGrid.module.css'
 import { isNotEmpty, useForm } from '@mantine/form';
 import { UseAdsCategory } from '@/_components/adsSection/UseAdsCategorySelect';
@@ -12,9 +12,13 @@ import { convertNumberToWords, formatNumber, persianToWesternNumerals } from '@/
 import AdsImageForm from '@/_components/adsSection/AdsImageForm';
 import { notifications } from '@mantine/notifications';
 import notifClasses from "@/_cssModules/notification.module.css";
+import { useRouter } from 'next/navigation';
+import LoginModal from '@/_components/loginModal/LoginModal';
+import { IconArrowLeft } from '@tabler/icons-react';
+import Link from 'next/link';
 
 
-export default function PageClient({ token }: { token: string | undefined }) {
+export default function PageClient() {
     const [provinces, setProvinces] = useState<Province[]>([]);
     const [cities, setCities] = useState<City[]>([]);
     const [availableCities, setAvailableCities] = useState<City[]>([]);
@@ -26,6 +30,33 @@ export default function PageClient({ token }: { token: string | undefined }) {
     const [priceInWords, setPriceInWords] = useState('');
     const [loading, setLoading] = useState(false)
     const { items, activeCategory } = UseAdsCategory();
+    const [token, setToken] = useState<string | null>(null);
+    const [openedLogin, { open: openLogin, close: closeLogin }] = useDisclosure(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const router = useRouter();
+
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const authResponse = await fetch('/api/check-auth'); // Call your API to check the token
+                const { token } = await authResponse.json();
+
+                if (!token.value) {
+                    setIsModalOpen(true);
+                    // router.push('/'); // Redirect if no token
+                } else {
+                    setToken(token.value); // Set the token
+                    setIsModalOpen(false);
+                }
+            } catch (error) {
+                router.push('/'); // Redirect on error
+            }
+        };
+
+        checkAuth();
+    }, []);
 
     const form = useForm({
         initialValues: {
@@ -111,7 +142,7 @@ export default function PageClient({ token }: { token: string | undefined }) {
                 }
                 setLoading(false)
                 return; // Prevent the success flow when there's an error
-            }else{
+            } else {
                 setLoading(false)
             }
             open();
@@ -139,6 +170,14 @@ export default function PageClient({ token }: { token: string | undefined }) {
         activeCategory === null ? setShowErrorCategory(true) : setShowErrorCategory(false)
     }
 
+
+    const HandleModalLoginOpen = () => {
+        if (token) {
+            closeLogin();
+        } else {
+            openLogin()
+        }
+    }
     return (
         <Container w={{ base: '100%', lg: '700px' }} size={'xxl'}>
             <Paper mb={'xl'} px={'xl'} shadow='sm' pb={'lg'} mt="xl">
@@ -216,6 +255,13 @@ export default function PageClient({ token }: { token: string | undefined }) {
                 </Box>
             </Paper>
             <ModalSubmit opened={opened} close={close} />
+
+            <Modal styles={{ title: { width: '100%' } }} withCloseButton={false} opened={isModalOpen} onClose={HandleModalLoginOpen}
+                title={<Flex w={'100%'} justify={'space-between'} align={'center'}><Text>ورود / ثبت نام</Text> <ActionIcon variant='subtle' component={Link} href={'/'}><IconArrowLeft />
+                </ActionIcon></Flex>} >
+                <LoginModal isAdsSection={true} setIsModalOpen={setIsModalOpen} close={HandleModalLoginOpen} />
+            </Modal>
+
         </Container>
     );
 }

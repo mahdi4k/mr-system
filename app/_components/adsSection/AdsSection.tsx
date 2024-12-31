@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, Card, Container, Flex, Group, Modal, SimpleGrid, Skeleton, Tabs, Text } from '@mantine/core'
+import { Button, Card, Container, Flex, Group, Skeleton, Tabs, Text } from '@mantine/core'
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import usePcparts from '@/_utils/customHook/usePcParts'
@@ -8,7 +8,6 @@ import { Carousel, Embla } from '@mantine/carousel'
 import CardPartPrice from '../shared/CardPartPrice'
 import { IconFlag3, IconSquarePlus2 } from '@tabler/icons-react'
 import { useDisclosure } from '@mantine/hooks'
-import LoginModal from '../loginModal/LoginModal'
 import { useRouter } from 'next/navigation'
 import { useLazyGetAdsListCategoryQuery } from '@/_redux/services/adsApi'
 import { cityTitleHandler, formatJalaliTimeAgo, provinceTitleHandler } from '@/_utils/utils'
@@ -24,7 +23,6 @@ type AppDispatch = ThunkDispatch<RootState, void, AnyAction>;
 
 const AdsSection = ({ token }: { token?: string }) => {
     const [embla, setEmbla] = useState<Embla | null>(null);
-    const [opened, { open, close }] = useDisclosure(false);
     const router = useRouter();
     const parts = usePcparts();
     const [activeTab, setActiveTab] = useState<string | null>('cpu');
@@ -54,14 +52,14 @@ const AdsSection = ({ token }: { token?: string }) => {
         }
     }, [embla]);
 
-    const handleAddAdsPage = () => {
-        if (token || success) {
-            router.push('/ads/create', { scroll: true })
-        } else {
-            sessionStorage.setItem('redirectPath', '/ads/create'); // Save redirect path
-            open()
-        }
-    }
+    // const handleAddAdsPage = () => {
+    //     if (token || success) {
+    //         router.push('/ads/create', { scroll: true })
+    //     } else {
+    //         sessionStorage.setItem('redirectPath', '/ads/create'); // Save redirect path
+    //         open()
+    //     }
+    // }
     useEffect(() => {
         if (activeTab)
             adsQuery({ category: activeTab })
@@ -77,7 +75,7 @@ const AdsSection = ({ token }: { token?: string }) => {
             return (
                 <Image
                     alt={title}
-                    style={{ borderRadius: '7px' ,objectFit:'contain'}}
+                    style={{ borderRadius: '7px', objectFit: 'contain' }}
                     width={190}
                     height={180}
                     src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/storage/${images[0]}`}
@@ -117,14 +115,16 @@ const AdsSection = ({ token }: { token?: string }) => {
                         dragFree
                         withControls={false}>
                         <Carousel.Slide mt={'sm'} >
-                            <Card onClick={handleAddAdsPage} styles={{ root: { borderStyle: "dashed", cursor: 'pointer' } }} h={'340px'} withBorder>
-                                <Card.Section h={'100%'} mt={'0'} ta={'center'}>
-                                    <Flex h={'100%'} align={'center'} justify={'center'} direction={'column'}>
-                                        <IconSquarePlus2 style={{ marginTop: '20px' }} color='var(--mantine-color-kiwi-7)' size={77} />
-                                        <Text my={'lg'} ta={'center'} lineClamp={1} c={'gr'} fz={'sm'}>افزودن آگهی</Text>
-                                    </Flex>
-                                </Card.Section>
-                            </Card>
+                            <Link href={'/ads/create'}>
+                                <Card styles={{ root: { borderStyle: "dashed", cursor: 'pointer' } }} h={'340px'} withBorder>
+                                    <Card.Section h={'100%'} mt={'0'} ta={'center'}>
+                                        <Flex h={'100%'} align={'center'} justify={'center'} direction={'column'}>
+                                            <IconSquarePlus2 style={{ marginTop: '20px' }} color='var(--mantine-color-kiwi-7)' size={77} />
+                                            <Text my={'lg'} ta={'center'} lineClamp={1} c={'gr'} fz={'sm'}>افزودن آگهی</Text>
+                                        </Flex>
+                                    </Card.Section>
+                                </Card>
+                            </Link>
                         </Carousel.Slide>
                         {adsData && !isFetchingAds && isSuccessAds && adsData.data.map(item => (
                             <Carousel.Slide key={item.id} mt={'sm'} >
@@ -172,9 +172,6 @@ const AdsSection = ({ token }: { token?: string }) => {
                 </Tabs.Panel>
             </Tabs>
 
-            <Modal opened={opened} onClose={close} title="ورود / ثبت نام" >
-                <LoginModal close={close} />
-            </Modal>
         </Container>
     )
 }
