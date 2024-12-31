@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { useDisclosure } from '@mantine/hooks';
-import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { setSuccessLogin } from '@/_redux/features/auth';
 
@@ -18,7 +17,6 @@ export default function ProfileLayout({ children }: ProfileLayoutProps) {
     const pathname = usePathname();
     const isActive = (href: string) => pathname === href;
     const [opened, { open, close }] = useDisclosure(false);
-    const router = useRouter();
     const dispatch = useDispatch();
 
 
@@ -27,8 +25,8 @@ export default function ProfileLayout({ children }: ProfileLayoutProps) {
             // Call the logout API to clear the cookie
             const response = await fetch('/api/logout', { method: 'GET' });
             if (response.ok) {
-                router.push('/'); // Redirect to login after logout
                 dispatch(setSuccessLogin(false));
+                window.location.href = '/'; // Redirect to login after logout
             } else {
                 console.error('Failed to log out');
             }

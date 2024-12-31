@@ -10,14 +10,14 @@ interface ProfilePageProps {
  
 
 const Page: React.FC = () => {
-    const token = cookies().get('authToken')?.value;
-    if (!token) {
-        // If token doesn't exist, redirect to the home page
-        redirect('/');
-    }
+    // const token = cookies().get('authToken')?.value;
+    // if (!token) {
+    //     // If token doesn't exist, redirect to the home page
+    //     redirect('/');
+    // }
 
     return (
-        <UserDetail token={token} />
+        <UserDetail />
     );
 };
 
