@@ -77,7 +77,7 @@ const AdsSection = ({ token }: { token?: string }) => {
             return (
                 <Image
                     alt={title}
-                    style={{ borderRadius: '7px' }}
+                    style={{ borderRadius: '7px' ,objectFit:'contain'}}
                     width={190}
                     height={180}
                     src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/storage/${images[0]}`}
