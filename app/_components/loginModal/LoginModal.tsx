@@ -12,8 +12,8 @@ import { useDispatch } from 'react-redux';
 import { setSuccessLogin } from '@/_redux/features/auth';
 
 
-export default function LoginModal({ close, isAdsSection, setIsModalOpen }: {
-    close: () => void, isAdsSection?: boolean, setIsModalOpen?: Dispatch<SetStateAction<boolean>>
+export default function LoginModal({ onLoginSuccess, close, isAdsSection, setIsModalOpen }: {
+    onLoginSuccess?: () => void, close: () => void, isAdsSection?: boolean, setIsModalOpen?: Dispatch<SetStateAction<boolean>>
 }) {
     const [otpSent, setOtpSent] = useState<boolean>(false);
     const [showErrorOtp, setShowErrorOtp] = useState<boolean>(false);
@@ -111,8 +111,12 @@ export default function LoginModal({ close, isAdsSection, setIsModalOpen }: {
 
             if (response.ok) {
 
+                if (onLoginSuccess) {
+                    onLoginSuccess(); // Call the callback if it exists
+                }
+
                 if (setIsModalOpen) {
-                    setIsModalOpen(false)
+                    setIsModalOpen(false) // close modal
                 }
 
                 setShowErrorOtp(false)
@@ -149,7 +153,7 @@ export default function LoginModal({ close, isAdsSection, setIsModalOpen }: {
 
     return (
         <Box pos={'relative'} mb={'xs'} mx="auto" >
-            
+
             {!otpSent && <Flex pos={'relative'} top={'-3px'} mb={'lg'} align={'center'} justify={'center'}>
                 <Image style={{ objectFit: 'contain' }} alt='kiwi part' src={colorScheme === 'dark' ? '/logo-dark.png' : '/logo.png'} width={180} height={60} />
             </Flex>}

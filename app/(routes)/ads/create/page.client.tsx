@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TextInput, Text, Button, Box, Title, Group, Container, Paper, Card, SimpleGrid, Select, Textarea, Modal, Flex, ActionIcon } from '@mantine/core';
 import classes from './ActionGrid.module.css'
 import { isNotEmpty, useForm } from '@mantine/form';
@@ -36,27 +36,31 @@ export default function PageClient() {
 
     const router = useRouter();
 
+    const checkAuth = useCallback(async () => {
+        try {
+            const authResponse = await fetch('/api/check-auth'); // Call your API to check the token
+            const { token } = await authResponse.json();
+
+            if (!token) {
+                setIsModalOpen(true); // Open modal if no token
+            } else {
+                setToken(token.value); // Save the token
+                setIsModalOpen(false); // Close modal
+            }
+        } catch (error) {
+            router.push('/'); // Redirect on error
+        }
+    }, [router]);
 
     useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const authResponse = await fetch('/api/check-auth'); // Call your API to check the token
-                const { token } = await authResponse.json();
+        checkAuth(); // Call checkAuth on component mount
+    }, [checkAuth]);
 
-                if (!token.value) {
-                    setIsModalOpen(true);
-                    // router.push('/'); // Redirect if no token
-                } else {
-                    setToken(token.value); // Set the token
-                    setIsModalOpen(false);
-                }
-            } catch (error) {
-                router.push('/'); // Redirect on error
-            }
-        };
-
+    const handleLoginSuccess = () => {
+        // Trigger re-checking the token after login
         checkAuth();
-    }, []);
+    };
+
 
     const form = useForm({
         initialValues: {
@@ -259,7 +263,7 @@ export default function PageClient() {
             <Modal styles={{ title: { width: '100%' } }} withCloseButton={false} opened={isModalOpen} onClose={HandleModalLoginOpen}
                 title={<Flex w={'100%'} justify={'space-between'} align={'center'}><Text>ورود / ثبت نام</Text> <ActionIcon variant='subtle' component={Link} href={'/'}><IconArrowLeft />
                 </ActionIcon></Flex>} >
-                <LoginModal isAdsSection={true} setIsModalOpen={setIsModalOpen} close={HandleModalLoginOpen} />
+                <LoginModal onLoginSuccess={handleLoginSuccess} isAdsSection={true} setIsModalOpen={setIsModalOpen} close={HandleModalLoginOpen} />
             </Modal>
 
         </Container>
