@@ -51,8 +51,8 @@ export default function ProfileLayout({ children }: ProfileLayoutProps) {
                 <Text>آیا مایل به خروج از حساب کاربری خود هستید؟</Text>
 
                 <Flex justify={'flex-end'} mt={'xl'}>
-                    <Button onClick={() => handleLogout()} ml={'lg'} >بله</Button>
-                    <Button variant='outline' onClick={close} px={'lg'}>خیر</Button>
+                    <Button variant='outline' onClick={close} px={'md'}>خیر</Button>
+                    <Button onClick={() => handleLogout()} mr={'lg'} px={'xl'} >بله</Button>
                 </Flex>
             </Modal>
         </Container>
