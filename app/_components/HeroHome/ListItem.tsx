@@ -43,7 +43,7 @@ const ListItem = ({ token }: { token?: string }) => {
                 </List.Item>
                 <List.Item>
                     <Group gap={'4px'}>
-                        به راحتی <Box style={{cursor:'pointer'}} onClick={handleAddAdsPage}><Text c={'var(--mantine-color-green-9)'} fz={'sm'}>آگهی ثبت کن</Text></Box> و قطعات مورد نیازت رو با بهترین قیمت <Link href={'/ads'}>پیدا کن</Link>!
+                        به راحتی <Box component={Link} href={'/ads/create'} style={{cursor:'pointer'}}><Text c={'var(--mantine-color-green-9)'} fz={'sm'}>آگهی ثبت کن</Text></Box> و قطعات مورد نیازت رو با بهترین قیمت <Link href={'/ads'}>پیدا کن</Link>!
                     </Group>
                 </List.Item>
                 <List.Item>
