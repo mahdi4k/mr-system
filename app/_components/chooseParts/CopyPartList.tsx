@@ -65,7 +65,7 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
             if (isSuccess && searchParams.has(paramKey) && data) {
                 const itemName = removePersianWords(data.name);
                 const itemPrice = data.price ? ` ||  ${Intl.NumberFormat('fa', {}).format(Number(data.price))} تومان` : '';
-                title += `${itemName}${itemPrice}\n`;
+                title += `${itemName}${itemPrice}\n\n`;
             }
         };
 
@@ -79,7 +79,7 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
         addItemToTitle(isSuccessCase, 'case', caseData?.data);
 
         if (Number(totalPrice) > 0) {
-            title += ` مجموع: ${Intl.NumberFormat('fa', {}).format(Number(totalPrice))} تومان`;
+            title += `\n مجموع: ${Intl.NumberFormat('fa', {}).format(Number(totalPrice))} تومان`;
         }
 
         return title;
