@@ -79,8 +79,8 @@ const UserAds = () => {
 
     return (
         <div>
-            <SimpleGrid cols={{ base: 1, lg: 2 }}>
-                {userAds && userAds.length > 0 ? userAds.map(item => (
+            <SimpleGrid mb={'xl'} cols={{ base: 1, lg: 2 }}>
+                {userAds && userAds.length > 20 ? userAds.map(item => (
                     <Link href={`/ads/${item.id}`}>
                         <Card key={item.id} withBorder>
                             <Group wrap="nowrap">
@@ -108,7 +108,7 @@ const UserAds = () => {
                         </Card>
                     </Link>
                 )) : (
-                    <Card>
+                    <Card withBorder>
                         <Text w={'100%'} ta={'center'} fw={'bold'}>{'آگهی یافت نشد'}</Text>
                     </Card>
                 )
