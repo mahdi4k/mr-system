@@ -8,6 +8,7 @@ const usePcparts = () => {
         { name: 'fan', link: '/category/fan', title: 'فن', svg: '/svg/fan.svg' },
         { name: 'ssd', link: '/category/ssd', title: 'ssd', svg: '/svg/ssd.svg' },
         { name: 'case', link: '/category/case', title: 'کیس', svg: '/svg/case.svg' },
+        { name: 'accessories', link: '/category/accessories', title: 'لوازم جانبی', svg: '/svg/accessories.svg' },
     ];
 
     return pcParts;
