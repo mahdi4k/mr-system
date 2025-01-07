@@ -21,7 +21,7 @@ type Props = {
     ramList: { data: RAM[] | undefined, isSuccessRamList: boolean, motherboardData: RAM[] | undefined, cpuData: RAM[] | undefined }
     caseList: { data: CASE[] | undefined, isSuccessCaseList: boolean }
     powerList: { data: POWER[] | undefined, isSuccessPowerList: boolean, graphicData: POWER[] | undefined }
-    graphicList: { data: Graphic[] | undefined, isSuccessGraphicList: boolean, cpuData: Graphic[] | undefined }
+    graphicList: { data: Graphic[] | undefined, isSuccessGraphicList: boolean, cpuData: Graphic[] | undefined , powerData: Graphic[] | undefined }
     fanList: { data: FAN[] | undefined, isSuccessFanList: boolean, cpuData: FAN[] | undefined }
     motherboardList: { data: Motherboard[] | undefined, isSuccessMotherboardList: boolean, cpuData: Motherboard[] | undefined }
     type: string
@@ -94,7 +94,10 @@ const ModalPart: FC<Props> = ({ opened, close, ssdList, cpuList, ramList, caseLi
                 case 'graphic':
                     if (graphicList.cpuData) {
                         setDataList(graphicList.cpuData)
-                    } else if (graphicList.isSuccessGraphicList) {
+                    }else if(graphicList.powerData){
+                        setDataList(graphicList.powerData)
+                    } 
+                    else if (graphicList.isSuccessGraphicList) {
                         setDataList(graphicList.data)
                     }
 

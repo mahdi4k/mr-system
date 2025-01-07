@@ -158,7 +158,7 @@ const PageClient: React.FC = () => {
                     ramList={{ data: ramList, isSuccessRamList ,motherboardData: motherboardData?.data.rams, cpuData: cpuData?.data.rams}}
                     caseList={{ data: caseList, isSuccessCaseList }}
                     powerList={{ data: powerList, isSuccessPowerList, graphicData: graphicData?.data.powers }}
-                    graphicList={{ data: graphicList, isSuccessGraphicList, cpuData: cpuData?.data.graphics }}
+                    graphicList={{ data: graphicList, isSuccessGraphicList, cpuData: cpuData?.data.graphics, powerData: powerData?.data.graphics }}
                     fanList={{ data: fanList, isSuccessFanList , cpuData:cpuData?.data.fans }}
                     ssdList={{ data: ssdList, isSuccessSsdList }}
                     motherboardList={{ data: motherboardList, isSuccessMotherboardList, cpuData: cpuData?.data.motherboards }}
