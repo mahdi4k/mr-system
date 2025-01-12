@@ -3,7 +3,7 @@
 import { Flex, Group, Box, ActionIcon, Text } from '@mantine/core'
 import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import { IconCamera, IconPlus, IconTrash } from '@tabler/icons-react'
-import React, { Dispatch, FC, SetStateAction, useState } from 'react'
+import React, { Dispatch, FC, SetStateAction, useRef, useState } from 'react'
 import imageCompression from 'browser-image-compression';
 import Image from "next/image";
 import classes from './ads.module.css'
@@ -16,6 +16,7 @@ const MAX_IMAGES = 3;
 
 const AdsImageForm: FC<props> = ({ images, setImages }) => {
   const [error, setError] = useState<string | null>(null);
+  const openRef = useRef<() => void>(null);
 
 
   const compressImage = async (file: File) => {
@@ -64,12 +65,12 @@ const AdsImageForm: FC<props> = ({ images, setImages }) => {
     for (let i = 0; i < placeholdersNeeded; i++) {
       placeholders.push(
         <Flex
+          onClick={() => openRef.current?.()}
           key={`placeholder-${i}`}
           direction="column"
           align="center"
           justify="center"
-          h={100}
-          w={100}
+          h={{ base: '70px', sm: '100px' }} w={{ base: '80px', sm: '100px' }}
           style={{
             borderRadius: '5px',
             cursor: 'pointer',
@@ -91,21 +92,21 @@ const AdsImageForm: FC<props> = ({ images, setImages }) => {
     <>
       <Text fz={'sm'} mb={'3px'} mt={'xl'}>عکس‌های آگهی <span style={{ fontSize: '12px', color: 'gray' }}>(حداکثر ۳ عکس)</span></Text>
 
-      <Flex mb={'xl'} pos={'relative'}>
-        <Dropzone
+      <Flex style={{overflow:'auto'}} mt={'sm'} mb={'xl'} pos={'relative'}>
+        <Dropzone openRef={openRef}
           onDrop={handleImageUpload}
           onReject={(files) => console.log('rejected files', files)}
           maxSize={10 * 1024 ** 2}
           accept={IMAGE_MIME_TYPE}
         >
-          <Flex direction={'column'} align={'center'} justify={'center'} h={{ base: '60px', sm: '100px' }} w={{ base: '70px', sm: '100px' }}
+          <Flex direction={'column'} align={'center'} justify={'center'} h={{ base: '70px', sm: '100px' }} w={{ base: '80px', sm: '100px' }}
             style={{ borderRadius: '5px', cursor: 'pointer', padding: 20, border: '1px dashed var(--mantine-color-kiwi-8)' }}>
             <IconPlus color='var(--mantine-color-kiwi-8)' size={22} />
-            <Text style={{whiteSpace:'nowrap'}} c={'var(--mantine-color-kiwi-8)'} fz={'xs'}>افزودن عکس</Text>
+            <Text style={{ whiteSpace: 'nowrap' }} c={'var(--mantine-color-kiwi-8)'} fz={'xs'}>افزودن عکس</Text>
           </Flex>
         </Dropzone>
 
-        <Group mr={'lg'} gap="sm" wrap="wrap">
+        <Group mr={'sm'} gap="xs" wrap="nowrap">
           {images.map((file, index) => (
             <Box
               key={index}
@@ -114,9 +115,8 @@ const AdsImageForm: FC<props> = ({ images, setImages }) => {
                 cursor: 'pointer',
                 borderRadius: '5px',
                 overflow: 'hidden',
-                width: 100,
-                height: 100,
               }}
+              h={{ base: '70px', sm: '100px' }} w={{ base: '80px', sm: '100px' }}
             >
               <ActionIcon
                 variant="filled"
