@@ -34,7 +34,7 @@ export const UseAdsCategory = () => {
       key={category.id} // Use category.id as a unique key
     >
       <Image width={40} height={40} src={category.icon} alt={category.name} />
-      <Text size="xs" mt={7}>
+      <Text ta={'center'} size="xs" mt={7}>
         {category.name}
       </Text>
     </UnstyledButton>

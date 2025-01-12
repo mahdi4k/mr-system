@@ -184,7 +184,7 @@ export default function PageClient() {
     }
     return (
         <Container w={{ base: '100%', lg: '700px' }} size={'xxl'}>
-            <Paper mb={'xl'} px={'xl'} shadow='sm' pb={'lg'} mt="xl">
+            <Paper mb={'xl'} px={{base:'xs',lg:'xl'}} shadow='sm' pb={'lg'} mt="xl">
                 <Box mx={'auto'}>
                     <Title onClick={open} order={2} mb="xl">ثبت آگهی</Title>
                     <form onSubmit={form.onSubmit(handleSubmit, validateOtherField)}>
