@@ -80,7 +80,7 @@ const UserAds = () => {
     return (
         <div>
             <SimpleGrid mb={'xl'} cols={{ base: 1, lg: 2 }}>
-                {userAds && userAds.length > 20 ? userAds.map(item => (
+                {userAds && userAds.length > 0 ? userAds.map(item => (
                     <Link href={`/ads/${item.id}`}>
                         <Card key={item.id} withBorder>
                             <Group wrap="nowrap">
@@ -99,9 +99,9 @@ const UserAds = () => {
                                 </Carousel>
                                 <Flex w={'100%'} direction={'column'}>
                                     <Text fz='sm'>{item.title}</Text>
-                                    <Flex mt={'md'} justify={'space-between'} align={'center'} w={'100%'}>
-                                        <CardPartPrice tomanHeight={17} tomanWidth={17} textSize={14} isAds price={item.price} />
-                                        <Badge>{item.status === 'approved' ? 'منتشر شده' : 'در حال بررسی'}</Badge>
+                                    <Flex mt={'xl'} justify={'space-between'} align={'center'} w={'100%'}>
+                                        <CardPartPrice mb={'0'} mt={'0'} tomanHeight={17} tomanWidth={17} textSize={14} isAds price={item.price} />
+                                        <Badge mr={'auto'}>{item.status === 'approved' ? 'منتشر شده' : 'در حال بررسی'}</Badge>
                                     </Flex>
                                 </Flex>
                             </Group>
