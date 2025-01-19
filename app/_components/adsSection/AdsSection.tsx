@@ -1,13 +1,12 @@
 "use client"
 
-import { Button, Card, Container, Flex, Group, Skeleton, Tabs, Text } from '@mantine/core'
+import { Box, Button, Card, Container, Flex, Group, Skeleton, Tabs, Text } from '@mantine/core'
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import usePcparts from '@/_utils/customHook/usePcParts'
 import { Carousel, Embla } from '@mantine/carousel'
 import CardPartPrice from '../shared/CardPartPrice'
 import { IconFlag3, IconSquarePlus2 } from '@tabler/icons-react'
-import { useDisclosure } from '@mantine/hooks'
 import { useRouter } from 'next/navigation'
 import { useLazyGetAdsListCategoryQuery } from '@/_redux/services/adsApi'
 import { cityTitleHandler, formatJalaliTimeAgo, provinceTitleHandler } from '@/_utils/utils'
@@ -17,6 +16,7 @@ import { RootState } from "@/_redux/store";
 import { fetchCity, fetchOstan } from '@/_redux/features/ads'
 import { ThunkDispatch, AnyAction } from '@reduxjs/toolkit'
 import ImgNoProduct from '../../../public/no-product.png'
+import classess from './ads.module.css'
 
 type AppDispatch = ThunkDispatch<RootState, void, AnyAction>;
 
@@ -108,7 +108,7 @@ const AdsSection = ({ token }: { token?: string }) => {
 
                 <Tabs.Panel style={{ direction: 'rtl' }} value={activeTab as string}>
                     <Carousel
-                        slideSize={{ base: '52%', lg: '21%' }}
+                        slideSize={{ base: '52%', xs: '28%', xl: '21%' }}
                         slideGap={{ base: 'sm', sm: 'md' }}
                         getEmblaApi={setEmbla}
                         align="start"
@@ -153,22 +153,17 @@ const AdsSection = ({ token }: { token?: string }) => {
                         ))}
                         {isFetchingAds && (
                             <Group wrap='nowrap' mt={'md'} gap={'lg'}>
-                                <Skeleton height={'340px'} width={'220px'} />
-                                <Skeleton height={'340px'} width={'220px'} />
-                                <Skeleton height={'340px'} width={'220px'} />
+                                {Array.from({ length: 3 }).map((_, index) => (
+                                    <Box className={classess.adsSkeleton}
+                                        key={index}
+                                    >
+                                        <Skeleton height="340px" />
+                                    </Box>
+                                ))}
                             </Group>
-
                         )}
 
                     </Carousel>
-                </Tabs.Panel>
-
-                <Tabs.Panel value="messages">
-                    Messages tab content
-                </Tabs.Panel>
-
-                <Tabs.Panel value="settings">
-                    Settings tab content
                 </Tabs.Panel>
             </Tabs>
 

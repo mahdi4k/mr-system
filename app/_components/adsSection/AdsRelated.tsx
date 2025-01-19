@@ -44,7 +44,7 @@ const AdsRelated: FC<props> = ({ filteredAds, isFetchingAds }) => {
         <Box mb={'xl'} mt={'60px'} style={{ direction: 'rtl' }}>
             <Text>آگهی‌ های مشابه</Text>
             <Carousel
-                slideSize={{ base: '52%', lg: '21%' }}
+                slideSize={{ base: '52%', xs:'30%', xl: '21%' }}
                 slideGap={{ base: 'sm', sm: 'md' }}
                 getEmblaApi={setEmbla}
                 align="start"

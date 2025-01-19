@@ -76,3 +76,15 @@
         background-color: rgba(0, 0, 0, 0.1);
     }
 }
+
+.adsSkeleton {
+   width: 220px;
+
+    @media (max-width: $mantine-breakpoint-lg) {
+        width: 280px !important;
+    }
+
+    @media (min-width: $mantine-breakpoint-xl) {
+        width: 400px;
+    }
+}
