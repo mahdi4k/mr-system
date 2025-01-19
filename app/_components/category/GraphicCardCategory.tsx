@@ -37,7 +37,7 @@ const GraphicCardCategory = () => {
         <TextInput mt={'2px'}
           mb={{ base: 'lg', lg: '0' }}
           radius="xl"
-          w={260}
+          w={{base:210,sm:260}}
           onKeyDown={e => e.key === 'Enter' ? setSearchSubmit(searchValue) : ''}
           size="sm"
           value={searchValue}

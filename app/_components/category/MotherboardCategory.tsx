@@ -37,9 +37,8 @@ const MotherboardCategory = () => {
 
       <Flex my={'md'} justify={'space-between'}>
         <TextInput mt={'2px'}
-          mb={{ base: 'lg', lg: '0' }}
           radius="xl"
-          w={260}
+          w={{base:210,sm:260}}
           onKeyDown={e => e.key === 'Enter' ? setSearchSubmit(searchValue) : ''}
           size="sm"
           value={searchValue}
@@ -55,7 +54,7 @@ const MotherboardCategory = () => {
 
         <Popover width={200} position="bottom" withArrow shadow="md">
           <Popover.Target>
-            <Button variant='outline' styles={{ section: { marginLeft: '5px' } }} radius={'xl'} color="gray" leftSection={<IconChevronDown size={16} />} px='xl'>نوع سوکت</Button>
+            <Button variant='outline' mt={'3px'} styles={{ section: { marginLeft: '5px' } }} radius={'xl'} color="gray" leftSection={<IconChevronDown size={16} />} px='lg'>نوع سوکت</Button>
           </Popover.Target>
           <Popover.Dropdown>
             <AmdOrIntelFilter value={value} setValue={setValue} />
