@@ -79,7 +79,7 @@ const UserAds = () => {
 
     return (
         <div>
-            <SimpleGrid mb={'xl'} cols={{ base: 1, lg: 2 }}>
+            <SimpleGrid mb={'xl'} cols={{ base: 1, xs: 2, sm: 3, xl: 2 }}>
                 {userAds && userAds.length > 0 ? userAds.map(item => (
                     <Link href={`/ads/${item.id}`}>
                         <Card key={item.id} withBorder>
