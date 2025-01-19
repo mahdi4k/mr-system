@@ -98,6 +98,75 @@ const DrawerHeader: FC<Props> = ({ opened, close }) => {
             </Link>
 
           </List.Item>
+
+          <List.Item mt={'xl'}
+            styles={{ itemWrapper: { width: '100%' }, itemLabel: { width: '100%' } }}
+            w={'100%'}
+            onClick={() => close()}
+            icon={
+              <Link href='/category/ram'>
+                <ThemeIcon variant='transparent' size={24} radius="xl">
+                  <Image width={25} height={30} src={'/svg/ram.svg'} alt={'ram'} />
+                </ThemeIcon>
+              </Link>
+            }
+          >
+            <Link href='/category/ram'>
+              <Text fz={'lg'}> رم</Text>
+            </Link>
+
+          </List.Item>
+
+          <List.Item mt={'xl'}
+            styles={{ itemWrapper: { width: '100%' }, itemLabel: { width: '100%' } }}
+            w={'100%'}
+            onClick={() => close()}
+            icon={
+              <Link href='/category/fan'>
+                <ThemeIcon variant='transparent' size={24} radius="xl">
+                  <Image width={25} height={30} src={'/svg/fan.svg'} alt={'power'} />
+                </ThemeIcon>
+              </Link>
+            }
+          >
+            <Link href='/category/fan'>
+              <Text fz={'lg'}> فن</Text>
+            </Link>
+          </List.Item>
+
+          <List.Item mt={'xl'}
+            styles={{ itemWrapper: { width: '100%' }, itemLabel: { width: '100%' } }}
+            w={'100%'}
+            onClick={() => close()}
+            icon={
+              <Link href='/category/ssd'>
+                <ThemeIcon variant='transparent' size={24} radius="xl">
+                  <Image width={25} height={30} src={'/svg/ssd.svg'} alt={'ssd'} />
+                </ThemeIcon>
+              </Link>
+            }
+          >
+            <Link href='/category/ssd'>
+              <Text fz={'lg'}> ssd</Text>
+            </Link>
+          </List.Item>
+
+          <List.Item mt={'xl'}
+            styles={{ itemWrapper: { width: '100%' }, itemLabel: { width: '100%' } }}
+            w={'100%'}
+            onClick={() => close()}
+            icon={
+              <Link href='/category/case'>
+                <ThemeIcon variant='transparent' size={24} radius="xl">
+                  <Image width={25} height={30} src={'/svg/case.svg'} alt={'case'} />
+                </ThemeIcon>
+              </Link>
+            }
+          >
+            <Link href='/category/case'>
+              <Text fz={'lg'}> کیس</Text>
+            </Link>
+          </List.Item>
         </List>
 
 
@@ -132,62 +201,7 @@ const DrawerHeader: FC<Props> = ({ opened, close }) => {
             </List.Item>
           ))}
 
-          <List.Item
-            styles={{ itemWrapper: { width: '100%' }, itemLabel: { width: '100%' } }}
-            mb={'xl'}
-            w={'100%'}
-            onClick={() => close()}
-            icon={
-              <Link href='/category/cpu'>
-
-                <ThemeIcon variant='transparent' size={24} radius="xl">
-                  <Image width={25} height={25} src={'/svg/cpu.svg'} alt={'cpu'} />
-                </ThemeIcon>
-              </Link>
-            }
-          >
-            <Link href='/category/cpu'>
-              <Text fz={'lg'}> cpu</Text>
-            </Link>
-          </List.Item>
-
-
-          <List.Item
-            styles={{ itemWrapper: { width: '100%' }, itemLabel: { width: '100%' } }}
-            w={'100%'}
-            mb={'xl'}
-            onClick={() => close()}
-            icon={
-              <Link href='/category/graphic'>
-                <ThemeIcon variant='transparent' size={24} radius="xl">
-                  <Image width={25} height={25} src={'/svg/graphic.svg'} alt={'graphic'} />
-                </ThemeIcon>
-              </Link>
-            }
-          >
-            <Link href='/category/graphic'>
-              <Text fz={'lg'}> کارت گرافیک</Text>
-            </Link>
-
-          </List.Item>
-
-          <List.Item
-            styles={{ itemWrapper: { width: '100%' }, itemLabel: { width: '100%' } }}
-            w={'100%'}
-            onClick={() => close()}
-            icon={
-              <Link href='/category/power'>
-                <ThemeIcon variant='transparent' size={24} radius="xl">
-                  <Image width={25} height={30} src={'/svg/power.svg'} alt={'power'} />
-                </ThemeIcon>
-              </Link>
-            }
-          >
-            <Link href='/category/power'>
-              <Text fz={'lg'}> پاور</Text>
-            </Link>
-
-          </List.Item>
+           
         </List>
       </Drawer>
 
