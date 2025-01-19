@@ -98,6 +98,7 @@ const AdsImageForm: FC<props> = ({ images, setImages }) => {
           onReject={(files) => console.log('rejected files', files)}
           maxSize={10 * 1024 ** 2}
           accept={IMAGE_MIME_TYPE}
+          style={{border:'unset !important'}}
         >
           <Flex direction={'column'} align={'center'} justify={'center'} h={{ base: '70px', sm: '100px' }} w={{ base: '80px', sm: '100px' }}
             style={{ borderRadius: '5px', cursor: 'pointer', padding: 20, border: '1px dashed var(--mantine-color-kiwi-8)' }}>

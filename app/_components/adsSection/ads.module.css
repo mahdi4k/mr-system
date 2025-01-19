@@ -29,7 +29,7 @@
 }
 
 .activeItem {
-    background-color: light-dark(var(--mantine-color-kiwi-5), var(--mantine-color-dark-9)) !important ;
+    background-color: light-dark(var(--mantine-color-kiwi-5), var(--mantine-color-dark-9)) !important;
     transform: scale(1.05);
     box-shadow: var(--mantine-shadow-md);
 
@@ -78,13 +78,17 @@
 }
 
 .adsSkeleton {
-   width: 220px;
+
+    @media (max-width: $mantine-breakpoint-sm) {
+        width: 220px;
+    }
 
     @media (max-width: $mantine-breakpoint-lg) {
-        width: 280px !important;
+        width: 270px;
     }
 
     @media (min-width: $mantine-breakpoint-xl) {
-        width: 400px;
+        width: 220px;
     }
+
 }
