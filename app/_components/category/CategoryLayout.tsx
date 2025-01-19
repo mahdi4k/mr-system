@@ -21,7 +21,7 @@ type Props = {
 const CategoryLayout: FC<Props> = ({ data, children, type }) => {
     return (
 
-        <Grid.Col key={data.id} span={{ base: 12, sm: 6, lg: 3 }}>
+        <Grid.Col key={data.id} span={{ base: 12, xs:6, sm: 4, lg: 3 }}>
             <Card className={classes.categoryCard} mih={{ base: '230px', sm: '375px' }} miw={'250px'} key={data.id} padding="lg" radius="md" withBorder>
                 <Link className={classes.categorySection} href={`/products/${type}/${data.id}`}>
                     <Card.Section className={classes.categoryImage} mt={'0'} ta={'center'}>
