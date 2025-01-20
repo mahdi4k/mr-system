@@ -21,10 +21,11 @@ export function Header({ token }: { token?: string }) {
     const isLoading = UseLoading();
     const router = useRouter();
     const success = useSelector((state: RootState) => state.auth.success);
+    const [logoSrc, setLogoSrc] = useState<string | null>(null); // Default to null
 
-    
+
     useEffect(() => {
-        router.prefetch('/profile'); 
+        router.prefetch('/profile');
     }, [router]);
 
     const handleAddAdsPage = () => {
@@ -35,6 +36,18 @@ export function Header({ token }: { token?: string }) {
             openModal()
         }
     }
+    useEffect(() => {
+        if (colorScheme === 'dark') {
+            setLogoSrc('/logo-dark.png');
+        } else {
+            setLogoSrc('/logo.png');
+        }
+    }, [colorScheme]);
+
+    // Only render the image once the logo source is set
+    if (!logoSrc) {
+        return null; // Prevent rendering until logoSrc is determined
+    }
 
     return (
 
@@ -44,7 +57,7 @@ export function Header({ token }: { token?: string }) {
 
                 <Flex className={classes.mobileHeader} align={'center'}>
                     <Link style={{ height: 40 }} className={'text-decoration-none'} href={'/'}>
-                        <Image style={{ objectFit: 'contain' }} alt='kiwi part' src={colorScheme === 'dark' ? '/logo-dark.png' : '/logo.png'} width={80} height={40} />
+                        <Image style={{ objectFit: 'contain' }} alt='kiwi part' src={logoSrc} width={80} height={40} />
                     </Link>
 
 

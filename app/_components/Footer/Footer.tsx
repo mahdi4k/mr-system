@@ -4,6 +4,7 @@ import { IconBrandTwitter, IconBrandYoutube, IconBrandInstagram } from '@tabler/
 import classes from './footer.module.css';
 import Image from 'next/image'
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 
 const data = [
@@ -30,6 +31,21 @@ const data = [
 
 export function Footer() {
     const { setColorScheme, colorScheme } = useMantineColorScheme();
+    const [logoSrc, setLogoSrc] = useState<string | null>(null); // Default to null
+
+
+     useEffect(() => {
+            if (colorScheme === 'dark') {
+                setLogoSrc('/logo-dark.png');
+            } else {
+                setLogoSrc('/logo.png');
+            }
+        }, [colorScheme]);
+    
+        // Only render the image once the logo source is set
+        if (!logoSrc) {
+            return null; // Prevent rendering until logoSrc is determined
+        }
 
     const groups = data.map((group) => {
         const links = group.links.map((link, index) => (
@@ -53,7 +69,7 @@ export function Footer() {
         <footer className={classes.footer}>
             <Container size={'lg'} className={classes.inner}>
                 <div className={classes.logo}>
-                    <Image style={{ objectFit: 'contain' }} alt='kiwi part' src={colorScheme === 'dark' ? '/logo-dark.png' : '/logo.png'} width={80} height={40} />
+                    <Image style={{ objectFit: 'contain' }} alt='kiwi part' src={logoSrc} width={80} height={40} />
 
                     <Text size="sm" c="dimmed" className={classes.description}>
                         هوشمندانه انتخاب کن، قیمت‌ها رو مقایسه کن و با خیال راحت سیستمت اسمبل کن!
