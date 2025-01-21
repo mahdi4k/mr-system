@@ -186,7 +186,7 @@ export default function PageClient() {
         <Container w={{ base: '100%', lg: '700px' }} size={'xxl'}>
             <Paper mb={'xl'} px={{base:'xs',lg:'xl'}} shadow='sm' pb={'lg'} mt="xl">
                 <Box mx={'auto'}>
-                    <Title onClick={open} order={2} mb="xl">ثبت آگهی</Title>
+                    <Title style={{fontFamily:'var(--font-vazirmatn)'}} onClick={open} order={2} mb="xl">ثبت آگهی</Title>
                     <form onSubmit={form.onSubmit(handleSubmit, validateOtherField)}>
                         <TextInput
                             label="عنوان آگهی"

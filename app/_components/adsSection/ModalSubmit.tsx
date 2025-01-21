@@ -447,7 +447,7 @@ const ModalSubmit: FC<Props> = ({ opened, close }) => {
                         loader={<Box component='div'></Box>}
                         src='/svg/success.svg' />
                     <Flex wrap={'wrap'} pb={'lg'} mt={'xl'} align={'center'} justify={'center'}>
-                        <Text ta={'center'}>آگهی شما با موفقیت ثبت شد و به زودی در سایت منتشر خواهد شد.</Text>
+                        <Text px={'lg'} ta={'center'}>آگهی شما با موفقیت ثبت شد و به زودی در سایت منتشر خواهد شد.</Text>
                         <ThemeIcon size={'30px'} variant='transparent' color="teal">
                             <IconCircleCheckFilled size={30} />
                         </ThemeIcon>
