@@ -63,7 +63,7 @@ const PageClient: FC<props> = ({ product }) => {
       return (
         <>
           <Carousel
-            slideSize={{ base: images.length === 1 ? '100%' : '62%', lg: '21%' }}
+            slideSize={{ base: images.length === 1 ? '100%' : '62%', sm:'40%', lg: '21%' }}
             slideGap={{ base: 'sm', sm: 'md' }}
             getEmblaApi={setEmbla}
             align="start"
