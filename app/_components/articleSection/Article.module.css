@@ -26,7 +26,7 @@
 
 .articleGrid {
     @media (max-width: $mantine-breakpoint-md) {
-        flex-wrap: unset;
+        flex-wrap: unset !important;
         flex-direction: column-reverse;
     }
 }
@@ -36,5 +36,8 @@
     width: 100%;
     @media (max-width: 1100px) {
         height: auto;
+    }
+    @media (max-width: 1000px) {
+        width: 57% !important;
     }
 }
