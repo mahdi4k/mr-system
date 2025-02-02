@@ -6,7 +6,7 @@ import React, { FC, useEffect, useState } from 'react'
 import { IAdsProps } from './page';
 import classes from './adsSingle.module.css'
 import Image from 'next/image';
-import { IconDiscountCheckFilled, IconPhone, IconUser } from '@tabler/icons-react';
+import { IconDiscountCheckFilled, IconMessages, IconPhone, IconUser } from '@tabler/icons-react';
 import { cityTitleHandler, formatJalaliTimeAgo, provinceTitleHandler } from '@/_utils/utils';
 import { fetchCity, fetchOstan } from '@/_redux/features/ads';
 import { AppDispatch, RootState } from '@/_redux/store';
@@ -15,6 +15,8 @@ import { useLazyGetAdsListCategoryQuery } from '@/_redux/services/adsApi';
 import { Carousel, Embla } from '@mantine/carousel';
 import AdsRelated from '@/_components/adsSection/AdsRelated';
 import AdsGalleryModal from '@/_components/adsSection/AdsGalleryModal';
+import { useChat } from '@/_utils/customHook/useChat';
+import { UserResponse } from '@/_components/profile/UserDetail';
 
 
 type props = {
@@ -44,7 +46,24 @@ const PageClient: FC<props> = ({ product }) => {
     }
   }, [ostan, city, dispatch]);
 
+  const [userData, setUserData] = useState<UserResponse>();
 
+  // get current user detail
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('/api/user-profile');
+        if (response.ok) {
+          const data = await response.json();
+          setUserData(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user data", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
   useEffect(() => {
     if (product)
       adsQuery({ category: product.category.value })
@@ -63,7 +82,7 @@ const PageClient: FC<props> = ({ product }) => {
       return (
         <>
           <Carousel
-            slideSize={{ base: images.length === 1 ? '100%' : '62%', sm:'40%', lg: '21%' }}
+            slideSize={{ base: images.length === 1 ? '100%' : '62%', sm: '40%', lg: '21%' }}
             slideGap={{ base: 'sm', sm: 'md' }}
             getEmblaApi={setEmbla}
             align="start"
@@ -89,6 +108,11 @@ const PageClient: FC<props> = ({ product }) => {
       )
     }
   }
+  const { createConversation } = useChat(userData?.userData.id);
+
+  const handleStartChat = () => {
+    createConversation(`${product.id}`);
+  };
 
 
   return (
@@ -112,7 +136,7 @@ const PageClient: FC<props> = ({ product }) => {
           <Group mt={'calc(var(--mantine-spacing-lg) * 2)'} align='center'>
             <Text fw={'bold'} fz={'h1'}>{product.title}</Text>
             <Badge
-              rightSection={product.status === 'approved' ? <IconDiscountCheckFilled style={{ width: rem(17), height: rem(17) }}/> : ''}
+              rightSection={product.status === 'approved' ? <IconDiscountCheckFilled style={{ width: rem(17), height: rem(17) }} /> : ''}
               color={product.status === 'approved' ? 'green' : 'orange'}>
               {product.status === 'approved' ? 'منتشر شده' : 'در انتظار تایید'}</Badge>
           </Group>
@@ -141,6 +165,12 @@ const PageClient: FC<props> = ({ product }) => {
         <Grid.Col span={{ base: 12, lg: 4 }}>
           <Card mt={'xl'} shadow=' rgba(0, 0, 0, 0.1) -4px 9px 25px -6px '>
             <Text fz={'sm'}>اطلاعات تماس</Text>
+
+
+            <Button rightSection={<IconMessages/>} onClick={handleStartChat} mt="md">
+              <Text>چت</Text>
+            </Button>
+
             <Flex direction={'column'} align={'center'} justify={'center'}>
               <ThemeIcon mt={'lg'} color="gray" variant="light" radius="xl" size="4rem">
                 <IconUser style={{ width: '70%', height: '70%' }} />

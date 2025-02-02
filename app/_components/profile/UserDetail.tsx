@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 
 
 
-interface UserResponse {
+export interface UserResponse {
     message: string;
     userData: UserData;
 }
