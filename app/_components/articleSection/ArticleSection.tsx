@@ -1,4 +1,5 @@
 import ArticleSectionClient from "./ArticleSection.client"
+import { headers } from "next/headers";
 
 
 type featuredmedia ={
@@ -19,16 +20,14 @@ export type postsMO = {
 }
 
 async function getData() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API}/posts?_fields=id,content,slug,excerpt,date,title,_links,_embedded&_embed`) 
-    // The return value is *not* serialized
-    // You can return Date, Map, Set, etc.
 
-    if (!res.ok) {
-        // This will activate the closest `error.js` Error Boundary
-        throw new Error('Failed to fetch data')
-    }
+    const host = headers().get("host"); // Get current domain
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+    const url = `${protocol}://${host}/api/articles`; // Construct absolute URL
 
-    return res.json()
+    const res = await fetch(url, { cache: "force-cache" });
+    if (!res.ok) throw new Error("Failed to fetch data");
+    return res.json();
 }
 
 const ArticleSection = async () => {

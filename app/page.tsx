@@ -67,14 +67,14 @@ const page = () => {
 
       <HeroHeader token={token}/>
       <CardParts />
-      {/* <AdsSection token={token} /> */}
+      <AdsSection token={token} />
       <CpuMotherboard />
       <CpuGraphic />
       <GraphicPower />
       <SuggestSection />
       <BannerSection />
       {/* <CardService /> */}
-      {/* <ArticleSection /> */}
+      <ArticleSection />
     </div>
   )
 }
