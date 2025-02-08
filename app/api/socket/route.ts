@@ -55,8 +55,6 @@ server.on('upgrade', (request, socket, head) => {
   }
 });
 
-server.listen(4001, () => {
-  console.log('WebSocket server running on ws://localhost:4001');
-});
+ 
 
 export const GET = () => new Response('WebSocket endpoint', { status: 200 });
