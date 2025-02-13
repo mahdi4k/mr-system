@@ -24,7 +24,7 @@ export const useChat = (userId: number | undefined) => {
   // Fetch messages when conversation is selected
   useEffect(() => {
     if (selectedConversation) {
-      fetch(`/api/messages?conversationId=${selectedConversation.id}`)
+      fetch(`/api/conversations/${selectedConversation.id}/messages`)
         .then(res => res.json())
         .then(setMessages);
     }

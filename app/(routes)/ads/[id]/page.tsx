@@ -1,4 +1,5 @@
 import PageClient from './page.client'
+import { cookies } from 'next/headers';
 
 export interface Category {
     id: number;
@@ -66,8 +67,10 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
     }
 }
 export default async function Page({ params }: { params: { id: string } }) {
+      const token = cookies().get('authToken')?.value;
+    
     const data = await getData(params);
     return <main style={{ flex: '1' }}>
-        <PageClient product={data} />
+        <PageClient product={data} token={token} />
     </main>
 }

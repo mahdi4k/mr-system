@@ -1,7 +1,7 @@
 "use client"
 
 import KiwiImage from '@/_components/shared/KiwiImage';
-import { Anchor, Breadcrumbs, Container, Text, Group, Flex, Grid, Box, Card, ThemeIcon, Button, Divider, Badge, rem } from '@mantine/core';
+import { Anchor, Breadcrumbs, Container, Text, Group, Flex, Grid, Box, Card, ThemeIcon, Button, Divider, Badge, rem, Modal } from '@mantine/core';
 import React, { FC, useEffect, useState } from 'react'
 import { IAdsProps } from './page';
 import classes from './adsSingle.module.css'
@@ -17,19 +17,24 @@ import AdsRelated from '@/_components/adsSection/AdsRelated';
 import AdsGalleryModal from '@/_components/adsSection/AdsGalleryModal';
 import { useChat } from '@/_utils/customHook/useChat';
 import { UserResponse } from '@/_components/profile/UserDetail';
+import { useDisclosure } from '@mantine/hooks';
+import LoginModal from '@/_components/loginModal/LoginModal';
 
 
 type props = {
   product: IAdsProps
+  token: string
 }
 
-const PageClient: FC<props> = ({ product }) => {
+const PageClient: FC<props> = ({ product, token }) => {
   const dispatch: AppDispatch = useDispatch();
   const { ostan, city, status } = useSelector((state: RootState) => state.ads);
   const [adsQuery, { data: adsData, isSuccess: isSuccessAds, isLoading, isFetching: isFetchingAds }] = useLazyGetAdsListCategoryQuery()
   const [embla, setEmbla] = useState<Embla | null>(null);
   const [openedImageModal, setOpenedImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
+  const success = useSelector((state: RootState) => state.auth.success);
+  const [openedModal, { open: openModalLogin, close: closeModal }] = useDisclosure(false);
 
   useEffect(() => {
     if (embla) {
@@ -110,8 +115,15 @@ const PageClient: FC<props> = ({ product }) => {
   }
   const { createConversation } = useChat(userData?.userData.id);
 
+
+
   const handleStartChat = () => {
-    createConversation(`${product.id}`);
+    if (token || success) {
+      createConversation(`${product.id}`);
+    } else {
+      openModalLogin()
+    }
+
   };
 
 
@@ -167,17 +179,18 @@ const PageClient: FC<props> = ({ product }) => {
             <Text fz={'sm'}>اطلاعات تماس</Text>
 
 
-            <Button rightSection={<IconMessages/>} onClick={handleStartChat} mt="md">
-              <Text>چت</Text>
-            </Button>
+
 
             <Flex direction={'column'} align={'center'} justify={'center'}>
               <ThemeIcon mt={'lg'} color="gray" variant="light" radius="xl" size="4rem">
                 <IconUser style={{ width: '70%', height: '70%' }} />
               </ThemeIcon>
               <Text mt={'md'} fz={'sm'}>{product.user.name}</Text>
-              <Button mt={'lg'} size='md' color='green' radius={'lg'} variant='light' w={'100%'} rightSection={<IconPhone size={20} />}>{product.user.phone}</Button>
+              <Button mt={'lg'} size='md' color='green' radius={'lg'} variant='light' w={'100%'} leftSection={<IconPhone size={20} />}>{product.user.phone}</Button>
             </Flex>
+            <Button radius={'lg'} variant='outline' leftSection={<IconMessages />} onClick={handleStartChat} mt="md">
+              <Text>چت با {product.user.name}</Text>
+            </Button>
           </Card>
         </Grid.Col>
       </Grid>
@@ -186,6 +199,10 @@ const PageClient: FC<props> = ({ product }) => {
         <AdsRelated filteredAds={filteredAds} isFetchingAds={isFetchingAds} />
       )}
       <AdsGalleryModal image={product.image} openedImageModal={openedImageModal} selectedImage={selectedImage} setOpenedImageModal={setOpenedImageModal} />
+      <Modal opened={openedModal} onClose={closeModal} title="ورود / ثبت نام" >
+        <LoginModal close={closeModal} />
+      </Modal>
+
     </Container>
 
   )
