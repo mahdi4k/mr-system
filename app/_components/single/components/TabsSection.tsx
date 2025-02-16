@@ -27,7 +27,7 @@ const TabsSection: FC<Props> = ({ tabLists, tabPanels, defaultValue }) => {
 
 
     return (
-        <Tabs color="green" mt={'xl'} defaultValue={defaultValue}>
+        <Tabs color="green" defaultValue={defaultValue}>
             <Tabs.List>
                 {tabLists.map(item => (
                     <Tabs.Tab onClick={() => setKey(prev => prev + 1)} key={item.value} value={item.value} leftSection={<Image width={20} height={27} alt='' src={item.img} />}>

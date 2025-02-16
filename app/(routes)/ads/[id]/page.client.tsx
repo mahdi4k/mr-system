@@ -23,7 +23,7 @@ import LoginModal from '@/_components/loginModal/LoginModal';
 
 type props = {
   product: IAdsProps
-  token: string
+  token?: string
 }
 
 const PageClient: FC<props> = ({ product, token }) => {
