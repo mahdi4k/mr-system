@@ -6,8 +6,12 @@ import { CPU } from '@/_redux/services/cpuApi';
 import classes from '@/_cssModules/PcSection.module.css'
 import TabsSection from './components/TabsSection';
 import SingleProductImage from './components/SingleProductImage';
+import LinksProducts from './LinksProducts';
 
 const CpuSingle = ({ product }: { product: CPU }) => {
+  const torobLink = JSON.parse(product.links)[0];
+  const EmallsLink = JSON.parse(product.links)[1];
+
   return (
     <>
       <Grid mt={'xl'}>
@@ -31,26 +35,7 @@ const CpuSingle = ({ product }: { product: CPU }) => {
               <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
             </Group>
           </> : ''}
-          <Flex justify={'end'} mt={'xl'}>
-            {product.links && (
-              <Link href={JSON.parse(product.links)[0]} target='_blank'>
-                <Button ml={'lg'} px={'xs'} color='red'
-                  leftSection={<Image style={{ borderRadius: '100%' }}
-                    alt='torob-kiwi-part' width={20} height={20}
-                    src={'/torob.png'} />}
-                  variant='light' >مشاهده در ترب</Button>
-              </Link>
-            )}
-
-            {product.links && (
-              <Link href={JSON.parse(product.links)[1]} target='_blank'>
-                <Button color="indigo" px={'xs'}
-                  variant='light'
-                  leftSection={<Image style={{ borderRadius: '100%' }}
-                    alt='emalls-kiwi-part' width={20} height={20} src={'/emalls.png'} />} >مشاهده در ایمالز</Button>
-              </Link>
-            )}
-          </Flex>
+          <LinksProducts EmallsLink={EmallsLink} torobLink={torobLink} />
         </Grid.Col>
       </Grid>
     

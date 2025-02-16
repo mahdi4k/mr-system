@@ -7,13 +7,16 @@ import classes from '@/_cssModules/PcSection.module.css'
 import CardPartPrice from '../shared/CardPartPrice';
 import TabsSection from './components/TabsSection';
 import SingleProductImage from './components/SingleProductImage';
+import LinksProducts from './LinksProducts';
 
 const MotherboardSingle = ({ product }: { product: Motherboard }) => {
- 
+  const torobLink = JSON.parse(product.links)[0];
+  const EmallsLink = JSON.parse(product.links)[1];
+
   return (
     <>
       <Grid mt={'xl'}>
-      <SingleProductImage product={product} />
+        <SingleProductImage product={product} />
 
         <Grid.Col pr={{ base: 'xs', lg: 'xl' }} span={{ base: 12, lg: 8 }}>
           <Text fz={{ base: '18pt', lg: '28pt' }} fw={'bold'}> {product.name}</Text>
@@ -40,26 +43,8 @@ const MotherboardSingle = ({ product }: { product: Motherboard }) => {
               <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
             </Group>
           </> : ''}
-          <Flex justify={'end'} mt={'xl'}>
-            {product.links && (
-              <Link href={JSON.parse(product.links)[0]} target='_blank'>
-                <Button px={'xs'} color='red'
-                  leftSection={<Image style={{ borderRadius: '100%' }}
-                    alt='torob-kiwi-part' width={20} height={20}
-                    src={'/torob.png'} />}
-                  variant='light' >مشاهده در ترب</Button>
-              </Link>
-            )}
+          <LinksProducts EmallsLink={EmallsLink} torobLink={torobLink} />
 
-            {product.links && JSON.parse(product.links)[1] && (
-              <Link href={JSON.parse(product.links)[1]} target='_blank'>
-                <Button mr={'lg'} color="indigo" px={'xs'}
-                  variant='light'
-                  leftSection={<Image style={{ borderRadius: '100%' }}
-                    alt='emalls-kiwi-part' width={20} height={20} src={'/emalls.png'} />} >مشاهده در ایمالز</Button>
-              </Link>
-            )}
-          </Flex>
         </Grid.Col>
       </Grid>
       {/* tab section */}

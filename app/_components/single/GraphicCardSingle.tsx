@@ -6,9 +6,12 @@ import classes from '@/_cssModules/PcSection.module.css'
 import Link from 'next/link';
 import TabsSection from './components/TabsSection';
 import SingleProductImage from './components/SingleProductImage';
+import LinksProducts from './LinksProducts';
 
 const GraphicCardSingle = ({ product }: { product: Graphic }) => {
- 
+    const torobLink = JSON.parse(product.links)[0];
+    const EmallsLink = JSON.parse(product.links)[1];
+
     return (
         <>
             <Grid mt={'xl'}>
@@ -39,26 +42,8 @@ const GraphicCardSingle = ({ product }: { product: Graphic }) => {
                             <Image className={classes.tomanIcon} src={'/svg/toman.svg'} alt='kiwi part price' width={16} height={16} />
                         </Group>
                     </> : ''}
-                    <Flex justify={'end'} mt={'xl'}>
-                        {product.links && (
-                            <Link href={JSON.parse(product.links)[0]} target='_blank'>
-                                <Button ml={'lg'} px={'xs'} color='red'
-                                    leftSection={<Image style={{ borderRadius: '100%' }}
-                                        alt='torob-kiwi-part' width={20} height={20}
-                                        src={'/torob.png'} />}
-                                    variant='light' >مشاهده در ترب</Button>
-                            </Link>
-                        )}
+                    <LinksProducts EmallsLink={EmallsLink} torobLink={torobLink} />
 
-                        {product.links && (
-                            <Link href={JSON.parse(product.links)[1]} target='_blank'>
-                                <Button color="indigo" px={'xs'}
-                                    variant='light'
-                                    leftSection={<Image style={{ borderRadius: '100%' }}
-                                        alt='emalls-kiwi-part' width={20} height={20} src={'/emalls.png'} />} >مشاهده در ایمالز</Button>
-                            </Link>
-                        )}
-                    </Flex>
                 </Grid.Col>
             </Grid>
 
