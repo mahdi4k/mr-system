@@ -5,7 +5,9 @@ import { io, Socket } from 'socket.io-client';
 import { ScrollArea, Card, Text, Button, TextInput, Stack, Divider, Box, Flex, Container, Paper } from '@mantine/core';
 import { Apiconversation, Transaction } from 'api/conversations/route';
 import { UserResponse } from '@/_components/profile/UserDetail';
-
+import { useSearchParams } from 'next/navigation';
+import { formatJalaliTimeAgo } from '@/_utils/utils';
+import { IconArrowBack, IconArrowRight } from '@tabler/icons-react';
 
 
 interface Message {
@@ -18,11 +20,14 @@ interface Message {
 const ChatPage = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [conversations, setConversations] = useState<Apiconversation>();
-  const [selectedConversation, setSelectedConversation] = useState<Transaction | null>(null);
+  const [selectedConversation, setSelectedConversation] = useState<Transaction | undefined>();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [userData, setUserData] = useState<UserResponse>();
   const [error, setError] = useState(null);
+
+  const searchParams = useSearchParams();
+  const conversationId = searchParams.get('conversationId');
 
   // Connect to Socket.IO server
   useEffect(() => {
@@ -40,9 +45,13 @@ const ChatPage = () => {
     const fetchConversations = async () => {
       try {
         const response = await fetch('/api/conversations');
-        const data = await response.json();
-        console.log("🚀 ~ fetchConversations ~ data:", data)
+        const data: Apiconversation = await response.json();
+
         setConversations(data);
+        if (conversationId && data.data.length > 0) {
+          console.log(conversationId);
+          setSelectedConversation(data.data.find(item => item.id === Number(conversationId)))
+        }
       } catch (error) {
         console.error('Error fetching conversations:', error);
       }
@@ -87,7 +96,7 @@ const ChatPage = () => {
       try {
         const response = await fetch(`/api/conversations/${selectedConversation.id}/messages`);
         const data = await response.json();
-        console.log("🚀 ~ fetchMessages ~ data:", data)
+
         setMessages(data ? data : []);
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -150,20 +159,18 @@ const ChatPage = () => {
       <Paper withBorder>
         <Flex style={{ height: '80vh' }}>
           {/* Sidebar */}
-          <Box
+          <Box p={{ base: selectedConversation ? '0' : '16px', lg: '16px' }} w={{ base: selectedConversation ? '0' : '100%', lg: '25%' }}
             style={{
-              width: '25%',
-              backgroundColor: '#f5f5f5', // Matches bg-gray-100
-              borderRight: '1px solid #e0e0e0', // Matches border-r
-              padding: '16px', // Matches p-4
+              backgroundColor: 'light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-7))', // Matches bg-gray-100
+              borderLeft: '1px solid #e0e0e0', // Matches border-r
+              overflow: 'auto'
             }}
           >
-            <Text size="lg" fw={700} style={{ marginBottom: '16px' }}>
-              Conversations
-            </Text>
-            <ScrollArea>
+
+            <Flex direction={'column-reverse'}>
               {conversations?.data.map((conversation) => (
                 <Card
+                  w={'100%'}
                   key={conversation.id}
                   shadow="sm"
                   padding="md"
@@ -172,25 +179,30 @@ const ChatPage = () => {
                   style={{
                     marginBottom: '8px', // Matches mb-2
                     cursor: 'pointer',
-                    backgroundColor: selectedConversation?.id === conversation.id ? '#e3f2fd' : 'white', // Matches bg-blue-50
+                    backgroundColor: selectedConversation?.id === conversation.id ? 'light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-9))' : 'var(--mantine-color-body)', // Matches bg-blue-50
                   }}
                 >
-                  <Text>Ad ID: {conversation.product_id}</Text>
-                  <Text size="sm" color="dimmed">
-                    {new Date(conversation.created_at).toLocaleString()}
+                  <Text fz={'sm'}>{conversation.product.title}</Text>
+                  <Text size="sm" c="dimmed">
+                    {formatJalaliTimeAgo(conversation.created_at)}
                   </Text>
                 </Card>
               ))}
-            </ScrollArea>
+            </Flex>
           </Box>
 
           {/* Main Chat Area */}
-          <Box style={{ width: '75%', padding: '16px', display: 'flex', flexDirection: 'column' }}>
+          <Box p={{ base: '0', lg: '16px' }} w={{ base: selectedConversation ? '100%' : '0', lg: '75%' }} style={{ display: 'flex', flexDirection: 'column' }}>
             {selectedConversation ? (
               <>
-                <Text size="lg" fw={700} style={{ marginBottom: '16px' }}>
-                  Chat for Ad ID: {selectedConversation.product_id}
-                </Text>
+                <Flex pr={{ base: '10px' }} pt={{ base: '15px', lg: '0' }} align={'center'}>
+                  <Box onClick={()=> setSelectedConversation(undefined)} ml={'4px'} display={{base:'flex',lg:'none'}}>
+                    <IconArrowRight size={22} />
+                  </Box>
+                  <Text size="md" fw={700} >
+                    {selectedConversation.product.title}
+                  </Text>
+                </Flex>
                 <Divider my="sm" />
                 <ScrollArea style={{ flex: 1, marginBottom: '16px' }}>
                   <Stack>
@@ -207,14 +219,14 @@ const ChatPage = () => {
                           radius="md"
                           style={{
                             backgroundColor:
-                              message.sender_id === userData?.userData.id ? '#E3F2FD' : '#F5F5F5',
+                              message.sender_id === userData?.userData.id ? 'light-dark(#E3F2FD,  #041622)' : 'light-dark(#F5F5F5,  #053555)',
                             maxWidth: '60%',
                             textAlign: message.sender_id === userData?.userData.id ? 'right' : 'left',
                           }}
                         >
                           <Text>{message.content}</Text>
-                          <Text size="xs" color="dimmed">
-                            {new Date(message.created_at).toLocaleString()}
+                          <Text size="xs" c="dimmed">
+                            {formatJalaliTimeAgo(message.created_at)}
                           </Text>
                         </Card>
                       </Flex>
@@ -225,16 +237,16 @@ const ChatPage = () => {
                 {/* Send Message Input */}
                 <Box style={{ display: 'flex', gap: '8px' }}>
                   <TextInput
-                    placeholder="Type a message..."
+                    placeholder="متن خود را وارد کنید"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.currentTarget.value)}
                     style={{ flex: 1 }}
                   />
-                  <Button onClick={handleSendMessage}>Send</Button>
+                  <Button onClick={handleSendMessage}>ارسال</Button>
                 </Box>
               </>
             ) : (
-              <Text>Select a conversation to start chatting.</Text>
+              <Text></Text>
             )}
           </Box>
         </Flex>
