@@ -1,8 +1,9 @@
-import { Drawer, List, ThemeIcon, rem, Text } from '@mantine/core'
+import { Drawer, List, ThemeIcon, rem, Text, Flex } from '@mantine/core'
 import React, { FC } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import usePcparts from '@/_utils/customHook/usePcParts'
+import { IconX } from '@tabler/icons-react'
 
 type Props = {
   opened: boolean
@@ -15,7 +16,10 @@ const DrawerHeader: FC<Props> = ({ opened, close }) => {
   return (
     <div>
       <Drawer withCloseButton={false} position="left" size={'xs'} opened={opened} onClose={close} title="">
-        <Text mt={'lg'} mb={'lg'} fz={'xl'} fw={'bold'}>قطعات کامپیوتر</Text>
+        <Flex justify={'space-between'}>
+          <Text mt={'lg'}  fz={'xl'} fw={'bold'}>قطعات کامپیوتر</Text>
+          <IconX onClick={close} size={22} />
+        </Flex>
         <List
           spacing="md"
           size="sm"
@@ -201,7 +205,7 @@ const DrawerHeader: FC<Props> = ({ opened, close }) => {
             </List.Item>
           ))}
 
-           
+
         </List>
       </Drawer>
 
