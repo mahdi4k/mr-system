@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { ScrollArea, Card, Text, Button, TextInput, Stack, Divider, Box, Flex, Container, Paper } from '@mantine/core';
+import { ScrollArea, Card, Text, Button, TextInput, Stack, Divider, Box, Flex, Container, Paper, Alert, LoadingOverlay } from '@mantine/core';
 import { Apiconversation, Transaction } from 'api/conversations/route';
 import { UserResponse } from '@/_components/profile/UserDetail';
 import { useSearchParams } from 'next/navigation';
@@ -15,7 +15,7 @@ import styles from './Chat.module.css'
 interface Message {
   id: number;
   content: string;
-  sender_id: number;
+  user_id: number;
   created_at: string;
 }
 
@@ -27,7 +27,7 @@ const ChatPage = () => {
   const [newMessage, setNewMessage] = useState('');
   const [userData, setUserData] = useState<UserResponse>();
   const [error, setError] = useState(null);
-
+  const [loading,setLoading] = useState(false)
   const searchParams = useSearchParams();
   const conversationId = searchParams.get('conversationId');
 
@@ -45,10 +45,11 @@ const ChatPage = () => {
   // Fetch conversations on page load
   useEffect(() => {
     const fetchConversations = async () => {
+      setLoading(true)
       try {
         const response = await fetch('/api/conversations');
         const data: Apiconversation = await response.json();
-
+        setLoading(false)
         setConversations(data);
         if (conversationId && data.data.length > 0) {
           console.log(conversationId);
@@ -56,6 +57,7 @@ const ChatPage = () => {
         }
       } catch (error) {
         console.error('Error fetching conversations:', error);
+        setLoading(false)
       }
     };
 
@@ -88,6 +90,8 @@ const ChatPage = () => {
     };
     fetchUserData()
   }, [])
+  console.log("🚀 ~ ChatPage ~ userData:", userData);
+  console.log("🚀 ~ messages ~ userMessages:", messages);
 
 
   // Fetch messages for the selected conversation
@@ -156,8 +160,9 @@ const ChatPage = () => {
   };
 
   return (
-    <Container my={'lg'} styles={{ root: { flex: '1 0 auto', width: '100%' } }} size={'lg'}>
-
+    <Container pos="relative" my={'lg'} styles={{ root: { flex: '1 0 auto', width: '100%' } }} size={'lg'}>
+      <LoadingOverlay visible={loading} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
+      {conversations?.data && conversations?.data.length > 0 ? <Text fz={'h1'} mt={'xs'} mb={'md'}>پیام‌ها</Text> : ''} 
       <Paper withBorder>
         {conversations?.data && conversations?.data.length > 0 ? (
           <Flex style={{ height: '80vh' }}>
@@ -213,7 +218,7 @@ const ChatPage = () => {
                         <Flex
                           key={message.id}
                           justify={
-                            message.sender_id === userData?.userData.id ? 'flex-end' : 'flex-start'
+                            message.user_id === userData?.userData.id ? 'flex-start' : 'flex-end'
                           }
                         >
                           <Card
@@ -222,9 +227,9 @@ const ChatPage = () => {
                             radius="md"
                             style={{
                               backgroundColor:
-                                message.sender_id === userData?.userData.id ? 'light-dark(#E3F2FD,  #041622)' : 'light-dark(#F5F5F5,  #053555)',
+                                message.user_id === userData?.userData.id ? 'light-dark(#E3F2FD,  #041622)' : 'light-dark(#F5F5F5,  #053555)',
                               maxWidth: '60%',
-                              textAlign: message.sender_id === userData?.userData.id ? 'right' : 'left',
+                              textAlign: 'right',
                             }}
                           >
                             <Text>{message.content}</Text>
@@ -249,7 +254,7 @@ const ChatPage = () => {
                   </Box>
                 </>
               ) : (
-                <Text></Text>
+                <Alert display={{ base: 'none', lg: 'flex' }}>لطفا یک گفتگو انتخاب کنید</Alert>
               )}
             </Box>
           </Flex>
