@@ -1,0 +1,12 @@
+.imgNoDescription {
+    width: 50%;
+  }
+   
+  @media (max-width: $mantine-breakpoint-md) {
+    
+    .imgNoDescription {
+        width: 100%;
+        padding: 20px;
+    }
+  }
+  

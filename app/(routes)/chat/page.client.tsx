@@ -7,8 +7,10 @@ import { Apiconversation, Transaction } from 'api/conversations/route';
 import { UserResponse } from '@/_components/profile/UserDetail';
 import { useSearchParams } from 'next/navigation';
 import { formatJalaliTimeAgo } from '@/_utils/utils';
-import { IconArrowBack, IconArrowRight } from '@tabler/icons-react';
-
+import { IconArrowRight } from '@tabler/icons-react';
+import Image from 'next/image'
+import NoMessageSvg from '../../../public/svg/no-message.svg'
+import styles from './Chat.module.css'
 
 interface Message {
   id: number;
@@ -157,99 +159,115 @@ const ChatPage = () => {
     <Container my={'lg'} styles={{ root: { flex: '1 0 auto', width: '100%' } }} size={'lg'}>
 
       <Paper withBorder>
-        <Flex style={{ height: '80vh' }}>
-          {/* Sidebar */}
-          <Box p={{ base: selectedConversation ? '0' : '16px', lg: '16px' }} w={{ base: selectedConversation ? '0' : '100%', lg: '25%' }}
-            style={{
-              backgroundColor: 'light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-7))', // Matches bg-gray-100
-              borderLeft: '1px solid #e0e0e0', // Matches border-r
-              overflow: 'auto'
-            }}
-          >
+        {conversations?.data && conversations?.data.length > 0 ? (
+          <Flex style={{ height: '80vh' }}>
+            {/* Sidebar */}
+            <Box p={{ base: selectedConversation ? '0' : '16px', lg: '16px' }} w={{ base: selectedConversation ? '0' : '100%', lg: '25%' }}
+              style={{
+                backgroundColor: 'light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-7))', // Matches bg-gray-100
+                borderLeft: '1px solid #e0e0e0', // Matches border-r
+                overflow: 'auto'
+              }}
+            >
 
-            <Flex direction={'column-reverse'}>
-              {conversations?.data.map((conversation) => (
-                <Card
-                  w={'100%'}
-                  key={conversation.id}
-                  shadow="sm"
-                  padding="md"
-                  radius="md"
-                  onClick={() => setSelectedConversation(conversation)}
-                  style={{
-                    marginBottom: '8px', // Matches mb-2
-                    cursor: 'pointer',
-                    backgroundColor: selectedConversation?.id === conversation.id ? 'light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-9))' : 'var(--mantine-color-body)', // Matches bg-blue-50
-                  }}
-                >
-                  <Text fz={'sm'}>{conversation.product.title}</Text>
-                  <Text size="sm" c="dimmed">
-                    {formatJalaliTimeAgo(conversation.created_at)}
-                  </Text>
-                </Card>
-              ))}
-            </Flex>
-          </Box>
+              <Flex direction={'column-reverse'}>
+                {conversations?.data.map((conversation) => (
+                  <Card
+                    w={'100%'}
+                    key={conversation.id}
+                    shadow="sm"
+                    padding="md"
+                    radius="md"
+                    onClick={() => setSelectedConversation(conversation)}
+                    style={{
+                      marginBottom: '8px', // Matches mb-2
+                      cursor: 'pointer',
+                      backgroundColor: selectedConversation?.id === conversation.id ? 'light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-9))' : 'var(--mantine-color-body)', // Matches bg-blue-50
+                    }}
+                  >
+                    <Text fz={'sm'}>{conversation.product.title}</Text>
+                    <Text size="sm" c="dimmed">
+                      {formatJalaliTimeAgo(conversation.created_at)}
+                    </Text>
+                  </Card>
+                ))}
+              </Flex>
+            </Box>
 
-          {/* Main Chat Area */}
-          <Box p={{ base: '0', lg: '16px' }} w={{ base: selectedConversation ? '100%' : '0', lg: '75%' }} style={{ display: 'flex', flexDirection: 'column' }}>
-            {selectedConversation ? (
-              <>
-                <Flex pr={{ base: '10px' }} pt={{ base: '15px', lg: '0' }} align={'center'}>
-                  <Box onClick={()=> setSelectedConversation(undefined)} ml={'4px'} display={{base:'flex',lg:'none'}}>
-                    <IconArrowRight size={22} />
-                  </Box>
-                  <Text size="md" fw={700} >
-                    {selectedConversation.product.title}
-                  </Text>
-                </Flex>
-                <Divider my="sm" />
-                <ScrollArea style={{ flex: 1, marginBottom: '16px' }}>
-                  <Stack>
-                    {messages.map((message) => (
-                      <Flex
-                        key={message.id}
-                        justify={
-                          message.sender_id === userData?.userData.id ? 'flex-end' : 'flex-start'
-                        }
-                      >
-                        <Card
-                          shadow="sm"
-                          padding="md"
-                          radius="md"
-                          style={{
-                            backgroundColor:
-                              message.sender_id === userData?.userData.id ? 'light-dark(#E3F2FD,  #041622)' : 'light-dark(#F5F5F5,  #053555)',
-                            maxWidth: '60%',
-                            textAlign: message.sender_id === userData?.userData.id ? 'right' : 'left',
-                          }}
+            {/* Main Chat Area */}
+            <Box p={{ base: '0', lg: '16px' }} w={{ base: selectedConversation ? '100%' : '0', lg: '75%' }} style={{ display: 'flex', flexDirection: 'column' }}>
+              {selectedConversation ? (
+                <>
+                  <Flex pr={{ base: '10px' }} pt={{ base: '15px', lg: '0' }} align={'center'}>
+                    <Box onClick={() => setSelectedConversation(undefined)} ml={'4px'} display={{ base: 'flex', lg: 'none' }}>
+                      <IconArrowRight size={22} />
+                    </Box>
+                    <Text size="md" fw={700} >
+                      {selectedConversation.product.title}
+                    </Text>
+                  </Flex>
+                  <Divider my="sm" />
+                  <ScrollArea style={{ flex: 1, marginBottom: '16px' }}>
+                    <Stack>
+                      {messages.map((message) => (
+                        <Flex
+                          key={message.id}
+                          justify={
+                            message.sender_id === userData?.userData.id ? 'flex-end' : 'flex-start'
+                          }
                         >
-                          <Text>{message.content}</Text>
-                          <Text size="xs" c="dimmed">
-                            {formatJalaliTimeAgo(message.created_at)}
-                          </Text>
-                        </Card>
-                      </Flex>
-                    ))}
-                  </Stack>
-                </ScrollArea>
+                          <Card
+                            shadow="sm"
+                            padding="md"
+                            radius="md"
+                            style={{
+                              backgroundColor:
+                                message.sender_id === userData?.userData.id ? 'light-dark(#E3F2FD,  #041622)' : 'light-dark(#F5F5F5,  #053555)',
+                              maxWidth: '60%',
+                              textAlign: message.sender_id === userData?.userData.id ? 'right' : 'left',
+                            }}
+                          >
+                            <Text>{message.content}</Text>
+                            <Text size="xs" c="dimmed">
+                              {formatJalaliTimeAgo(message.created_at)}
+                            </Text>
+                          </Card>
+                        </Flex>
+                      ))}
+                    </Stack>
+                  </ScrollArea>
 
-                {/* Send Message Input */}
-                <Box style={{ display: 'flex', gap: '8px' }}>
-                  <TextInput
-                    placeholder="متن خود را وارد کنید"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.currentTarget.value)}
-                    style={{ flex: 1 }}
-                  />
-                  <Button onClick={handleSendMessage}>ارسال</Button>
-                </Box>
-              </>
-            ) : (
-              <Text></Text>
-            )}
-          </Box>
-        </Flex>
+                  {/* Send Message Input */}
+                  <Box style={{ display: 'flex', gap: '8px' }}>
+                    <TextInput
+                      placeholder="متن خود را وارد کنید"
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.currentTarget.value)}
+                      style={{ flex: 1 }}
+                    />
+                    <Button onClick={handleSendMessage}>ارسال</Button>
+                  </Box>
+                </>
+              ) : (
+                <Text></Text>
+              )}
+            </Box>
+          </Flex>
+        ) : (
+          <Flex py={'xl'} direction={'column'} justify={'center'} align={'center'}>
+            <Image alt='kiwipart no message'
+              sizes="100vw"
+              className={styles.imgNoDescription}
+              style={{
+                height: 'auto',
+              }} src={NoMessageSvg} />
+            <Text fw={'bold'} fz={'lg'} pt={'xl'}>چتی یافت نشد ...!!</Text>
+            <Text px={'md'} pt={'xs'} fz={'sm'} c={'dimmend'}>
+              با کلیک بروی دکمه «چت» در صفحه آگهی می‌توانید با دیگران گفتگو کنید.
+            </Text>
+          </Flex>
+        )}
+
       </Paper>
     </Container>
   );
