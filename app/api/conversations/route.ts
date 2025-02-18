@@ -27,7 +27,7 @@ interface Product {
     user_id: number;
     category_id: number;
     title: string;
-    image: string[]; // The string contains JSON, so it's parsed as an array
+    image: string; // The string contains JSON, so it's parsed as an array
     city: string;
     ostan: string;
     price: number | null;

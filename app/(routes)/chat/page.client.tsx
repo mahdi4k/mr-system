@@ -2,15 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { ScrollArea, Card, Text, Button, TextInput, Stack, Divider, Box, Flex, Container, Paper, Alert, LoadingOverlay } from '@mantine/core';
+import { ScrollArea, Card, Text, Button, TextInput, Stack, Divider, Box, Flex, Container, Paper, Alert, LoadingOverlay, ActionIcon } from '@mantine/core';
 import { Apiconversation, Transaction } from 'api/conversations/route';
 import { UserResponse } from '@/_components/profile/UserDetail';
 import { useSearchParams } from 'next/navigation';
 import { formatJalaliTimeAgo } from '@/_utils/utils';
-import { IconArrowRight } from '@tabler/icons-react';
+import { IconArrowRight, IconCircleArrowUpFilled } from '@tabler/icons-react';
 import Image from 'next/image'
 import NoMessageSvg from '../../../public/svg/no-message.svg'
 import styles from './Chat.module.css'
+import ImgNoProduct from '../../../public/no-product.png'
 
 interface Message {
   id: number;
@@ -27,7 +28,8 @@ const ChatPage = () => {
   const [newMessage, setNewMessage] = useState('');
   const [userData, setUserData] = useState<UserResponse>();
   const [error, setError] = useState(null);
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState(false);
   const searchParams = useSearchParams();
   const conversationId = searchParams.get('conversationId');
 
@@ -90,21 +92,20 @@ const ChatPage = () => {
     };
     fetchUserData()
   }, [])
-  console.log("🚀 ~ ChatPage ~ userData:", userData);
-  console.log("🚀 ~ messages ~ userMessages:", messages);
-
 
   // Fetch messages for the selected conversation
   useEffect(() => {
     if (!selectedConversation) return;
-
+    setLoadingMessage(true)
     const fetchMessages = async () => {
       try {
         const response = await fetch(`/api/conversations/${selectedConversation.id}/messages`);
         const data = await response.json();
 
         setMessages(data ? data : []);
+        setLoadingMessage(false)
       } catch (error) {
+        setLoadingMessage(false)
         console.error('Error fetching messages:', error);
       }
     };
@@ -159,10 +160,32 @@ const ChatPage = () => {
     }
   };
 
+  const handleImageAds = (image: string, title: string) => {
+
+    const images: string[] = JSON.parse(image);
+    if (images.length > 0) {
+      return (
+        <Image
+          alt={title}
+          style={{ borderRadius: '7px' }}
+          width={40}
+          height={40}
+          src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/storage/${images[0]}`}
+        />
+      );
+
+    } else {
+      return (
+        <Image style={{ objectFit: 'contain' }} width={40} height={40} alt='no img' src={ImgNoProduct} />
+      )
+    }
+  }
+
+
   return (
     <Container pos="relative" my={'lg'} styles={{ root: { flex: '1 0 auto', width: '100%' } }} size={'lg'}>
       <LoadingOverlay visible={loading} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
-      {conversations?.data && conversations?.data.length > 0 ? <Text fz={'h1'} mt={'xs'} mb={'md'}>پیام‌ها</Text> : ''} 
+      {conversations?.data && conversations?.data.length > 0 ? <Text fz={'h1'} mt={'xs'} mb={'md'}>پیام‌ها</Text> : ''}
       <Paper withBorder>
         {conversations?.data && conversations?.data.length > 0 ? (
           <Flex style={{ height: '80vh' }}>
@@ -190,10 +213,14 @@ const ChatPage = () => {
                       backgroundColor: selectedConversation?.id === conversation.id ? 'light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-9))' : 'var(--mantine-color-body)', // Matches bg-blue-50
                     }}
                   >
-                    <Text fz={'sm'}>{conversation.product.title}</Text>
-                    <Text size="sm" c="dimmed">
-                      {formatJalaliTimeAgo(conversation.created_at)}
-                    </Text>
+                    <Flex align={'center'} >
+                      {handleImageAds(conversation.product.image as string, conversation.product.title)}
+                      <Box>
+                        <Text fz={'sm'}>{conversation.product.title}</Text>
+                      </Box>
+                    </Flex>
+                    <Text fz={'xs'} c={'dimmed'} mt={'xs'}>{formatJalaliTimeAgo(conversation.created_at)}</Text>
+
                   </Card>
                 ))}
               </Flex>
@@ -207,12 +234,14 @@ const ChatPage = () => {
                     <Box onClick={() => setSelectedConversation(undefined)} ml={'4px'} display={{ base: 'flex', lg: 'none' }}>
                       <IconArrowRight size={22} />
                     </Box>
+                    {handleImageAds(selectedConversation.product.image as string, selectedConversation.product.title)}
                     <Text size="md" fw={700} >
                       {selectedConversation.product.title}
                     </Text>
                   </Flex>
                   <Divider my="sm" />
-                  <ScrollArea style={{ flex: 1, marginBottom: '16px' }}>
+                  <ScrollArea offsetScrollbars={true} pos={'relative'} style={{ flex: 1, marginBottom: '16px' }}>
+                    <LoadingOverlay visible={loadingMessage} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
                     <Stack>
                       {messages.map((message) => (
                         <Flex
@@ -222,6 +251,8 @@ const ChatPage = () => {
                           }
                         >
                           <Card
+                            mr={{ base: message.user_id === userData?.userData.id ? '10px' : '', lg: '0' }}
+                            ml={{ base: message.user_id === userData?.userData.id ? '0' : '10px', lg: '0' }}
                             shadow="sm"
                             padding="md"
                             radius="md"
@@ -244,13 +275,15 @@ const ChatPage = () => {
 
                   {/* Send Message Input */}
                   <Box style={{ display: 'flex', gap: '8px' }}>
+                  <ActionIcon variant='transparent'  size='compact-lg' onClick={handleSendMessage}><IconCircleArrowUpFilled size={22} /></ActionIcon>
                     <TextInput
+                      size='md'
                       placeholder="متن خود را وارد کنید"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.currentTarget.value)}
                       style={{ flex: 1 }}
                     />
-                    <Button onClick={handleSendMessage}>ارسال</Button>
+                    
                   </Box>
                 </>
               ) : (
@@ -271,10 +304,11 @@ const ChatPage = () => {
               با کلیک بروی دکمه «چت» در صفحه آگهی می‌توانید با دیگران گفتگو کنید.
             </Text>
           </Flex>
-        )}
+        )
+        }
 
-      </Paper>
-    </Container>
+      </Paper >
+    </Container >
   );
 };
 
