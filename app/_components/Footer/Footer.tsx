@@ -1,6 +1,6 @@
 "use client"
-import { Container, Group, ActionIcon, rem, Text, useMantineColorScheme } from '@mantine/core';
-import { IconBrandTwitter, IconBrandYoutube, IconBrandInstagram } from '@tabler/icons-react';
+import { Container, Group, ActionIcon, rem, Text, useMantineColorScheme, Flex } from '@mantine/core';
+import { IconBrandTwitter, IconBrandYoutube, IconBrandInstagram, IconBrandLinkedin, IconBrandTelegram, IconMail } from '@tabler/icons-react';
 import classes from './footer.module.css';
 import Image from 'next/image'
 import Link from 'next/link';
@@ -24,6 +24,14 @@ const data = [
             { label: 'مادربرد', link: '/category/motherboard' },
             { label: 'گرافیک', link: '/category/graphic' },
             { label: 'پاور', link: '/category/power' },
+        ],
+    },
+    {
+        title: 'تماس با ما',
+        links: [
+            { label: <Flex align={'center'}><IconBrandTelegram color='green' size={16} /><Text style={{fontFamily:'cursive'}} mr={'5px'} fz={'sm'}>kiwipart_support@</Text></Flex>, link: 'https://t.me/kiwi_part' },
+            { label: <Flex align={'center'}><IconMail color='green' size={16} /><Text style={{fontFamily:'cursive'}} mr={'5px'} fz={'sm'}>support@kiwipart.ir</Text></Flex>, link: 'mailto:support@kiwipart.ir' },
+ 
         ],
     },
 
@@ -79,19 +87,17 @@ export function Footer() {
             </Container>
             <Container className={classes.afterFooter}>
                 <Text c="dimmed" size="sm">
-                    © 2024 kiwi part. All rights reserved
+                    © 2025 kiwi part. All rights reserved
                 </Text>
 
                 <Group gap={0} className={classes.social} justify="flex-end" wrap="nowrap">
-                    <ActionIcon size="lg" color="gray" variant="subtle">
-                        <IconBrandTwitter size={18} stroke={1.5} />
+                    <ActionIcon component={Link} target='_blank' href={'https://www.linkedin.com/in/mahdi-falahati-b21045b8/'} size="lg" color="gray" variant="subtle">
+                        <IconBrandLinkedin size={18} stroke={1.5} />
+                    </ActionIcon> 
+                    <ActionIcon component={Link} target='_blank' href={'https://t.me/kiwi_part'} size="lg" color="gray" variant="subtle">
+                        <IconBrandTelegram size={18} stroke={1.5} />
                     </ActionIcon>
-                    <ActionIcon size="lg" color="gray" variant="subtle">
-                        <IconBrandYoutube size={18} stroke={1.5} />
-                    </ActionIcon>
-                    <ActionIcon size="lg" color="gray" variant="subtle">
-                        <IconBrandInstagram size={18} stroke={1.5} />
-                    </ActionIcon>
+                     
                 </Group>
             </Container>
         </footer>
