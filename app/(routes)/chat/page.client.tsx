@@ -213,6 +213,7 @@ const ChatPage = () => {
                       backgroundColor: selectedConversation?.id === conversation.id ? 'light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-9))' : 'var(--mantine-color-body)', // Matches bg-blue-50
                     }}
                   >
+                    <Text fz={'sm'} fw={'bold'} mb={'5px'}>{conversation.seller.name}</Text>
                     <Flex align={'center'} >
                       {handleImageAds(conversation.product.image as string, conversation.product.title)}
                       <Box>
@@ -230,6 +231,7 @@ const ChatPage = () => {
             <Box p={{ base: '0', lg: '16px' }} w={{ base: selectedConversation ? '100%' : '0', lg: '75%' }} style={{ display: 'flex', flexDirection: 'column' }}>
               {selectedConversation ? (
                 <>
+                  <Text pr={{ base: '10px' }} fz={'sm'} fw={'bold'} mb={'5px'}>{selectedConversation.seller.name}</Text>
                   <Flex pr={{ base: '10px' }} pt={{ base: '15px', lg: '0' }} align={'center'}>
                     <Box onClick={() => setSelectedConversation(undefined)} ml={'4px'} display={{ base: 'flex', lg: 'none' }}>
                       <IconArrowRight size={22} />
@@ -264,7 +266,7 @@ const ChatPage = () => {
                             }}
                           >
                             <Text>{message.content}</Text>
-                            <Text size="xs" c="dimmed">
+                            <Text size="11px" mt={'3px'} c="dimmed">
                               {formatJalaliTimeAgo(message.created_at)}
                             </Text>
                           </Card>
@@ -280,6 +282,11 @@ const ChatPage = () => {
                       size='md'
                       placeholder="متن خود را وارد کنید"
                       value={newMessage}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleSendMessage();
+                        }
+                      }}
                       onChange={(e) => setNewMessage(e.currentTarget.value)}
                       style={{ flex: 1 }}
                     />
