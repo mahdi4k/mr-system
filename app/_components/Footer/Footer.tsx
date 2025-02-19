@@ -29,9 +29,8 @@ const data = [
     {
         title: 'تماس با ما',
         links: [
-            { label: <Flex align={'center'}><IconBrandTelegram color='green' size={16} /><Text style={{fontFamily:'cursive'}} mr={'5px'} fz={'sm'}>kiwipart_support@</Text></Flex>, link: 'https://t.me/kiwi_part' },
-            { label: <Flex align={'center'}><IconMail color='green' size={16} /><Text style={{fontFamily:'cursive'}} mr={'5px'} fz={'sm'}>support@kiwipart.ir</Text></Flex>, link: 'mailto:support@kiwipart.ir' },
- 
+            { label: <Flex align={'center'}><IconBrandTelegram color='green' size={16} /><Text mr={'5px'} fz={'sm'}>kiwipart_support@</Text></Flex>, link: 'https://t.me/kiwi_part' },
+            { label: <Flex mt={'5px'} align={'center'}><IconMail color='green' size={16} /><Text mr={'5px'} fz={'sm'}>support@kiwipart.ir</Text></Flex>, link: 'mailto:support@kiwipart.ir' },
         ],
     },
 
