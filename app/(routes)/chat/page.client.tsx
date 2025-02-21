@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { ScrollArea, Card, Text, Button, TextInput, Stack, Divider, Box, Flex, Container, Paper, Alert, LoadingOverlay, ActionIcon } from '@mantine/core';
 import { Apiconversation, Transaction } from 'api/conversations/route';
@@ -32,13 +32,24 @@ const ChatPage = () => {
   const [loadingMessage, setLoadingMessage] = useState(false);
   const searchParams = useSearchParams();
   const conversationId = searchParams.get('conversationId');
+  const viewport = useRef<HTMLDivElement | null>(null);
 
   // Connect to Socket.IO server
   useEffect(() => {
-    const newSocket = io('http://localhost:4001'); // Update with your server URL
+    const newSocket = io('http://localhost:4001', {
+      transports: ['websocket', 'polling'],  // Ensure both transports work
+    });
+
+    newSocket.on('connect', () => {
+      console.log('✅ Connected to Socket.IO:', newSocket.id);
+    });
+
+    newSocket.on('connect_error', (err) => {
+      console.error('❌ Connection error:', err);
+    });
+
     setSocket(newSocket);
 
-    // Clean up on component unmount
     return () => {
       newSocket.disconnect();
     };
@@ -101,7 +112,7 @@ const ChatPage = () => {
       try {
         const response = await fetch(`/api/conversations/${selectedConversation.id}/messages`);
         const data = await response.json();
-
+        setTimeout(scrollToBottom, 100);
         setMessages(data ? data : []);
         setLoadingMessage(false)
       } catch (error) {
@@ -116,18 +127,30 @@ const ChatPage = () => {
   // Listen for real-time messages
   useEffect(() => {
     if (!socket || !selectedConversation) return;
+    console.log(`Joining conversation: ${selectedConversation.id}`);
+    if (!selectedConversation) {
+      console.warn("⚠️ selectedConversation is undefined!");
+      return;
+    }
+    socket.emit('joinConversation', { conversationId: selectedConversation.id });
 
-    socket.emit('joinConversation', selectedConversation.id);
-
-    socket.on('newMessage', (message: Message) => {
-      setMessages((prev) => [...prev, message]);
+    socket.on('newMessage', (message) => {
+      console.log('📥📩📩 New message received:', message);
+      setMessages((prev) => [...prev, message]); // Update messages state
     });
+    // Scroll to the bottom when a new message is added
+    setTimeout(scrollToBottom, 100);
 
     return () => {
       socket.emit('leaveConversation', selectedConversation.id);
       socket.off('newMessage');
     };
   }, [socket, selectedConversation]);
+
+  const scrollToBottom = () =>
+    viewport.current!.scrollTo({ top: viewport.current!.scrollHeight, behavior: 'smooth' });
+
+
 
   // Send a new message
   const handleSendMessage = async () => {
@@ -145,6 +168,9 @@ const ChatPage = () => {
       }
 
       const message = await response.json();
+      console.log("🚀 ~ handleSendMessage ~ message:", message)
+      // Scroll to the bottom when a new message is added
+      setTimeout(scrollToBottom, 100);
 
       // Emit the new message via Socket.IO
       socket?.emit('sendMessage', {
@@ -242,7 +268,7 @@ const ChatPage = () => {
                     </Text>
                   </Flex>
                   <Divider my="sm" />
-                  <ScrollArea offsetScrollbars={true} pos={'relative'} style={{ flex: 1, marginBottom: '16px' }}>
+                  <ScrollArea offsetScrollbars={true} viewportRef={viewport} pos={'relative'} style={{ flex: 1, marginBottom: '16px' }}>
                     <LoadingOverlay visible={loadingMessage} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
                     <Stack>
                       {messages.map((message) => (
@@ -273,11 +299,12 @@ const ChatPage = () => {
                         </Flex>
                       ))}
                     </Stack>
+                    
                   </ScrollArea>
 
                   {/* Send Message Input */}
                   <Box style={{ display: 'flex', gap: '8px' }}>
-                  <ActionIcon variant='transparent'  size='compact-lg' onClick={handleSendMessage}><IconCircleArrowUpFilled size={22} /></ActionIcon>
+                    <ActionIcon variant='transparent' size='compact-lg' onClick={handleSendMessage}><IconCircleArrowUpFilled size={22} /></ActionIcon>
                     <TextInput
                       size='md'
                       placeholder="متن خود را وارد کنید"
@@ -290,7 +317,7 @@ const ChatPage = () => {
                       onChange={(e) => setNewMessage(e.currentTarget.value)}
                       style={{ flex: 1 }}
                     />
-                    
+
                   </Box>
                 </>
               ) : (
