@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { ScrollArea, Card, Text, Button, TextInput, Stack, Divider, Box, Flex, Container, Paper, Alert, LoadingOverlay, ActionIcon } from '@mantine/core';
+import { ScrollArea, Card, Text, TextInput, Stack, Divider, Box, Flex, Container, Paper, Alert, LoadingOverlay, ActionIcon } from '@mantine/core';
 import { Apiconversation, Transaction } from 'api/conversations/route';
 import { UserResponse } from '@/_components/profile/UserDetail';
 import { useSearchParams } from 'next/navigation';
@@ -137,9 +137,10 @@ const ChatPage = () => {
     socket.on('newMessage', (message) => {
       console.log('📥📩📩 New message received:', message);
       setMessages((prev) => [...prev, message]); // Update messages state
+      setTimeout(scrollToBottom, 100);
     });
     // Scroll to the bottom when a new message is added
-    setTimeout(scrollToBottom, 100);
+
 
     return () => {
       socket.emit('leaveConversation', selectedConversation.id);
@@ -179,7 +180,7 @@ const ChatPage = () => {
       });
 
       // Update the message list
-      setMessages((prev) => [...prev, message]);
+      // setMessages((prev) => [...prev, message]);
       setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
@@ -219,7 +220,7 @@ const ChatPage = () => {
             <Box p={{ base: selectedConversation ? '0' : '16px', lg: '16px' }} w={{ base: selectedConversation ? '0' : '100%', lg: '25%' }}
               style={{
                 backgroundColor: 'light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-7))', // Matches bg-gray-100
-                borderLeft: '1px solid #e0e0e0', // Matches border-r
+                borderLeft: '1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))', // Matches border-r
                 overflow: 'auto'
               }}
             >
@@ -254,21 +255,28 @@ const ChatPage = () => {
             </Box>
 
             {/* Main Chat Area */}
-            <Box p={{ base: '0', lg: '16px' }} w={{ base: selectedConversation ? '100%' : '0', lg: '75%' }} style={{ display: 'flex', flexDirection: 'column' }}>
+            <Box w={{ base: selectedConversation ? '100%' : '0', lg: '75%' }} style={{ display: 'flex', flexDirection: 'column' }}>
               {selectedConversation ? (
                 <>
-                  <Text pr={{ base: '10px' }} fz={'sm'} fw={'bold'} mb={'5px'}>{selectedConversation.seller.name}</Text>
-                  <Flex pr={{ base: '10px' }} pt={{ base: '15px', lg: '0' }} align={'center'}>
-                    <Box onClick={() => setSelectedConversation(undefined)} ml={'4px'} display={{ base: 'flex', lg: 'none' }}>
-                      <IconArrowRight size={22} />
+                  <Flex pt={{ base: '20px', lg: '0' }} py={'xs'} pr={'lg'}
+                    bg={'light-dark(var(--mantine-color-green-0), var(--mantine-color-dark-8))'}>
+                    <Box
+                      onClick={() => setSelectedConversation(undefined)} ml={'4px'}
+                      display={{ base: 'flex', lg: 'none' }}>
+                      <IconArrowRight size={20} />
                     </Box>
+                    <Text fz={'13px'} >{selectedConversation.seller.name}</Text>
+                  </Flex>
+
+                  <Flex pr={{ base: '10px' }} pt={{ base: '10px', lg: '0' }} align={'center'}>
+
                     {handleImageAds(selectedConversation.product.image as string, selectedConversation.product.title)}
                     <Text size="md" fw={700} >
                       {selectedConversation.product.title}
                     </Text>
                   </Flex>
-                  <Divider my="sm" />
-                  <ScrollArea offsetScrollbars={true} viewportRef={viewport} pos={'relative'} style={{ flex: 1, marginBottom: '16px' }}>
+                  <Divider />
+                  <ScrollArea p={'md'} pb={'0'} offsetScrollbars={true} viewportRef={viewport} pos={'relative'} style={{ flex: 1, marginBottom: '16px' }}>
                     <LoadingOverlay visible={loadingMessage} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
                     <Stack>
                       {messages.map((message) => (
@@ -299,14 +307,14 @@ const ChatPage = () => {
                         </Flex>
                       ))}
                     </Stack>
-                    
+
                   </ScrollArea>
 
                   {/* Send Message Input */}
-                  <Box style={{ display: 'flex', gap: '8px' }}>
-                    <ActionIcon variant='transparent' size='compact-lg' onClick={handleSendMessage}><IconCircleArrowUpFilled size={22} /></ActionIcon>
-                    <TextInput
-                      size='md'
+                  <Box style={{ display: 'flex', gap: '8px', borderTop: '1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))' }}>
+                    <TextInput styles={{ input: { border: 'unset' } }}
+                      rightSection={<ActionIcon variant='transparent' size='compact-lg' onClick={handleSendMessage}><IconCircleArrowUpFilled size={22} /></ActionIcon>}
+                      size='lg'
                       placeholder="متن خود را وارد کنید"
                       value={newMessage}
                       onKeyDown={(e) => {
