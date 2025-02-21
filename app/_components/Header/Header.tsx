@@ -2,7 +2,7 @@
 import { Container, Text, Group, Burger, ActionIcon, useComputedColorScheme, useMantineColorScheme, Box, Center, HoverCard, SimpleGrid, UnstyledButton, rem, ThemeIcon, Flex, Modal } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import classes from './Header.module.css';
-import { IconSun, IconMoon, IconChevronDown, IconChartPie3, IconUserCircle } from '@tabler/icons-react';
+import { IconSun, IconMoon, IconChevronDown, IconChartPie3, IconUserCircle, IconBrandLine } from '@tabler/icons-react';
 import Link from "next/link";
 import UseLoading from "@/_utils/customHook/useLoading";
 import Image from 'next/image'
@@ -186,6 +186,10 @@ export function Header({ token }: { token?: string }) {
 
 
                 <Group gap={5} >
+                    <ActionIcon component={Link} href={'/chat'} onClick={handleAddAdsPage} size={'lg'} radius={'lg'} variant='transparent' ml={'md'}>
+                        <IconBrandLine size={24} />
+                    </ActionIcon>
+
                     <Group w={'27px'} justify="center">
                         {isLoading ? (<ActionIcon
                             onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
