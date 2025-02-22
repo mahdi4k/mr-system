@@ -4,14 +4,12 @@ const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
+
 const io = new Server(server, {
     cors: {
-        origin: '*',
-        methods: ["GET", "POST"],
-        credentials: true,
-    },
-    path: "/socket.io/", // Important for proxy support
-    transports: ['websocket', 'polling']
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
 });
 
 const PORT = 4001;
