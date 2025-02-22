@@ -14,7 +14,7 @@ const io = new Server(server, {
     transports: ['websocket', 'polling']
 });
 
-const PORT = 3000;
+const PORT = 4001;
 
 let onlineUsers = new Map();
 
