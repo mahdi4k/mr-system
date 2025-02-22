@@ -11,9 +11,10 @@ const io = new Server(server, {
         credentials: true,
     },
     path: "/socket.io/", // Important for proxy support
+    transports: ['websocket', 'polling']
 });
 
-const PORT = 4001;
+const PORT = 3000;
 
 let onlineUsers = new Map();
 
