@@ -58,7 +58,7 @@
 
 .root {
     background-color: var(--notification-color, var(--mantine-primary-color-filled)) !important;
-
+    color: white !important;
     &::before {
         background-color: var(--mantine-color-white);
     }
