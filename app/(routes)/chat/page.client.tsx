@@ -36,7 +36,7 @@ const ChatPage = () => {
 
   // Connect to Socket.IO server
   useEffect(() => {
-    const newSocket = io('wss://kiwipart.ir:31028', {
+    const newSocket = io('wss://c8399d78-fd40-48b2-8c76-d82fc0308b72.hsvc.ir', {
       path: "/socket.io/", // Ensure correct WebSocket path
       transports: ['websocket', 'polling'],
       secure: true,
