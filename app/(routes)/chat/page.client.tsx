@@ -246,7 +246,7 @@ const ChatPage = () => {
                     <Text fz={'sm'} fw={'bold'} mb={'5px'}>{conversation.seller.name}</Text>
                     <Flex align={'center'} >
                       {handleImageAds(conversation.product.image as string, conversation.product.title)}
-                      <Box>
+                      <Box mr={'xs'}>
                         <Text fz={'sm'}>{conversation.product.title}</Text>
                       </Box>
                     </Flex>
@@ -271,15 +271,15 @@ const ChatPage = () => {
                     <Text fz={'13px'} >{selectedConversation.seller.name}</Text>
                   </Flex>
 
-                  <Flex pr={{ base: '10px' }} pt={{ base: '10px', lg: '0' }} align={'center'}>
+                  <Flex p={{ base: '10px' }} align={'center'}>
 
                     {handleImageAds(selectedConversation.product.image as string, selectedConversation.product.title)}
-                    <Text size="md" fw={700} >
+                    <Text pr={'xs'} size="md" fw={700} >
                       {selectedConversation.product.title}
                     </Text>
                   </Flex>
                   <Divider />
-                  <ScrollArea p={'md'} pb={'0'} offsetScrollbars={true} viewportRef={viewport} pos={'relative'} style={{ flex: 1, marginBottom: '16px' }}>
+                  <ScrollArea p={'md'} pb={'0'} pl={{base:'0',lg:'sm'}} offsetScrollbars={true} viewportRef={viewport} pos={'relative'} style={{ flex: 1, marginBottom: '16px' }}>
                     <LoadingOverlay visible={loadingMessage} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
                     <Stack>
                       {messages.map((message) => (
@@ -290,8 +290,6 @@ const ChatPage = () => {
                           }
                         >
                           <Card
-                            mr={{ base: message.user_id === userData?.userData.id ? '10px' : '', lg: '0' }}
-                            ml={{ base: message.user_id === userData?.userData.id ? '0' : '10px', lg: '0' }}
                             shadow="sm"
                             padding="md"
                             radius="md"
@@ -332,7 +330,7 @@ const ChatPage = () => {
                   </Box>
                 </>
               ) : (
-                <Alert display={{ base: 'none', lg: 'flex' }}>لطفا یک گفتگو انتخاب کنید</Alert>
+                <Alert display={{ base: 'none', lg: 'flex' }}>لطفا یک گفت‌و‌گو انتخاب کنید</Alert>
               )}
             </Box>
           </Flex>
@@ -346,7 +344,7 @@ const ChatPage = () => {
               }} src={NoMessageSvg} />
             <Text fw={'bold'} fz={'lg'} pt={'xl'}>چتی یافت نشد ...!!</Text>
             <Text px={'md'} pt={'xs'} fz={'sm'} c={'dimmend'}>
-              با کلیک بروی دکمه «چت» در صفحه آگهی می‌توانید با دیگران گفتگو کنید.
+              با کلیک بروی دکمه «چت» در صفحه آگهی می‌توانید با دیگران گفت‌و‌گو کنید.
             </Text>
           </Flex>
         )
