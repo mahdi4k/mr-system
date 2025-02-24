@@ -36,6 +36,15 @@ export function Header({ token }: { token?: string }) {
             openModal()
         }
     }
+
+    const handleToChatPage = () => {
+
+        if (token || success) {
+            router.push('/chat', { scroll: true })
+        } else {
+            openModal()
+        }
+    }
     useEffect(() => {
         if (colorScheme === 'dark') {
             setLogoSrc('/logo-dark.png');
@@ -186,7 +195,7 @@ export function Header({ token }: { token?: string }) {
 
 
                 <Group gap={5} >
-                    <ActionIcon component={Link} href={'/chat'} onClick={handleAddAdsPage} size={'lg'} radius={'lg'} variant='transparent' ml={'md'}>
+                    <ActionIcon onClick={handleToChatPage} size={'lg'} radius={'lg'} variant='transparent' ml={'md'}>
                         <IconBrandLine size={24} />
                     </ActionIcon>
 

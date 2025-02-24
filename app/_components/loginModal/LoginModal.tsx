@@ -10,6 +10,7 @@ import { notifications } from '@mantine/notifications';
 import classes from '@/_components/adsSection/ads.module.css'
 import { useDispatch } from 'react-redux';
 import { setSuccessLogin } from '@/_redux/features/auth';
+import { convertToEnglishNumber } from '@/_utils/utils';
 
 
 export default function LoginModal({ onLoginSuccess, close, isAdsSection, setIsModalOpen }: {
@@ -151,6 +152,17 @@ export default function LoginModal({ onLoginSuccess, close, isAdsSection, setIsM
         }
     };
 
+    const handleNumberChange = (value: string) => {
+        // Convert Persian/Arabic digits to English digits
+        let inputValue = convertToEnglishNumber(value);
+        // Remove non-numeric characters (except commas for formatted values)
+        inputValue = inputValue.replace(/\D/g, '');
+
+        // Update the state
+        form.setFieldValue('phone', inputValue);
+    };
+
+
     return (
         <Box pos={'relative'} mb={'xs'} mx="auto" >
 
@@ -168,7 +180,9 @@ export default function LoginModal({ onLoginSuccess, close, isAdsSection, setIsM
                         data-autofocus
                         label="لطفاً شماره موبایلتان را وارد کنید"
                         placeholder=" شماره موبایل"
-                        {...form.getInputProps('phone')}
+                        value={form.values.phone}
+                        onChange={(event) => handleNumberChange(event.currentTarget.value)}
+
                         required
                         withAsterisk={false}
                         mb="md"
