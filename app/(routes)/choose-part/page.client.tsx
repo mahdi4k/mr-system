@@ -161,7 +161,7 @@ const PageClient: React.FC = () => {
                     graphicList={{ data: graphicList, isSuccessGraphicList, cpuData: cpuData?.data.graphics, powerData: powerData?.data.graphics }}
                     fanList={{ data: fanList, isSuccessFanList , cpuData:cpuData?.data.fans }}
                     ssdList={{ data: ssdList, isSuccessSsdList }}
-                    motherboardList={{ data: motherboardList, isSuccessMotherboardList, cpuData: cpuData?.data.motherboards }}
+                    motherboardList={{ data: motherboardList, isSuccessMotherboardList, cpuData: cpuData?.data.motherboards , ramData : ramData?.data.motherboards }}
                     close={close}
                     opened={opened} />
             </Suspense>

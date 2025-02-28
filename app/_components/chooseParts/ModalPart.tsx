@@ -21,9 +21,9 @@ type Props = {
     ramList: { data: RAM[] | undefined, isSuccessRamList: boolean, motherboardData: RAM[] | undefined, cpuData: RAM[] | undefined }
     caseList: { data: CASE[] | undefined, isSuccessCaseList: boolean }
     powerList: { data: POWER[] | undefined, isSuccessPowerList: boolean, graphicData: POWER[] | undefined }
-    graphicList: { data: Graphic[] | undefined, isSuccessGraphicList: boolean, cpuData: Graphic[] | undefined , powerData: Graphic[] | undefined }
+    graphicList: { data: Graphic[] | undefined, isSuccessGraphicList: boolean, cpuData: Graphic[] | undefined, powerData: Graphic[] | undefined }
     fanList: { data: FAN[] | undefined, isSuccessFanList: boolean, cpuData: FAN[] | undefined }
-    motherboardList: { data: Motherboard[] | undefined, isSuccessMotherboardList: boolean, cpuData: Motherboard[] | undefined }
+    motherboardList: { data: Motherboard[] | undefined, isSuccessMotherboardList: boolean, cpuData: Motherboard[] | undefined , ramData: Motherboard[] | undefined }
     type: string
 
 }
@@ -41,6 +41,13 @@ const ModalPart: FC<Props> = ({ opened, close, ssdList, cpuList, ramList, caseLi
     const [dataList, setDataList] = useState<dataProp[] | undefined>([]);
     const [modalTitle, setModalTitle] = useState('');
 
+    const searchParams = useSearchParams();
+
+    const cpuParam = searchParams.get('cpu');
+    const motherboardParam = searchParams.get('motherboard');
+    const ramParam = searchParams.get('ram');
+    const graphicParam = searchParams.get('graphic');
+    const powerParam = searchParams.get('power');
     useEffect(() => {
         if (opened) {
             setDataList([])
@@ -58,9 +65,9 @@ const ModalPart: FC<Props> = ({ opened, close, ssdList, cpuList, ramList, caseLi
                     setModalTitle('انتخاب ssd')
                     break
                 case 'cpu':
-                    if (cpuList.motherboardData) {
+                    if (motherboardParam && cpuList.motherboardData) {
                         setDataList(cpuList.motherboardData)
-                    } else if (cpuList.ramData) {
+                    } else if (ramParam && cpuList.ramData) {
                         setDataList(cpuList.ramData)
                     } else if (cpuList.isSuccessCpuList) {
                         setDataList(cpuList.data)
@@ -68,9 +75,9 @@ const ModalPart: FC<Props> = ({ opened, close, ssdList, cpuList, ramList, caseLi
                     setModalTitle('انتخاب cpu')
                     break
                 case 'ram':
-                    if (ramList.motherboardData) {
+                    if (motherboardParam && ramList.motherboardData) {
                         setDataList(ramList.motherboardData)
-                    } else if (ramList.cpuData) {
+                    } else if (cpuParam && ramList.cpuData) {
                         setDataList(ramList.cpuData)
                     } else if (ramList.isSuccessRamList) {
                         setDataList(ramList.data)
@@ -83,7 +90,7 @@ const ModalPart: FC<Props> = ({ opened, close, ssdList, cpuList, ramList, caseLi
                     setModalTitle('انتخاب کیس')
                     break
                 case 'power':
-                    if (powerList.graphicData) {
+                    if (graphicParam && powerList.graphicData) {
                         setDataList(powerList.graphicData)
                     } else if (powerList.isSuccessPowerList) {
                         setDataList(powerList.data)
@@ -92,11 +99,11 @@ const ModalPart: FC<Props> = ({ opened, close, ssdList, cpuList, ramList, caseLi
                     setModalTitle('انتخاب پاور')
                     break
                 case 'graphic':
-                    if (graphicList.cpuData) {
+                    if (cpuParam && graphicList.cpuData) {
                         setDataList(graphicList.cpuData)
-                    }else if(graphicList.powerData){
+                    } else if (powerParam && graphicList.powerData) {
                         setDataList(graphicList.powerData)
-                    } 
+                    }
                     else if (graphicList.isSuccessGraphicList) {
                         setDataList(graphicList.data)
                     }
@@ -104,15 +111,17 @@ const ModalPart: FC<Props> = ({ opened, close, ssdList, cpuList, ramList, caseLi
                     setModalTitle('انتخاب کارت گرافیک')
                     break
                 case 'fan':
-                    if (fanList.cpuData) {
+                    if (cpuParam && fanList.cpuData) {
                         setDataList(fanList.cpuData)
                     } else if (fanList.isSuccessFanList)
                         setDataList(fanList.data)
                     setModalTitle('انتخاب فن')
                     break
                 case 'motherboard':
-                    if (motherboardList.cpuData) {
+                    if (cpuParam && motherboardList.cpuData) {
                         setDataList(motherboardList.cpuData)
+                    } else if (ramParam && motherboardList.ramData) {
+                        setDataList(motherboardList.ramData)
                     } else if (motherboardList.isSuccessMotherboardList) {
                         setDataList(motherboardList.data)
                     }
@@ -124,7 +133,6 @@ const ModalPart: FC<Props> = ({ opened, close, ssdList, cpuList, ramList, caseLi
     }, [type, cpuList, caseList, fanList, graphicList, powerList, ramList, ssdList])
 
     const router = useRouter();
-    const searchParams = useSearchParams();
 
 
     const handleCardClick = (id: number) => {
