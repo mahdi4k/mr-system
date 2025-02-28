@@ -78,21 +78,21 @@ const PageClient: React.FC = () => {
 
                 <Container mb={'100px'} mt={'60px'} styles={{ root: { flex: '1 0 auto' } }} size={'lg'}>
                     <Text px={'sm'} mb={'50px'} fw={'bold'} fz={'xl'} ta={'center'}>هوشمندانه انتخاب کنید </Text>
-                    <SimpleGrid spacing={{ base: 'sm', lg: 'xl' }} verticalSpacing={{ base: 'sm', lg: 'xl' }} style={{ justifyItems: 'center' }} cols={{ base: 2, sm: 2, lg: 4 }}
+                    <SimpleGrid spacing={{ base: 'sm', lg: 'xl' }} verticalSpacing={{ base: 'sm', lg: 'xl' }} style={{ justifyItems: 'center' }} cols={{ base: 2, sm: 4 }}
                     >
                         <Box pos="relative" className='cursor-pointer' onClick={() => handleModalOpen(cpuListQuery, 'cpu')}>
                             <LoadingOverlay visible={isFetchingCpu} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
                             <ChoosePartItem itemData={cpuData?.data} partEmpty={isPartEmpty.cpu} svg={'/svg/cpu.svg'} title='cpu' type='cpu' />
                         </Box>
 
-                        <Box pos="relative" className='cursor-pointer' onClick={() => handleModalOpen(graphicListQuery, 'graphic')}>
-                            <LoadingOverlay visible={isFetchingGraphic} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
-                            <ChoosePartItem itemData={graphicData?.data} partEmpty={isPartEmpty.graphic} svg={'/svg/graphic.svg'} type='graphic' title='graphic' />
-                        </Box>
-
                         <Box pos="relative" className='cursor-pointer' onClick={() => handleModalOpen(motherboardListQuery, 'motherboard')}>
                             <LoadingOverlay visible={isFetchingMotherboard} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
                             <ChoosePartItem itemData={motherboardData?.data} partEmpty={isPartEmpty.motherboard} svg={'/svg/motherboard.svg'} type='motherboard' title='motherboard' />
+                        </Box>
+
+                        <Box pos="relative" className='cursor-pointer' onClick={() => handleModalOpen(graphicListQuery, 'graphic')}>
+                            <LoadingOverlay visible={isFetchingGraphic} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
+                            <ChoosePartItem itemData={graphicData?.data} partEmpty={isPartEmpty.graphic} svg={'/svg/graphic.svg'} type='graphic' title='graphic' />
                         </Box>
 
                         <Box pos="relative" className='cursor-pointer' onClick={() => handleModalOpen(powerListQuery, 'power')}>
