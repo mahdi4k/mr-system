@@ -81,43 +81,43 @@ const PageClient: React.FC = () => {
                     <SimpleGrid spacing={{ base: 'sm', lg: 'xl' }} verticalSpacing={{ base: 'sm', lg: 'xl' }} style={{ justifyItems: 'center' }} cols={{ base: 2, sm: 4 }}
                     >
                         <Box pos="relative" className='cursor-pointer' onClick={() => handleModalOpen(cpuListQuery, 'cpu')}>
-                            <LoadingOverlay visible={isFetchingCpu} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
+                            <LoadingOverlay visible={selectedType === 'cpu' && isFetchingCpu} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
                             <ChoosePartItem itemData={cpuData?.data} partEmpty={isPartEmpty.cpu} svg={'/svg/cpu.svg'} title='cpu' type='cpu' />
                         </Box>
 
                         <Box pos="relative" className='cursor-pointer' onClick={() => handleModalOpen(motherboardListQuery, 'motherboard')}>
-                            <LoadingOverlay visible={isFetchingMotherboard} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
+                            <LoadingOverlay visible={selectedType === 'motherboard' && isFetchingMotherboard} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
                             <ChoosePartItem itemData={motherboardData?.data} partEmpty={isPartEmpty.motherboard} svg={'/svg/motherboard.svg'} type='motherboard' title='motherboard' />
                         </Box>
 
                         <Box pos="relative" className='cursor-pointer' onClick={() => handleModalOpen(graphicListQuery, 'graphic')}>
-                            <LoadingOverlay visible={isFetchingGraphic} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
+                            <LoadingOverlay visible={selectedType === 'graphic' && isFetchingGraphic} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
                             <ChoosePartItem itemData={graphicData?.data} partEmpty={isPartEmpty.graphic} svg={'/svg/graphic.svg'} type='graphic' title='graphic' />
                         </Box>
 
                         <Box pos="relative" className='cursor-pointer' onClick={() => handleModalOpen(powerListQuery, 'power')}>
-                            <LoadingOverlay visible={isFetchingPower} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
+                            <LoadingOverlay visible={selectedType === 'power' && isFetchingPower} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
                             <ChoosePartItem itemData={powerData?.data} partEmpty={isPartEmpty.power} svg={'/svg/power.svg'} type='power' title='power' />
                         </Box>
 
                         <Box pos="relative" className='cursor-pointer' onClick={() => handleModalOpen(ramListQuery, 'ram')}>
-                            <LoadingOverlay visible={isFetchingRam} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
+                            <LoadingOverlay visible={selectedType === 'ram' && isFetchingRam} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
                             <ChoosePartItem itemData={ramData?.data} partEmpty={isPartEmpty.ram} svg={'/svg/ram.svg'} type='ram' title='رم' />
 
                         </Box>
 
                         <Box pos="relative" className='cursor-pointer' onClick={() => handleModalOpen(fanListQuery, 'fan')}>
-                            <LoadingOverlay visible={isFetchingFan} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
+                            <LoadingOverlay visible={selectedType === 'fan' && isFetchingFan} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
                             <ChoosePartItem itemData={fanData?.data} partEmpty={isPartEmpty.fan} svg={'/svg/fan.svg'} type='fan' title='فن' />
                         </Box>
 
                         <Box pos="relative" className='cursor-pointer' onClick={() => handleModalOpen(ssdListQuery, 'ssd')}>
-                            <LoadingOverlay visible={isFetchingSsd} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
+                            <LoadingOverlay visible={selectedType === 'ssd' && isFetchingSsd} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
                             <ChoosePartItem itemData={ssdData?.data} partEmpty={isPartEmpty.ssd} svg={'/svg/ssd.svg'} type='ssd' title='ssd' />
                         </Box>
 
                         <Box pos="relative" className='cursor-pointer' onClick={() => handleModalOpen(caseListQuery, 'case')}>
-                            <LoadingOverlay visible={isFetchingCase} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
+                            <LoadingOverlay visible={selectedType === 'case' && isFetchingCase} zIndex={1000} loaderProps={{ color: 'green', type: 'bars' }} overlayProps={{ radius: "sm", blur: 2 }} />
                             <ChoosePartItem itemData={caseData?.data} partEmpty={isPartEmpty.case} svg={'/svg/case.svg'} type='case' title='کیس' />
                         </Box>
                     </SimpleGrid>
