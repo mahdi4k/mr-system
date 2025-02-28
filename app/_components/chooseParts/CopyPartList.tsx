@@ -52,6 +52,16 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
     const searchParams = useSearchParams();
 
 
+    const cpuParam = searchParams.get('cpu');
+    const motherboardParam = searchParams.get('motherboard');
+    const ramParam = searchParams.get('ram');
+    const graphicParam = searchParams.get('graphic');
+    const powerParam = searchParams.get('power');
+    const ssdParam = searchParams.get('ssd');
+    const fanParam = searchParams.get('fan');
+    const caseParam = searchParams.get('case');
+
+
     const hasParts = searchParams.has('motherboard') ||
         searchParams.has('cpu') || searchParams.has('graphic') || searchParams.has('power') || searchParams.has('ram') ||
         searchParams.has('fan') || searchParams.has('ssd') || searchParams.has('case');
@@ -112,7 +122,7 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                         </Box>
                     </Flex>
                     <Stack mt={'sm'} gap={'sm'}>
-                        {isSuccessMotherboardData ? (
+                        {isSuccessMotherboardData && motherboardParam ? (
                             <Flex
                                 hidden={!searchParams.has('motherboard')}
                                 justify="space-between"
@@ -125,8 +135,8 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                                     <Text truncate="start" fw={'bold'} fz={'xs'}>{removePersianWords(motherboardData?.data.name as string)}</Text>
                                 </Box>
                             </Flex>
-                        ) : <Skeleton height={15} mt={16} radius="md" />}
-                        {isSuccessCpu ? (
+                        ) : ''}
+                        {isSuccessCpu && cpuParam ? (
                             <Flex
                                 hidden={!searchParams.has('cpu')}
                                 justify="space-between"
@@ -139,8 +149,8 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                                     <Text truncate="start" fw={'bold'} fz={'xs'}>{removePersianWords(cpuData?.data.name as string)}</Text>
                                 </Box>
                             </Flex>
-                        ) : <Skeleton height={15} mt={10} radius="md" />}
-                        {isSuccessGraphic ? (
+                        ) : ''}
+                        {isSuccessGraphic && graphicParam ? (
                             <Flex
                                 hidden={!searchParams.has('graphic')}
                                 justify="space-between"
@@ -153,8 +163,8 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                                     <Text truncate="start" fw={'bold'} fz={'xs'}>{removePersianWords(graphicData?.data.name as string)}</Text>
                                 </Box>
                             </Flex>
-                        ) : <Skeleton height={15} mt={10} radius="md" />}
-                        {isSuccessPower ? (
+                        ) : ''}
+                        {isSuccessPower && powerParam ? (
                             <Flex
                                 hidden={!searchParams.has('power')}
                                 justify="space-between"
@@ -167,8 +177,8 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                                     <Text truncate="start" fz={'xs'} fw={'bold'}>{removePersianWords(powerData?.data.name as string)}</Text>
                                 </Box>
                             </Flex>
-                        ) : <Skeleton height={15} mt={10} radius="md" />}
-                        {isSuccessRam ? (
+                        ) : ''}
+                        {isSuccessRam && ramParam ? (
                             <Flex
                                 hidden={!searchParams.has('ram')}
                                 justify="space-between"
@@ -181,8 +191,8 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                                     <Text truncate="start" fz={'xs'} fw={'bold'}>{removePersianWords(ramData?.data.name as string)}</Text>
                                 </Box>
                             </Flex>
-                        ) : <Skeleton height={15} mt={10} radius="md" />}
-                        {isSuccessFan ? (
+                        ) : ''}
+                        {isSuccessFan && fanParam ? (
                             <Flex
                                 hidden={!searchParams.has('fan')}
                                 justify="space-between"
@@ -195,8 +205,8 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                                     <Text truncate="start" hidden={!searchParams.has('fan')} fz={'xs'} fw={'bold'}>{removePersianWords(fanData?.data.name as string)}</Text>
                                 </Box>
                             </Flex>
-                        ) : <Skeleton height={15} mt={10} radius="md" />}
-                        {isSuccessSsd ? (
+                        ) : ''}
+                        {isSuccessSsd && ssdParam ? (
                             <Flex
                                 hidden={!searchParams.has('ssd')}
                                 justify="space-between"
@@ -209,8 +219,8 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                                     <Text truncate="start" fz={'xs'} fw={'bold'}>{removePersianWords(ssdData?.data.name as string)}</Text>
                                 </Box>
                             </Flex>
-                        ) : <Skeleton height={15} mt={10} radius="md" />}
-                        {isSuccessCase ? (
+                        ) : ''}
+                        {isSuccessCase && caseParam ? (
                             <Flex
                                 hidden={!searchParams.has('case')}
                                 justify="space-between"
@@ -222,7 +232,7 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                                 <Box w={215}>
                                     <Text truncate="start" fz={'xs'} fw={'bold'}>{removePersianWords(caseData?.data.name as string)}</Text>
                                 </Box>
-                            </Flex>) : <Skeleton height={15} mt={10} radius="md" />}
+                            </Flex>) : ''}
                     </Stack>
                 </Card>
             )}
