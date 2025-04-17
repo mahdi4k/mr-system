@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"next dev\" \"yarn server\"",
+    "dev": "next dev",
     "build": "next build",
     "analyze": "ANALYZE=true next build",
     "start": "next start",
