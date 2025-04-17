@@ -55,8 +55,8 @@ export default function LoginModal({ onLoginSuccess, close, isAdsSection, setIsM
             phone: ''
         },
         validate: {
-            code: (value) => value ? (value.length !== 6 ? 'code not complete' : null) : null,
-            phone: (value) =>
+            code: (value: string) => value ? (value.length !== 6 ? 'code not complete' : null) : null,
+            phone: (value: string) =>
                 /^0?(9\d{9})$/.test(value)
                     ? null
                     : 'شماره موبایل وارد شده معتبر نمی‌باشد',
