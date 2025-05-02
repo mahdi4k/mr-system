@@ -177,6 +177,8 @@ export default function LoginModal({ onLoginSuccess, close, isAdsSection, setIsM
             {!otpSent ? (
                 <form onSubmit={form.onSubmit(handlePhoneSubmit)}>
                     <TextInput
+                        mt={'xl'}
+                        size='md'
                         data-autofocus
                         label="لطفاً شماره موبایلتان را وارد کنید"
                         placeholder=" شماره موبایل"
@@ -188,7 +190,7 @@ export default function LoginModal({ onLoginSuccess, close, isAdsSection, setIsM
                         mb="md"
                     />
                     <Group w={'100%'} align='center'>
-                        <Button color='var(--mantine-color-kiwi-9)' w={'100%'} type="submit">ارسال کد</Button>
+                        <Button size='md' color='var(--mantine-color-kiwi-9)' w={'100%'} type="submit">ارسال کد</Button>
                     </Group>
                 </form>
             ) : (

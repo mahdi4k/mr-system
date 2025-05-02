@@ -44,7 +44,7 @@ const Page = () => {
                     <LoginModal
                         style={{ width: '348px', padding: '23px', borderRadius: '10px', border: '1px solid #a0bb5f' }}
                         onLoginSuccess={handleLoginSuccess}
-                        isAdsSection={true}
+                        isAdsSection={false}
                         setIsModalOpen={setIsModalOpen}
                         close={HandleModalLoginOpen}
                     />
