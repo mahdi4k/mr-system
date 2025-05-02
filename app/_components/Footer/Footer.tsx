@@ -5,6 +5,7 @@ import classes from './footer.module.css';
 import Image from 'next/image'
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 
 const data = [
@@ -40,7 +41,9 @@ export function Footer() {
     const { setColorScheme, colorScheme } = useMantineColorScheme();
     const [logoSrc, setLogoSrc] = useState<string | null>(null); // Default to null
 
-
+    const pathname = usePathname();
+    const hideHeaderFooter = pathname === '/login';
+  
      useEffect(() => {
             if (colorScheme === 'dark') {
                 setLogoSrc('/logo-dark.png');
@@ -73,7 +76,7 @@ export function Footer() {
         );
     });
     return (
-        <footer className={classes.footer}>
+        <footer style={{display:hideHeaderFooter ? 'none' : 'block'}} className={classes.footer}>
             <Container size={'lg'} className={classes.inner}>
                 <div className={classes.logo}>
                     <Image style={{ objectFit: 'contain' }} alt='kiwi part' src={logoSrc} width={80} height={40} />

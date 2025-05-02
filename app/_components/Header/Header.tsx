@@ -9,7 +9,7 @@ import Image from 'next/image'
 import DrawerHeader from './Drawer';
 import LoginModal from '../loginModal/LoginModal';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux';
 import { RootState } from '@/_redux/store';
 
@@ -23,6 +23,8 @@ export function Header({ token }: { token?: string }) {
     const success = useSelector((state: RootState) => state.auth.success);
     const [logoSrc, setLogoSrc] = useState<string | null>(null); // Default to null
 
+    const pathname = usePathname();
+    const hideHeaderFooter = pathname === '/login';
 
     useEffect(() => {
         router.prefetch('/profile');
@@ -60,7 +62,7 @@ export function Header({ token }: { token?: string }) {
 
     return (
 
-        <header className={`${classes.header} main-header`}>
+        <header style={{ display: hideHeaderFooter ? 'none' : 'block' }} className={`${classes.header} main-header`}>
             <Container size="lg" className={classes.inner}>
                 <Burger opened={opened} onClick={open} hiddenFrom="xs" size="sm" />
 
@@ -210,9 +212,11 @@ export function Header({ token }: { token?: string }) {
                             {computedColorScheme === 'light' ? <IconMoon /> : <IconSun />}
                         </ActionIcon>) : ''}
                     </Group>
-                    <ActionIcon onClick={handleAddAdsPage} size={'lg'} radius={'lg'} variant='light' mr={'lg'}>
-                        <IconUserCircle size={24} />
-                    </ActionIcon>
+                    <Link href={'/login'} >
+                        <ActionIcon size={'lg'} radius={'lg'} variant='light' mr={'lg'}>
+                            <IconUserCircle size={24} />
+                        </ActionIcon>
+                    </Link>
                 </Group>
             </Container>
             <DrawerHeader opened={opened} close={close} />
