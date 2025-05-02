@@ -60,13 +60,13 @@
     background-color: var(--notification-color, var(--mantine-primary-color-filled)) !important;
     color: white !important;
     &::before {
-        background-color: var(--mantine-color-white);
+        background-color:  white !important;
     }
 }
 
 .description,
 .title {
-    color: var(--mantine-color-white);
+    color: white !important;
 }
 
 .closeButton {
