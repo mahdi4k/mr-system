@@ -13,8 +13,8 @@ import { setSuccessLogin } from '@/_redux/features/auth';
 import { convertToEnglishNumber } from '@/_utils/utils';
 
 
-export default function LoginModal({ onLoginSuccess, close, isAdsSection, setIsModalOpen }: {
-    onLoginSuccess?: () => void, close: () => void, isAdsSection?: boolean, setIsModalOpen?: Dispatch<SetStateAction<boolean>>
+export default function LoginModal({ onLoginSuccess, close, isAdsSection, setIsModalOpen , style }: {
+    style?: React.CSSProperties, onLoginSuccess?: () => void, close: () => void, isAdsSection?: boolean, setIsModalOpen?: Dispatch<SetStateAction<boolean>>
 }) {
     const [otpSent, setOtpSent] = useState<boolean>(false);
     const [showErrorOtp, setShowErrorOtp] = useState<boolean>(false);
@@ -164,7 +164,7 @@ export default function LoginModal({ onLoginSuccess, close, isAdsSection, setIsM
 
 
     return (
-        <Box pos={'relative'} mb={'xs'} mx="auto" >
+        <Box style={style} pos={'relative'} mb={'xs'} mx="auto" >
 
             {!otpSent && <Flex pos={'relative'} top={'-3px'} mb={'lg'} align={'center'} justify={'center'}>
                 <Image style={{ objectFit: 'contain' }} alt='kiwi part' src={colorScheme === 'dark' ? '/logo-dark.png' : '/logo.png'} width={180} height={60} />
