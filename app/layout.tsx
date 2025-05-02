@@ -10,7 +10,6 @@ import { Header } from "@/_components/Header/Header";
 import { Footer } from "@/_components/Footer/Footer";
 import Providers from "./(routes)/dashboard/Provider";
 import NextTopLoader from "nextjs-toploader";
-import { GoogleAnalytics  } from '@next/third-parties/google'
 import './global.css'
 import { cookies } from 'next/headers';
 
@@ -39,13 +38,12 @@ export const metadata = {
   description: "kiwi-part pc building",
 };
 
-export default function RootLayout({ children }: { children: any }) {
+export default function RootLayout({ children ,modal}: { children: any ,modal:any}) {
 
   const token = cookies().get('authToken')?.value;
 
   return (
     <html style={{height:'100%'}} dir="rtl" lang="en" className={`${vazirmatn.variable} ${vibes.variable}`}>
-      <GoogleAnalytics gaId={`${process.env.NEXT_PUBLIC_GTAG_ID}`} />
       <head>
         <ColorSchemeScript />
         <link rel="shortcut icon" href="/favicon.ico" />
@@ -63,6 +61,8 @@ export default function RootLayout({ children }: { children: any }) {
               <Providers>
                 <Header token={token}/>
                 {children}
+                {modal}
+
                 <Footer />
               </Providers>
             </ReduxProviders>
