@@ -35,7 +35,7 @@ export function Header({ token }: { token?: string }) {
         if (token || success) {
             router.push('/profile', { scroll: true })
         } else {
-            openModal()
+            router.push('/login', { scroll: true })
         }
     }
 
@@ -212,11 +212,11 @@ export function Header({ token }: { token?: string }) {
                             {computedColorScheme === 'light' ? <IconMoon /> : <IconSun />}
                         </ActionIcon>) : ''}
                     </Group>
-                    <Link href={'/login'} >
-                        <ActionIcon size={'lg'} radius={'lg'} variant='light' mr={'lg'}>
-                            <IconUserCircle size={24} />
-                        </ActionIcon>
-                    </Link>
+
+                    <ActionIcon onClick={handleAddAdsPage} size={'lg'} radius={'lg'} variant='light' mr={'lg'}>
+                        <IconUserCircle size={24} />
+                    </ActionIcon>
+
                 </Group>
             </Container>
             <DrawerHeader opened={opened} close={close} />

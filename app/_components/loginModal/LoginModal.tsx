@@ -13,7 +13,7 @@ import { setSuccessLogin } from '@/_redux/features/auth';
 import { convertToEnglishNumber } from '@/_utils/utils';
 
 
-export default function LoginModal({ onLoginSuccess, close, isAdsSection, setIsModalOpen , style }: {
+export default function LoginModal({ onLoginSuccess, close, isAdsSection, setIsModalOpen, style }: {
     style?: React.CSSProperties, onLoginSuccess?: () => void, close: () => void, isAdsSection?: boolean, setIsModalOpen?: Dispatch<SetStateAction<boolean>>
 }) {
     const [otpSent, setOtpSent] = useState<boolean>(false);
@@ -119,6 +119,7 @@ export default function LoginModal({ onLoginSuccess, close, isAdsSection, setIsM
                 if (setIsModalOpen) {
                     setIsModalOpen(false) // close modal
                 }
+                router.back() // Navigate back to the root page
 
                 setShowErrorOtp(false)
                 notifications.show({
