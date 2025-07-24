@@ -1,9 +1,11 @@
 # 🖥️ Kiwipart
 
+[![Live Site](https://img.shields.io/badge/Live%20Site-kiwipart.ir-brightgreen?style=for-the-badge&logo=vercel)](https://kiwipart.ir)
+
 **Kiwipart** is a powerful platform built for Iranian PC users to assemble computer parts intelligently, buy and sell PC components, and browse updated product prices. It also features a blog section to share insights, guides, and news in the tech world.
 
 <p align="center">
-  <img src="./public/images/screenshot.png" alt="Homepage Preview" width="800"/>
+  <img src="https://raw.githubusercontent.com/mahdi4k/mr-system/master/public/screenshot.png" alt="Homepage Preview" width="800"/>
 </p>
 
 
