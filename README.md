@@ -1,37 +1,57 @@
-# Mantine Next.js template
+# 🖥️ Kiwipart
 
-This is a template for [Next.js](https://nextjs.org/) app router + [Mantine](https://mantine.dev/).
-If you want to use pages router instead, see [next-pages-template](https://github.com/mantinedev/next-pages-template).
+**Kiwipart** is a powerful platform built for Iranian PC users to assemble computer parts intelligently, buy and sell PC components, and browse updated product prices. It also features a blog section to share insights, guides, and news in the tech world.
 
-## Features
+<p align="center">
+  <img src="./public/images/screenshot.png" alt="Homepage Preview" width="800"/>
+</p>
 
-This template comes with the following features:
 
-- [PostCSS](https://postcss.org/) with [mantine-postcss-preset](https://mantine.dev/styles/postcss-preset)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Storybook](https://storybook.js.org/)
-- [Jest](https://jestjs.io/) setup with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
-- ESLint setup with [eslint-config-mantine](https://github.com/mantinedev/eslint-config-mantine)
 
-## npm scripts
+## 🌟 Key Features
 
-### Build and dev scripts
+### 🔧 Smart PC Assembly
+- Intelligent PC builder that suggests compatible parts.
+- Allows users to configure and build their dream setup.
+- Real-time compatibility checks and price calculations.
 
-- `dev` – start dev server
-- `build` – bundle application for production
-- `analyze` – analyzes application bundle with [@next/bundle-analyzer](https://www.npmjs.com/package/@next/bundle-analyzer)
+### 📢 PC Parts Marketplace (Ads)
+- Users can post ads to sell or buy PC components.
+- Clean, easy-to-browse layout for different categories (CPU, GPU, RAM, etc.).
+- Contact info and negotiation options included.
 
-### Testing scripts
+### 🛍️ Product Listings with Live Price Sync
+- Live prices pulled from sources like **Torob** and **Emalls**.
+- Product pages with specifications and price history.
 
-- `typecheck` – checks TypeScript types
-- `lint` – runs ESLint
-- `prettier:check` – checks files with Prettier
-- `jest` – runs jest tests
-- `jest:watch` – starts jest watch
-- `test` – runs `jest`, `prettier:check`, `lint` and `typecheck` scripts
+### 📰 Blog Section
+- Headless WordPress blog for sharing news, reviews, and tutorials.
+- Clean and accessible reading experience.
 
-### Other scripts
+---
 
-- `storybook` – starts storybook dev server
-- `storybook:build` – build production storybook bundle to `storybook-static`
-- `prettier:write` – formats all files with Prettier
+## 🧰 Tech Stack
+
+### Frontend
+- **Next.js 14 (Pages Router)**
+- **Mantine UI** (components, forms, hooks, notifications, etc.)
+- **Redux Toolkit** for state management
+- **Mantine Hook Form** for form handling
+- **Jest + React Testing Library** for testing
+
+---
+
+## ⚙️ Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/mahdi4k/kiwipart.git
+
+# Navigate into the project
+cd kiwipart
+
+# Install dependencies
+yarn install
+
+# Run the development server
+yarn dev
