@@ -1,20 +1,18 @@
-import React from 'react'
-import type { Metadata } from 'next'
+import React from "react";
+import type { Metadata } from "next";
 import ClientPower from "./clientFan";
 
 export const metadata: Metadata = {
-    title: 'لیست fan',
-    description: '',
-}
+  title: "لیست fan",
+  description: "",
+};
 
 const CPU = () => {
+  return (
+    <>
+      <ClientPower />
+    </>
+  );
+};
 
-
-    return (
-        <>
-            <ClientPower/>
-        </>
-    )
-}
-
-export default CPU
+export default CPU;

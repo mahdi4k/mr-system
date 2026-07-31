@@ -1,37 +1,55 @@
-import ClientPage from "./clientPage"
+import ClientPage from "./clientPage";
+import {
+  getMockCpu,
+  getMockGraphic,
+  getMockMotherboard,
+  getMockPower,
+} from "@/_redux/services/mockData";
 
+async function getData(params: { part: string; id: string }) {
+  let product = null;
 
-async function getData(params: { part: string, id: string }) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${params.part}/${params.id}`)
-    // The return value is *not* serialized
-    // You can return Date, Map, Set, etc.
+  switch (params.part) {
+    case "cpu":
+      product = getMockCpu(params.id);
+      break;
+    case "graphic":
+      product = getMockGraphic(params.id);
+      break;
+    case "motherboard":
+      product = getMockMotherboard(params.id);
+      break;
+    case "power":
+      product = getMockPower(params.id);
+      break;
+  }
 
-    if (!res.ok) {
-        const status = res.status;
-        const statusText = res.statusText;
-        let errorDetails = '';
-        try {
-            errorDetails = await res.json(); // If the response body is in JSON format
-        } catch {
-            errorDetails = await res.text(); // If the response body is in text format
-        }
+  if (!product) {
+    throw new Error("Product not found");
+  }
 
-        throw new Error('Failed to fetch data')
-    }
-    return res.json()
+  return { data: product };
 }
-export async function generateMetadata({ params }: { params: { part: 'graphics' | 'powers' | 'motherboards' | 'cpus', id: string } }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: { part: "graphics" | "powers" | "motherboards" | "cpus"; id: string };
+}) {
+  const product = await getData(params);
 
-    const product = await getData(params);
-
-
-    return {
-        title: ` ${product.data.name} - کیوی پارت`,
-    }
+  return {
+    title: ` ${product.data.name} - کیوی پارت`,
+  };
 }
-export default async function Page({ params }: { params: { part: 'graphics' | 'powers' | 'motherboards' | 'cpus', id: string } }) {
-    const { data } = await getData(params);
-    return <main style={{flex:'1'}}>
-        <ClientPage product={data} type={params.part} />
+export default async function Page({
+  params,
+}: {
+  params: { part: "graphics" | "powers" | "motherboards" | "cpus"; id: string };
+}) {
+  const { data } = await getData(params);
+  return (
+    <main style={{ flex: "1" }}>
+      <ClientPage product={data} type={params.part} />
     </main>
+  );
 }

@@ -5,7 +5,6 @@
 // import { IconArrowBackUp, IconArrowForwardUp, IconBlockquote, IconBold, IconClearFormatting, IconCode, IconH1, IconH2, IconHighlight, IconItalic, IconList, IconListDetails, IconListNumbers, IconPilcrow, IconSeparator, IconStrikethrough, IconTextWrap } from '@tabler/icons-react'
 // // import { Editor } from '@tiptap/react'
 
-
 // export default ({ editor }:{editor:Editor}) => {
 //     const items = [
 //         {
@@ -133,6 +132,6 @@
 //                     {item.type === 'divider' ? <div className="divider" /> : <MenuItem {...item} />}
 //                 </Fragment>
 //             ))}
-//         </div> 
+//         </div>
 //     )
 // }

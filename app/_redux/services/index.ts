@@ -1,9 +1,8 @@
-export * from "./caseApi"
-export * from "./cpuApi"
-export * from "./fanApi"
-export * from "./graphicApi"
-export * from "./motherboardApi"
-export * from "./powerApi"
-export * from "./ramApi"
-export * from "./ssdApi"
- 
+export * from "./caseApi";
+export * from "./cpuApi";
+export * from "./fanApi";
+export * from "./graphicApi";
+export * from "./motherboardApi";
+export * from "./powerApi";
+export * from "./ramApi";
+export * from "./ssdApi";

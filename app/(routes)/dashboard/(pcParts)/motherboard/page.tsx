@@ -1,20 +1,18 @@
-import React from 'react'
+import React from "react";
 import ClientMotherboard from "./clientMotherboard";
-import type { Metadata } from 'next'
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: 'لیست مادربرد',
-    description: '',
-}
+  title: "لیست مادربرد",
+  description: "",
+};
 
 const Motherboard = () => {
+  return (
+    <>
+      <ClientMotherboard />
+    </>
+  );
+};
 
-
-    return (
-         <>
-            <ClientMotherboard/>
-         </>
-    )
-}
-
-export default Motherboard
+export default Motherboard;

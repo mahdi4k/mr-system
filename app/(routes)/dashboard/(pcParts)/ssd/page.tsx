@@ -1,20 +1,18 @@
-import React from 'react'
-import type { Metadata } from 'next'
+import React from "react";
+import type { Metadata } from "next";
 import ClientSsd from "./clientSsd";
 
 export const metadata: Metadata = {
-    title: 'لیست ssd',
-    description: '',
-}
+  title: "لیست ssd",
+  description: "",
+};
 
 const CPU = () => {
+  return (
+    <>
+      <ClientSsd />
+    </>
+  );
+};
 
-
-    return (
-        <>
-            <ClientSsd/>
-        </>
-    )
-}
-
-export default CPU
+export default CPU;

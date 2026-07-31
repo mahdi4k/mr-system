@@ -1,6 +1,6 @@
 .card {
     position: relative;
-    height: rem(143px);
+    height: rem(203px);
     background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
 
     @mixin hover {

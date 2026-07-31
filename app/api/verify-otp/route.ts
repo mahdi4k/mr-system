@@ -1,45 +1,31 @@
-import { NextResponse } from 'next/server';
-import { NextRequest } from 'next/server';
-import { cookies } from 'next/headers';
+import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { cookies } from "next/headers";
 
 interface VerifyOtpRequest {
-    phone: string;
-    otp: string;
-    name?: string;
+  phone: string;
+  otp: string;
+  name?: string;
 }
 
 export async function POST(req: NextRequest) {
-    const { phone, otp, name }: VerifyOtpRequest = await req.json();
+  const { phone, otp, name }: VerifyOtpRequest = await req.json();
 
-    try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/verify-otp`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ phone, otp, name: name || null }),
-        });
+  console.log("Mock OTP verification for:", phone, "OTP:", otp);
 
-        if (!response.ok) {
-            return NextResponse.json({ message: 'OTP verification failed' }, { status: 401 });
-        }
+  const mockToken = `mock_token_${Date.now()}`;
 
-        const data: { status: boolean; token: string } = await response.json();
+  const res = NextResponse.json({
+    message: "OTP verified and token stored (Mock)",
+    status: true,
+    token: mockToken,
+  });
+  res.cookies.set("authToken", mockToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 30 * 24 * 60 * 60,
+    path: "/",
+  });
 
-        if (data.status) {
-            const res = NextResponse.json({ message: 'OTP verified and token stored' });
-            res.cookies.set('authToken', data.token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 30 * 24 * 60 * 60, // 30 days
-                path: '/',
-            });
-
-            return res;
-        } else {
-            return NextResponse.json({ message: 'OTP verification failed' }, { status: 401 });
-        }
-    } catch (error) {
-        return NextResponse.json({ message: 'Server error' }, { status: 500 });
-    }
+  return res;
 }

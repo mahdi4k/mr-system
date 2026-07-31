@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from './features/auth'
+import authReducer from "./features/auth";
 import motherboardReducer from "./features/motherboard";
 import graphicReducer from "./features/graphic";
 import cpuReducer from "./features/cpu";
@@ -9,26 +9,25 @@ import RamReducer from "./features/ram";
 import SsdReducer from "./features/ssd";
 import CaseReducer from "./features/case";
 import AdsReducer from "./features/ads";
-import { api } from './services/api'
+import { api } from "./services/api";
 
 export const store = configureStore({
-    reducer: {
-        auth: authReducer,
-        motherboard: motherboardReducer,
-        cpu: cpuReducer,
-        power: PowerReducer,
-        fan: FanReducer,
-        ram: RamReducer,
-        graphic: graphicReducer,
-        ssd: SsdReducer,
-        case: CaseReducer,
-        ads:AdsReducer,
-        [api.reducerPath]: api.reducer,
-    },
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(api.middleware),
-    devTools: process.env.NODE_ENV !== "production",
-
+  reducer: {
+    auth: authReducer,
+    motherboard: motherboardReducer,
+    cpu: cpuReducer,
+    power: PowerReducer,
+    fan: FanReducer,
+    ram: RamReducer,
+    graphic: graphicReducer,
+    ssd: SsdReducer,
+    case: CaseReducer,
+    ads: AdsReducer,
+    [api.reducerPath]: api.reducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(api.middleware),
+  devTools: process.env.NODE_ENV !== "production",
 });
 
 export type RootState = ReturnType<typeof store.getState>;

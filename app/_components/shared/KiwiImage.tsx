@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import React, { FC } from 'react';
-import Image from 'next/image';
-import { useMantineColorScheme } from '@mantine/core';
+import React, { FC } from "react";
+import Image from "next/image";
+import { useMantineColorScheme } from "@mantine/core";
 
 type Props = {
   img: string;
   alt: string;
   width: number;
   height: number;
-  url?: string
-  objectFit?: 'cover' | 'contain' | 'none'
+  url?: string;
+  objectFit?: "cover" | "contain" | "none";
 };
 
 const KiwiImage: FC<Props> = ({ img, alt, width, height, url, objectFit }) => {
@@ -41,10 +41,10 @@ const KiwiImage: FC<Props> = ({ img, alt, width, height, url, objectFit }) => {
     <Image
       placeholder={`data:image/svg+xml;base64,${toBase64(shimmer(width, height))}`}
       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-      style={{ objectFit: objectFit ? objectFit : 'contain' }}
+      style={{ objectFit: objectFit ? objectFit : "contain" }}
       alt={alt}
       fill
-      src={url ? url : `${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${img}`}
+      src={url ? url : img}
     />
   );
 };

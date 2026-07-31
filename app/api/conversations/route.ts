@@ -1,135 +1,148 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
-import { cookies } from 'next/headers';
-
+import { cookies } from "next/headers";
 
 export interface Apiconversation {
-    data: Transaction[];
-    meta: {
-        count: number;
-    };
+  data: Transaction[];
+  meta: {
+    count: number;
+  };
 }
 
 export interface Transaction {
-    id: number;
-    product_id: number;
-    user_id: number;
-    seller_id: number;
-    created_at: string;
-    updated_at: string;
-    product: Product;
-    buyer: User;
-    seller: User;
+  id: number;
+  product_id: number;
+  user_id: number;
+  seller_id: number;
+  created_at: string;
+  updated_at: string;
+  product: Product;
+  buyer: User;
+  seller: User;
 }
 
 interface Product {
-    id: number;
-    user_id: number;
-    category_id: number;
-    title: string;
-    image: string; // The string contains JSON, so it's parsed as an array
-    city: string;
-    ostan: string;
-    price: number | null;
-    description: string;
-    status: string;
-    created_at: string;
-    updated_at: string;
+  id: number;
+  user_id: number;
+  category_id: number;
+  title: string;
+  image: string;
+  city: string;
+  ostan: string;
+  price: number | null;
+  description: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface User {
-    id: number;
-    name: string;
-    username: string;
-    phone: string;
-    email: string;
-    email_verified_at: string | null;
-    created_at: string;
-    updated_at: string;
+  id: number;
+  name: string;
+  username: string;
+  phone: string;
+  email: string;
+  email_verified_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
+const mockTransactions: Transaction[] = [
+  {
+    id: 1,
+    product_id: 1,
+    user_id: 1,
+    seller_id: 2,
+    created_at: "2024-01-15T10:30:00Z",
+    updated_at: "2024-01-15T10:30:00Z",
+    product: {
+      id: 1,
+      user_id: 2,
+      category_id: 1,
+      title: "کامپیوتر گیمینگ",
+      image: '["https://via.placeholder.com/400x300"]',
+      city: "تهران",
+      ostan: "1",
+      price: 45000000,
+      description: "سیستم گیمینگ حرفه‌ای",
+      status: "active",
+      created_at: "2024-01-14T09:00:00Z",
+      updated_at: "2024-01-14T09:00:00Z",
+    },
+    buyer: {
+      id: 1,
+      name: "کاربر خریدار",
+      username: "buyer_user",
+      phone: "09123456789",
+      email: "buyer@test.com",
+      email_verified_at: null,
+      created_at: "2024-01-01T00:00:00Z",
+      updated_at: "2024-01-01T00:00:00Z",
+    },
+    seller: {
+      id: 2,
+      name: "فروشنده",
+      username: "seller_user",
+      phone: "09123456790",
+      email: "seller@test.com",
+      email_verified_at: null,
+      created_at: "2024-01-01T00:00:00Z",
+      updated_at: "2024-01-01T00:00:00Z",
+    },
+  },
+];
 
 export async function POST(request: Request) {
-    const token = cookies().get('authToken')?.value;
-    console.log("🚀 ~ POST ~ token:", token);
+  const token = cookies().get("authToken")?.value;
 
-    if (!token) {
-        return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  if (!token) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const { adId } = await request.json();
+
+    if (!adId) {
+      return NextResponse.json(
+        { error: "Missing adId in request body" },
+        { status: 400 },
+      );
     }
 
-    try {
-        const { adId } = await request.json();
+    const mockResponse = {
+      id: 1,
+      product_id: adId,
+      user_id: 1,
+      seller_id: 2,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
 
-        if (!adId) {
-            return NextResponse.json(
-                { error: 'Missing adId in request body' },
-                { status: 400 }
-            );
-        }
+    return NextResponse.json(mockResponse);
+  } catch (error) {
+    console.error("Error in POST /api/conversations:", error);
 
-        // Ensure the backend URL is configured
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-        if (!backendUrl) {
-            console.error('Backend URL is not defined in environment variables.');
-            return NextResponse.json(
-                { error: 'Server configuration error' },
-                { status: 500 }
-            );
-        }
-
-        const response = await fetch(`${backendUrl}/api/conversations`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({ ad_id: adId }),
-        });
-
-        // Log response details
-        console.log('Response Status:', response.status);
-        console.log('Response Headers:', Object.fromEntries(response.headers.entries()));
-
-        const responseData = await response.json();
-        console.log('Response Body:', responseData);
-
-        if (!response.ok) {
-            return NextResponse.json(
-                {
-                    error: 'Backend request failed',
-                    status: response.status,
-                    details: responseData,
-                },
-                { status: response.status }
-            );
-        }
-
-        return NextResponse.json(responseData);
-    } catch (error) {
-        console.error('Error in POST /api/conversations:', error);
-
-        return NextResponse.json(
-            {
-                error: 'Internal server error',
-                details: error instanceof Error ? error.message : 'Unknown error',
-            },
-            { status: 500 }
-        );
-    }
+    return NextResponse.json(
+      {
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    );
+  }
 }
 
-
-
 export async function GET() {
-    const token = cookies().get('authToken')?.value;
+  const token = cookies().get("authToken")?.value;
 
-    // Replace with your Laravel API call
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/conversations`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        },
+  if (!token) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
 
-    });
-    return NextResponse.json(await response.json());
+  return NextResponse.json({
+    data: mockTransactions,
+    meta: {
+      count: mockTransactions.length,
+    },
+  });
 }

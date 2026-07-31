@@ -9,7 +9,6 @@
 // // import TaskItem from '@tiptap/extension-task-item'
 // // import TaskList from '@tiptap/extension-task-list'
 
-
 // const colors = ['#958DF1', '#F98181', '#FBBC88', '#FAF594', '#70CFF8', '#94FADB', '#B9F18D']
 // const names = [
 //     'Lea Thompson',
@@ -39,9 +38,6 @@
 //     'Lisa Bonet',
 // ]
 
-
-
-
 // export default () => {
 //     const [status, setStatus] = useState('connecting')
 
@@ -53,7 +49,7 @@
 //     //         Highlight,
 //     //         TaskList,
 //     //         TaskItem,
-      
+
 //     //         CharacterCount.configure({
 //     //             limit: 10000,
 //     //         }),
@@ -66,7 +62,7 @@
 //             <EditorContent className="editor__content" editor={editor} />
 //             <div className="editor__footer">
 //                 <div className={`editor__status editor__status--${status}`}>
-                    
+
 //                 </div>
 //                 <div className="editor__name">
 //                  </div>

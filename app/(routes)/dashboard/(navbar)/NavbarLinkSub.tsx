@@ -1,110 +1,110 @@
-import React from 'react';
+import React from "react";
 import Link from "next/link";
 import classes from "./navbar.module.css";
-import {LinksGroup} from "./NavbarLinksGroup";
-import {ScrollArea} from "@mantine/core";
-import { usePathname } from 'next/navigation'
-
+import { LinksGroup } from "./NavbarLinksGroup";
+import { ScrollArea } from "@mantine/core";
+import { usePathname } from "next/navigation";
 
 type linksDTO = {
-    label: string
-    link: string
-}
+  label: string;
+  link: string;
+};
 type linkDataDTO = {
-     label:string
-    initiallyOpened:boolean
-    links:linksDTO[]
-}
-type activeLink = 'pcParts' | 'articles'
+  label: string;
+  initiallyOpened: boolean;
+  links: linksDTO[];
+};
+type activeLink = "pcParts" | "articles";
 
-const NavbarLinkSub = ({activeLink}: { activeLink: activeLink }) => {
-    const pathname = usePathname()
-    const activeTabBaseUrl = pathname.split('/')[2];
+const NavbarLinkSub = ({ activeLink }: { activeLink: activeLink }) => {
+  const pathname = usePathname();
+  const activeTabBaseUrl = pathname.split("/")[2];
 
-    const links: linkDataDTO[] =
-        [
-            {
-                label: 'motherboard',
-                initiallyOpened: activeTabBaseUrl === 'motherboard',
-                links: [
-                    { label: 'لیست', link: '/dashboard/motherboard' },
-                    { label: 'افزودن', link: '/dashboard/motherboard/add' },
-                ],
-            },
-            {
-                label: 'cpu',
-                initiallyOpened: activeTabBaseUrl === 'cpu',
-                links: [
-                    { label: 'لیست', link: '/dashboard/cpu' },
-                    { label: 'افزودن', link: '/dashboard/cpu/add' },
-                ],
-            },
-            {
-                label: 'گرافیک',
-                initiallyOpened: activeTabBaseUrl === 'graphic',
-                links: [
-                    { label: 'لیست', link: '/dashboard/graphic' },
-                    { label: 'افزودن', link: '/dashboard/graphic/add' },
-                ],
-            },
-            {
-                label: 'پاور',
-                initiallyOpened: activeTabBaseUrl === 'power',
-                links: [
-                    { label: 'لیست', link: '/dashboard/power' },
-                    { label: 'افزودن', link: '/dashboard/power/add' },
-                ],
-            },
-            {
-                label: 'فن',
-                initiallyOpened: activeTabBaseUrl === 'fan',
-                links: [
-                    { label: 'لیست', link: '/dashboard/fan' },
-                    { label: 'افزودن', link: '/dashboard/fan/add' },
-                ],
-            },
-            {
-                label: 'رم',
-                initiallyOpened: activeTabBaseUrl === 'ram',
-                links: [
-                    { label: 'لیست', link: '/dashboard/ram' },
-                    { label: 'افزودن', link: '/dashboard/ram/add' },
-                ],
-            },
-            {
-                label: 'ssd',
-                initiallyOpened: activeTabBaseUrl === 'ram',
-                links: [
-                    { label: 'لیست', link: '/dashboard/ssd' },
-                    { label: 'افزودن', link: '/dashboard/ssd/add' },
-                ],
-            },
-            {
-                label: 'کیس',
-                initiallyOpened: activeTabBaseUrl === 'ram',
-                links: [
-                    { label: 'لیست', link: '/dashboard/case' },
-                    { label: 'افزودن', link: '/dashboard/case/add' },
-                ],
-            },
-            {
-                label: 'آگهی‌ها',
-                initiallyOpened: activeTabBaseUrl === 'ram',
-                links: [
-                    { label: 'لیست', link: '/dashboard/ads' },
-                    { label: 'افزودن', link: '/dashboard/case/add' },
-                ],
-            },
-        ]
-    const linkGroup = links.map((item) => <LinksGroup {...item} key={item.label} />);
-    
-    return (
-        <div>
-            <ScrollArea className={classes.links}>
-                <div className={classes.linksInner}>{linkGroup}</div>
-            </ScrollArea>
-        </div>
-    );
+  const links: linkDataDTO[] = [
+    {
+      label: "motherboard",
+      initiallyOpened: activeTabBaseUrl === "motherboard",
+      links: [
+        { label: "لیست", link: "/dashboard/motherboard" },
+        { label: "افزودن", link: "/dashboard/motherboard/add" },
+      ],
+    },
+    {
+      label: "cpu",
+      initiallyOpened: activeTabBaseUrl === "cpu",
+      links: [
+        { label: "لیست", link: "/dashboard/cpu" },
+        { label: "افزودن", link: "/dashboard/cpu/add" },
+      ],
+    },
+    {
+      label: "گرافیک",
+      initiallyOpened: activeTabBaseUrl === "graphic",
+      links: [
+        { label: "لیست", link: "/dashboard/graphic" },
+        { label: "افزودن", link: "/dashboard/graphic/add" },
+      ],
+    },
+    {
+      label: "پاور",
+      initiallyOpened: activeTabBaseUrl === "power",
+      links: [
+        { label: "لیست", link: "/dashboard/power" },
+        { label: "افزودن", link: "/dashboard/power/add" },
+      ],
+    },
+    {
+      label: "فن",
+      initiallyOpened: activeTabBaseUrl === "fan",
+      links: [
+        { label: "لیست", link: "/dashboard/fan" },
+        { label: "افزودن", link: "/dashboard/fan/add" },
+      ],
+    },
+    {
+      label: "رم",
+      initiallyOpened: activeTabBaseUrl === "ram",
+      links: [
+        { label: "لیست", link: "/dashboard/ram" },
+        { label: "افزودن", link: "/dashboard/ram/add" },
+      ],
+    },
+    {
+      label: "ssd",
+      initiallyOpened: activeTabBaseUrl === "ram",
+      links: [
+        { label: "لیست", link: "/dashboard/ssd" },
+        { label: "افزودن", link: "/dashboard/ssd/add" },
+      ],
+    },
+    {
+      label: "کیس",
+      initiallyOpened: activeTabBaseUrl === "ram",
+      links: [
+        { label: "لیست", link: "/dashboard/case" },
+        { label: "افزودن", link: "/dashboard/case/add" },
+      ],
+    },
+    {
+      label: "آگهی‌ها",
+      initiallyOpened: activeTabBaseUrl === "ram",
+      links: [
+        { label: "لیست", link: "/dashboard/ads" },
+        { label: "افزودن", link: "/dashboard/case/add" },
+      ],
+    },
+  ];
+  const linkGroup = links.map((item) => (
+    <LinksGroup {...item} key={item.label} />
+  ));
+
+  return (
+    <div>
+      <ScrollArea className={classes.links}>
+        <div className={classes.linksInner}>{linkGroup}</div>
+      </ScrollArea>
+    </div>
+  );
 };
 
 export default NavbarLinkSub;

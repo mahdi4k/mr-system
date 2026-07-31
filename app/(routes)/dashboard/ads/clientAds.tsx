@@ -1,24 +1,41 @@
-"use client"
-import { useApproveAdsItem, useGetAdsListQuery, useRejectAdsItem, useRemoveAds } from '@/_redux/services/adsApi'
-import { ActionIcon, Button, Flex, Loader, Modal, Pagination, Popover, Table, Text } from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks'
-import { notifications } from '@mantine/notifications'
-import { IconCheck, IconTrash, IconXboxX } from '@tabler/icons-react'
-import React, { useEffect, useState } from 'react'
-import Image from 'next/image';
-import ConfirmDeletePopover from '@/_components/adsSection/ConfirmDeletePopover'
+"use client";
+import {
+  useApproveAdsItem,
+  useGetAdsListQuery,
+  useRejectAdsItem,
+  useRemoveAds,
+} from "@/_redux/services/adsApi";
+import {
+  ActionIcon,
+  Button,
+  Flex,
+  Loader,
+  Modal,
+  Pagination,
+  Popover,
+  Table,
+  Text,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import { IconCheck, IconTrash, IconXboxX } from "@tabler/icons-react";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import ConfirmDeletePopover from "@/_components/adsSection/ConfirmDeletePopover";
 
 const ClientAds = () => {
   const [currentPage, setCurrentPage] = useState(1); // Track current page
   const [openedDescription, { open, close }] = useDisclosure(false);
-  const [descriptionTitle, setDescriptionTitle] = useState('')
-  const { data, isLoading, isSuccess } = useGetAdsListQuery({ page: currentPage })
+  const [descriptionTitle, setDescriptionTitle] = useState("");
+  const { data, isLoading, isSuccess } = useGetAdsListQuery({
+    page: currentPage,
+  });
   const [opened, setOpened] = useState<{ [key: number]: boolean }>({});
   const [openedImageModal, setOpenedImageModal] = useState(false);
 
   const [approve, { isSuccess: isSuccessApprove }] = useApproveAdsItem();
   const [reject, { isSuccess: isSuccessReject }] = useRejectAdsItem();
-  const [remove, { isSuccess: isSuccessRemove }] = useRemoveAds()
+  const [remove, { isSuccess: isSuccessRemove }] = useRemoveAds();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const handlePageChange = (page: number) => {
@@ -27,51 +44,50 @@ const ClientAds = () => {
 
   const acceptAds = (id: number) => {
     if (id) {
-      approve({ id })
+      approve({ id });
     }
-  }
+  };
 
   const rejectAds = (id: number) => {
     if (id) {
-      reject({ id })
+      reject({ id });
     }
-
-  }
+  };
   const removeAds = (id: number) => {
     if (id) {
-      remove(id)
+      remove(id);
     }
-  }
+  };
 
   useEffect(() => {
     if (isSuccessApprove) {
       notifications.show({
-        color: 'green',
-        title: 'با موفقیت تایید شد',
-        message: '',
-      })
+        color: "green",
+        title: "با موفقیت تایید شد",
+        message: "",
+      });
     }
-  }, [isSuccessApprove])
+  }, [isSuccessApprove]);
 
   useEffect(() => {
     if (isSuccessReject) {
       notifications.show({
-        color: 'green',
-        title: 'با موفقیت رد شد',
-        message: '',
-      })
+        color: "green",
+        title: "با موفقیت رد شد",
+        message: "",
+      });
     }
-  }, [isSuccessReject])
+  }, [isSuccessReject]);
 
   useEffect(() => {
     if (isSuccessRemove) {
       notifications.show({
-        color: 'green',
-        title: 'با موفقیت حذف شد',
-        message: '',
-      })
+        color: "green",
+        title: "با موفقیت حذف شد",
+        message: "",
+      });
     }
-  }, [isSuccessRemove])
+  }, [isSuccessRemove]);
 
   const handleOpen = (id: number) => {
     setOpened((prevState) => ({ ...prevState, [id]: true }));
@@ -93,52 +109,67 @@ const ClientAds = () => {
               width={30}
               onClick={() => openModal(img)} // Opens modal on click
               height={30}
-              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/storage/${img}`}
+              src={`/public/storage/${img}`}
             />
           ))}
         </>
       );
-
     } else {
-      return (
-        <></>
-      )
+      return <></>;
     }
-  }
-
-  const openModal = (img: string) => {
-    setSelectedImage(`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/storage/${img}`);
-    setOpenedImageModal(true);
   };
 
+  const openModal = (img: string) => {
+    setSelectedImage(`/public/storage/${img}`);
+    setOpenedImageModal(true);
+  };
 
   const rows = data?.data.map((product) => (
     <Table.Tr key={product.id}>
       <Table.Td>{product.id}</Table.Td>
       <Table.Td>{product.title}</Table.Td>
       <Table.Td>{handleImageAds(product.image, product.title)}</Table.Td>
-      <Table.Td onClick={() => { setDescriptionTitle(product.description); open(); }}>
+      <Table.Td
+        onClick={() => {
+          setDescriptionTitle(product.description);
+          open();
+        }}
+      >
         <Text fz="sm" lineClamp={1}>
           {product.description}
         </Text>
       </Table.Td>
       <Table.Td>{product.category.name}</Table.Td>
       <Table.Td>{product.user.username}</Table.Td>
-      <Table.Td>{new Intl.NumberFormat('fa-IR').format(Number(product.price))}</Table.Td>
       <Table.Td>
-        {product.status === 'approved' ? (
-          <Text fz="xs" c="green">Approved</Text>
+        {new Intl.NumberFormat("fa-IR").format(Number(product.price))}
+      </Table.Td>
+      <Table.Td>
+        {product.status === "approved" ? (
+          <Text fz="xs" c="green">
+            Approved
+          </Text>
         ) : (
-          <Text fz="xs" c="red">Pending</Text>
+          <Text fz="xs" c="red">
+            Pending
+          </Text>
         )}
       </Table.Td>
       <Table.Td>{product.city}</Table.Td>
       <Table.Td>
         <Flex>
-          <ActionIcon onClick={() => acceptAds(product.id)} variant="light" ml={'lg'}>
+          <ActionIcon
+            onClick={() => acceptAds(product.id)}
+            variant="light"
+            ml={"lg"}
+          >
             <IconCheck size={17} />
           </ActionIcon>
-          <ActionIcon onClick={() => rejectAds(product.id)} variant="light" color="orange">
+          <ActionIcon
+            onClick={() => rejectAds(product.id)}
+            variant="light"
+            color="orange"
+          >
             <IconXboxX size={17} />
           </ActionIcon>
           <ConfirmDeletePopover productId={product.id} onDelete={removeAds} />
@@ -146,7 +177,7 @@ const ClientAds = () => {
       </Table.Td>
     </Table.Tr>
   ));
-  
+
   const totalPages = data?.last_page || 1;
 
   return (
@@ -170,9 +201,7 @@ const ClientAds = () => {
                 <Table.Th> </Table.Th>
               </Table.Tr>
             </Table.Thead>
-            <Table.Tbody>
-              {rows}
-            </Table.Tbody>
+            <Table.Tbody>{rows}</Table.Tbody>
           </Table>
 
           {/* Mantine Pagination */}
@@ -182,11 +211,13 @@ const ClientAds = () => {
             value={currentPage}
             onChange={handlePageChange}
           />
-          <Modal size={'xl'} opened={openedDescription} onClose={close} title="">
-
-            <div style={{ whiteSpace: 'pre-wrap' }}>
-              {descriptionTitle}
-            </div>
+          <Modal
+            size={"xl"}
+            opened={openedDescription}
+            onClose={close}
+            title=""
+          >
+            <div style={{ whiteSpace: "pre-wrap" }}>{descriptionTitle}</div>
           </Modal>
 
           <Modal
@@ -196,20 +227,15 @@ const ClientAds = () => {
             size="auto" // Adjust the size automatically based on content
           >
             {selectedImage && (
-              <Image
-                src={selectedImage}
-                alt={''}
-                width={600}
-                height={600}
-                />
+              <Image src={selectedImage} alt={""} width={600} height={600} />
             )}
           </Modal>
         </>
       ) : (
-        <Text >No products found.</Text>
+        <Text>No products found.</Text>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ClientAds
+export default ClientAds;

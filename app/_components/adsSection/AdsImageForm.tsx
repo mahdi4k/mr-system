@@ -1,23 +1,22 @@
-"use client"
+"use client";
 
-import { Flex, Group, Box, ActionIcon, Text } from '@mantine/core'
-import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
-import { IconCamera, IconPlus, IconTrash } from '@tabler/icons-react'
-import React, { Dispatch, FC, SetStateAction, useRef, useState } from 'react'
-import imageCompression from 'browser-image-compression';
+import { Flex, Group, Box, ActionIcon, Text } from "@mantine/core";
+import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
+import { IconCamera, IconPlus, IconTrash } from "@tabler/icons-react";
+import React, { Dispatch, FC, SetStateAction, useRef, useState } from "react";
+import imageCompression from "browser-image-compression";
 import Image from "next/image";
-import classes from './ads.module.css'
+import classes from "./ads.module.css";
 
 type props = {
-  images: File[]
-  setImages: Dispatch<SetStateAction<File[]>>
-}
+  images: File[];
+  setImages: Dispatch<SetStateAction<File[]>>;
+};
 const MAX_IMAGES = 3;
 
 const AdsImageForm: FC<props> = ({ images, setImages }) => {
   const [error, setError] = useState<string | null>(null);
   const openRef = useRef<() => void>(null);
-
 
   const compressImage = async (file: File) => {
     try {
@@ -28,15 +27,15 @@ const AdsImageForm: FC<props> = ({ images, setImages }) => {
       };
       return await imageCompression(file, options);
     } catch (err) {
-      console.error('Compression error:', err);
-      setError('خطا در فشرده‌سازی عکس');
+      console.error("Compression error:", err);
+      setError("خطا در فشرده‌سازی عکس");
       return null;
     }
   };
 
   const handleImageUpload = async (files: File[]) => {
     if (images.length + files.length > 3) {
-      setError('حداکثر تعداد عکس ۳ است.');
+      setError("حداکثر تعداد عکس ۳ است.");
       return;
     }
 
@@ -55,8 +54,7 @@ const AdsImageForm: FC<props> = ({ images, setImages }) => {
     }
 
     setImages((current) => [...current, ...compressedFiles]);
-  }
-
+  };
 
   const renderPlaceholders = () => {
     const placeholders = [];
@@ -70,15 +68,16 @@ const AdsImageForm: FC<props> = ({ images, setImages }) => {
           direction="column"
           align="center"
           justify="center"
-          h={{ base: '70px', sm: '100px' }} w={{ base: '80px', sm: '100px' }}
+          h={{ base: "70px", sm: "100px" }}
+          w={{ base: "80px", sm: "100px" }}
           style={{
-            borderRadius: '5px',
-            cursor: 'pointer',
-            border: '1px dashed var(--mantine-color-gray-5)',
+            borderRadius: "5px",
+            cursor: "pointer",
+            border: "1px dashed var(--mantine-color-gray-5)",
           }}
         >
           <IconCamera color="var(--mantine-color-gray-5)" size={30} />
-        </Flex>
+        </Flex>,
       );
     }
 
@@ -90,41 +89,63 @@ const AdsImageForm: FC<props> = ({ images, setImages }) => {
   };
   return (
     <>
-      <Text fz={'sm'} mb={'3px'} mt={'xl'}>عکس‌های آگهی <span style={{ fontSize: '12px', color: 'gray' }}>(حداکثر ۳ عکس)</span></Text>
+      <Text fz={"sm"} mb={"3px"} mt={"xl"}>
+        عکس‌های آگهی{" "}
+        <span style={{ fontSize: "12px", color: "gray" }}>(حداکثر ۳ عکس)</span>
+      </Text>
 
-      <Flex style={{overflow:'auto'}} mt={'sm'} mb={'xl'} pos={'relative'}>
-        <Dropzone openRef={openRef}
+      <Flex style={{ overflow: "auto" }} mt={"sm"} mb={"xl"} pos={"relative"}>
+        <Dropzone
+          openRef={openRef}
           onDrop={handleImageUpload}
-          onReject={(files) => console.log('rejected files', files)}
+          onReject={(files) => console.log("rejected files", files)}
           maxSize={10 * 1024 ** 2}
           accept={IMAGE_MIME_TYPE}
-          style={{border:'unset !important'}}
+          style={{ border: "unset !important" }}
         >
-          <Flex direction={'column'} align={'center'} justify={'center'} h={{ base: '70px', sm: '100px' }} w={{ base: '80px', sm: '100px' }}
-            style={{ borderRadius: '5px', cursor: 'pointer', padding: 20, border: '1px dashed var(--mantine-color-kiwi-8)' }}>
-            <IconPlus color='var(--mantine-color-kiwi-8)' size={22} />
-            <Text style={{ whiteSpace: 'nowrap' }} c={'var(--mantine-color-kiwi-8)'} fz={'xs'}>افزودن عکس</Text>
+          <Flex
+            direction={"column"}
+            align={"center"}
+            justify={"center"}
+            h={{ base: "70px", sm: "100px" }}
+            w={{ base: "80px", sm: "100px" }}
+            style={{
+              borderRadius: "5px",
+              cursor: "pointer",
+              padding: 20,
+              border: "1px dashed var(--mantine-color-kiwi-8)",
+            }}
+          >
+            <IconPlus color="var(--mantine-color-kiwi-8)" size={22} />
+            <Text
+              style={{ whiteSpace: "nowrap" }}
+              c={"var(--mantine-color-kiwi-8)"}
+              fz={"xs"}
+            >
+              افزودن عکس
+            </Text>
           </Flex>
         </Dropzone>
 
-        <Group mr={'sm'} gap="xs" wrap="nowrap">
+        <Group mr={"sm"} gap="xs" wrap="nowrap">
           {images.map((file, index) => (
             <Box
               key={index}
               style={{
-                position: 'relative',
-                cursor: 'pointer',
-                borderRadius: '5px',
-                overflow: 'hidden',
+                position: "relative",
+                cursor: "pointer",
+                borderRadius: "5px",
+                overflow: "hidden",
               }}
-              h={{ base: '70px', sm: '100px' }} w={{ base: '80px', sm: '100px' }}
+              h={{ base: "70px", sm: "100px" }}
+              w={{ base: "80px", sm: "100px" }}
             >
               <ActionIcon
                 variant="filled"
                 color="red"
                 size="sm"
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   top: 5,
                   left: 5,
                   zIndex: 10,
@@ -138,7 +159,7 @@ const AdsImageForm: FC<props> = ({ images, setImages }) => {
                 alt={`Preview ${index}`}
                 width={100}
                 height={100}
-                style={{ objectFit: 'cover' }}
+                style={{ objectFit: "cover" }}
               />
             </Box>
           ))}
@@ -146,7 +167,7 @@ const AdsImageForm: FC<props> = ({ images, setImages }) => {
         </Group>
       </Flex>
     </>
-  )
-}
+  );
+};
 
-export default AdsImageForm
+export default AdsImageForm;

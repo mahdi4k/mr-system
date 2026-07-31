@@ -1,42 +1,39 @@
-"use client"
-import React from 'react';
-import {Text, Title, TextInput, Button, Group, Flex, Container} from '@mantine/core';
-import classes from '@/_cssModules/PcSection.module.css';
-import Image from 'next/image'
-import {IconArrowsExchange} from "@tabler/icons-react";
+"use client";
+import React from "react";
+import {
+  Text,
+  Title,
+  TextInput,
+  Button,
+  Group,
+  Flex,
+  Container,
+  Stack,
+} from "@mantine/core";
+import classes from "@/_cssModules/PcSection.module.css";
+import Image from "next/image";
+import { IconArrowsExchange } from "@tabler/icons-react";
 import Link from "next/link";
 
 const CpuGraphic = () => {
-    return (
-        <Container my={'xl'} size="lg">
-            <Flex className={classes.wrapper}>
-                <Link className={classes.image} href={'/pieces/graphic/cpu'}>
-                    <Image fill alt="graphic card vs cpu"
-                            src={'/svg/cpu-graphic.svg'} />
-                </Link>
-                <div className={classes.bodyRight}>
-                    <Group mb={'md'} align={'center'}>
-                        <Title fs={'italic'} className={classes.title}>CPU</Title>
-                        <IconArrowsExchange/>
-                        <Title className={classes.title} fs={'italic'}>کارت گرافیک</Title>
-                    </Group>
-
-                    <Text fz="md" c="dimmed">
-                        در این قسمت میتوانید cpu مناسب برای کارت گرافیک یا برعکس کارت گرافیک مناسب cpu خود را انتخاب
-                        کنید
-                    </Text>
-                    <div className={classes.controls}>
-                        <Link href={'/pieces/graphic/cpu'}>
-                            <Button px={'xl'} variant="gradient"
-                                    gradient={{from: ' rgb(14,163,93)', to: ' rgb(12,119,115)', deg: 90}}
-                            >انتخاب</Button>
-                        </Link>
-                    </div>
-                </div>
-               
-            </Flex>
-        </Container>
-    );
+  return (
+    <Container my={"xl"} size="lg">
+      <Stack>
+        <Link className={classes.image} href={"/pieces/graphic/cpu"}>
+          <Image fill alt="graphic card vs cpu" src={"/svg/cpu-graphic.svg"} />
+        </Link>
+        <Group mb={"md"} justify="center" align={"center"}>
+          <Title order={3} fs={"italic"} className={classes.title}>
+            CPU
+          </Title>
+          <IconArrowsExchange />
+          <Title order={3} className={classes.title} fs={"italic"}>
+            کارت گرافیک
+          </Title>
+        </Group>
+      </Stack>
+    </Container>
+  );
 };
 
 export default CpuGraphic;

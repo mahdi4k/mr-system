@@ -1,41 +1,42 @@
-:root[data-mantine-color-scheme='dark']{
-    --mantine-color-body: #222831 !important
+:root[data-mantine-color-scheme="dark"] {
+  --mantine-color-body: #222831 !important
+;
 }
-body,html h1 , input , textarea{
-    font-family: var(--font-vazirmatn) !important;
+body,
+html h1,
+input,
+textarea {
+  font-family: var(--font-vazirmatn) !important;
 }
-.vibes {
-    font-family: var(--font-vibes) !important;
-}
-.text-decoration-none{
-    text-decoration: none;
-}
-
-body{
-    display: flex;
-    flex-direction: column;
+.text-decoration-none {
+  text-decoration: none;
 }
 
-a{
-    text-decoration: none !important;
-    color: unset;
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  text-decoration: none !important;
+  color: unset;
 }
 
 #man-sit {
-    animation: fadeInUp 1s;
+  animation: fadeInUp 1s;
 }
 
 @keyframes fadeInUp {
-    0% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.cursor-pointer{
-    cursor: pointer;
+.cursor-pointer {
+  cursor: pointer;
 }

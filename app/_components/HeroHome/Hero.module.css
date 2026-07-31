@@ -1,96 +1,95 @@
 .inner {
-    display: flex;
-    justify-content: space-between;
-    padding-top: calc(var(--mantine-spacing-xl) * 4);
-    padding-bottom: calc(var(--mantine-spacing-xl) * 4);
-    align-items: center;
-    @media (max-width: $mantine-breakpoint-sm) {
-      flex-direction: column;
-      padding-top: 20px;
-      padding-bottom: 20px;
-    }
+  display: flex;
+  justify-content: space-between;
+  padding-top: calc(var(--mantine-spacing-xl) * 4);
+  padding-bottom: calc(var(--mantine-spacing-xl) * 4);
+  align-items: center;
+  @media (max-width: $mantine-breakpoint-sm) {
+    flex-direction: column;
+    padding-top: 20px;
+    padding-bottom: 20px;
   }
-  .responiveImage{
-    object-fit: cover;
-    @media (max-width: $mantine-breakpoint-md) {
-      width: 70%;
-      height: auto;
-    }
+}
+.responiveImage {
+  object-fit: cover;
+  @media (max-width: $mantine-breakpoint-md) {
+    width: 70%;
+    height: auto;
   }
-  .content {
-    max-width: rem(480px);
-    margin-right: calc(var(--mantine-spacing-xl) * 3);
-  
-    @media (max-width: $mantine-breakpoint-md) {
-      max-width: 100%;
-      margin-right: 0;
-      margin-top: 50px;
-    }
-  }
-  
-  .title {
-    color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-    font-family: Vazirmatn, var(--mantine-font-family);
-    font-size: rem(40px);
-    line-height: 1.6;
-    font-weight: 700;
+}
+.content {
+  max-width: rem(480px);
+  margin-right: calc(var(--mantine-spacing-xl) * 3);
 
-    @media (max-width: $mantine-breakpoint-md) {
-      font-size: rem(38px);
-    }
-    @media (max-width: $mantine-breakpoint-sm) {
-      font-size: rem(28px);
-    }
+  @media (max-width: $mantine-breakpoint-md) {
+    max-width: 100%;
+    margin-right: 0;
+    margin-top: 50px;
   }
-  
-  .control {
-    @media (max-width: $mantine-breakpoint-xs) {
-      flex: 1;
-    }
+}
+
+.title {
+  color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+  font-family: var(--font-vazirmatn), var(--mantine-font-family);
+  font-size: rem(40px);
+  line-height: 1.6;
+  font-weight: 700;
+
+  @media (max-width: $mantine-breakpoint-md) {
+    font-size: rem(38px);
   }
-  
-  .image {
-    width: rem(376px);
-    height: rem(356px);
-  
-    @media (max-width: $mantine-breakpoint-md) {
-      display: none;
-    }
+  @media (max-width: $mantine-breakpoint-sm) {
+    font-size: rem(28px);
   }
-  
-  .highlight {
-    position: relative;
-    background-color: var(--mantine-color-kiwi-2);
-    border-radius: var(--mantine-radius-sm);
-    margin: rem(7px) rem(7px);
-    color: white;
-  
-    /* Gradient Background */
-    background-image: 
-      linear-gradient(#7ea300, #7ea300), 
-      linear-gradient(#fff, #fff);
-  
-    /* Background Clip with Safari Support */
-    -webkit-background-clip: padding-box, text;
-    background-clip: padding-box, text;
-  
-    /* Background Behavior */
-    background-size: 0% 100%;
-    background-repeat: no-repeat;
-    background-position: right;
-  
-    /* Animation */
-    animation: revealer-text 2.8s 0.5s forwards; /* 'forwards' retains the final state */
-    -webkit-animation: revealer-text 2.8s 0.5s forwards;
-  
-    /* Ensure the final background-color */
-    background-color: #7ea300;
+}
+
+.control {
+  @media (max-width: $mantine-breakpoint-xs) {
+    flex: 1;
   }
-  
-  .IconSmile{
-    position: relative;
-    top: 10px;
+}
+
+.image {
+  width: rem(376px);
+  height: rem(356px);
+
+  @media (max-width: $mantine-breakpoint-md) {
+    display: none;
   }
+}
+
+.highlight {
+  position: relative;
+  background-color: var(--mantine-color-kiwi-2);
+  border-radius: var(--mantine-radius-sm);
+  margin: rem(7px) rem(7px);
+  color: white;
+
+  /* Gradient Background */
+  background-image: linear-gradient(#7ea300, #7ea300),
+    linear-gradient(#fff, #fff);
+
+  /* Background Clip with Safari Support */
+  -webkit-background-clip: padding-box, text;
+  background-clip: padding-box, text;
+
+  /* Background Behavior */
+  background-size: 0% 100%;
+  background-repeat: no-repeat;
+  background-position: right;
+
+  /* Animation */
+  animation: revealer-text 2.8s 0.5s forwards; /* 'forwards' retains the final state */
+  -webkit-animation: revealer-text 2.8s 0.5s forwards;
+
+  /* Ensure the final background-color */
+  background-color: #7ea300;
+}
+
+.IconSmile {
+  position: relative;
+  top: 10px;
+}
 @keyframes revealer-text {
   0% {
     background-size: 0% 100%;
@@ -106,17 +105,17 @@
   }
 }
 
-  .heroSvg {
-    width: 507px;
-    height: 478px;
-    @media (max-width: $mantine-breakpoint-md) {
-      margin-left: 50px;
-      width: auto;
-      height: 100%;
-    }
-    @media (max-width: $mantine-breakpoint-sm) {
-      margin-left: 0;
-      width: auto;
-      height: 100%;
-    }
+.heroSvg {
+  width: 507px;
+  height: 478px;
+  @media (max-width: $mantine-breakpoint-md) {
+    margin-left: 50px;
+    width: auto;
+    height: 100%;
   }
+  @media (max-width: $mantine-breakpoint-sm) {
+    margin-left: 0;
+    width: auto;
+    height: 100%;
+  }
+}

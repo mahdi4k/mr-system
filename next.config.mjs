@@ -34,9 +34,9 @@ export default withPWA(withBundleAnalyzer({
   images: {
     remotePatterns: [ 
       {
-        protocol: 'https',
-        // hostname: '127.0.0.1',
-        hostname: 'app.kiwipart.ir',
+        protocol: 'http',
+        hostname: '127.0.0.1',
+        // hostname: 'app.kiwipart.ir',
         pathname: '**',
       },
     ],

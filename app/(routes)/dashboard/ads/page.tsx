@@ -1,23 +1,18 @@
-
-
-import React from 'react'
-import type { Metadata } from 'next'
+import React from "react";
+import type { Metadata } from "next";
 import ClientAds from "./clientAds";
- 
+
 export const metadata: Metadata = {
-    title: 'لیست آگهی',
-    description: '',
-}
+  title: "لیست آگهی",
+  description: "",
+};
 
 const Page = () => {
+  return (
+    <>
+      <ClientAds />
+    </>
+  );
+};
 
-
-    return (
-        <>
-            <ClientAds />
-        </>
-    )
-}
-
-export default Page
- 
+export default Page;

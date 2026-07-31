@@ -1,10 +1,8 @@
-"use client"
+"use client";
 
-import {usePathname} from "next/navigation";
+import { usePathname } from "next/navigation";
 
 export function useActivePathname(): string[] {
-
-    const pathname = usePathname();
-    return pathname.split('/')
-
+  const pathname = usePathname();
+  return pathname.split("/");
 }

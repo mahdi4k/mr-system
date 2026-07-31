@@ -1,7 +1,7 @@
-import CardService from './CardService';
+import CardService from "./CardService";
 
 export default {
-  title: 'Welcome',
+  title: "Welcome",
 };
 
 export const Usage = () => <CardService />;

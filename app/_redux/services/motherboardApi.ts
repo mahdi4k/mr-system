@@ -1,84 +1,95 @@
-import { api } from './api'
-import { IResult } from './caseApi';
-import { CPU } from './cpuApi';
-import { RAM } from './ramApi';
+import { api } from "./api";
+import { IResult } from "./caseApi";
+import {
+  mockMotherboards,
+  filterMockMotherboards,
+  getMockMotherboard,
+} from "./mockData";
 
 export type Motherboard = {
-    id: number
-    name: string
-    size: string
-    total_slot_ram: number
-    brand: string
-    price?: string
-    cpu_socket?: string
-    ddr3?: boolean
-    ddr4?: boolean
-    ddr5?: boolean
-    wifi_support?: boolean
-    links: string
-    image: string
-    cpus: CPU[]
-    rams: RAM[]
-    attributes?: string[]
+  id: number;
+  name: string;
+  size: string;
+  total_slot_ram: number;
+  brand: string;
+  price?: string;
+  cpu_socket?: string;
+  ddr3?: boolean;
+  ddr4?: boolean;
+  ddr5?: boolean;
+  wifi_support?: boolean;
+  links: string;
+  image: string;
+  cpus: number[];
+  rams: number[];
+  attributes?: string[];
 };
 
 type authTokenDTO = {
-    auth: {
-        userToken: {
-            user: string
-        }
-    }
-}
+  auth: {
+    userToken: {
+      user: string;
+    };
+  };
+};
 export const motherboardApi = api.injectEndpoints({
-
-    endpoints: (builder) => ({
-        getMotherboards: builder.query<Motherboard[], { manufacturer?: string[] | never[], search?: string }>({
-            query: ({ manufacturer, search }) => {
-                return {
-                    url: `/motherboards`,
-                    method: 'GET',
-                    params: { manufacturer: manufacturer, search }
-                }
-            },
-            providesTags: ['motherboards']
-        }),
-        getMotherboard: builder.query<IResult<Motherboard>, { id: string }>({
-            query: ({ id }) => {
-                return {
-                    url: `/motherboards/${id}`,
-                    method: 'GET',
-
-                }
-            },
-            providesTags: ['motherboards']
-        }),
-        createMotherboard: builder.mutation({
-            query: (payload) => ({
-                url: `/motherboards`,
-                method: 'POST',
-                body: payload,
-            }),
-            invalidatesTags: ['motherboards']
-        }),
-        addMotherboardImage: builder.mutation({
-            query: (payload) => {
-                return {
-                    url: `/motherboards/${payload.id}/image`,
-                    method: 'POST',
-                    body: payload.logo,
-                }
-            }
-        }),
-        removeMotherboard: builder.mutation({
-            query: (payload) => {
-                return {
-                    url: `/motherboards/${payload}`,
-                    method: 'DELETE',
-                }
-            },
-            invalidatesTags: ['motherboards']
-        })
+  endpoints: (builder) => ({
+    getMotherboards: builder.query<
+      Motherboard[],
+      { manufacturer?: string[] | never[]; search?: string }
+    >({
+      queryFn: async ({ manufacturer, search }) => {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        const data = filterMockMotherboards({ manufacturer, search });
+        return { data };
+      },
+      providesTags: ["motherboards"],
     }),
+    getMotherboard: builder.query<IResult<Motherboard>, { id: string }>({
+      queryFn: async ({ id }) => {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        const motherboard = getMockMotherboard(id);
+        if (motherboard) {
+          return {
+            data: { message: "Motherboard یافت شد", data: motherboard },
+          };
+        }
+        return {
+          data: { message: "Motherboard یافت نشد", data: mockMotherboards[0] },
+        };
+      },
+      providesTags: ["motherboards"],
+    }),
+    createMotherboard: builder.mutation({
+      queryFn: async (payload) => {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return {
+          data: { message: "Motherboard با موفقیت ایجاد شد", data: payload },
+        };
+      },
+      invalidatesTags: ["motherboards"],
+    }),
+    addMotherboardImage: builder.mutation({
+      queryFn: async (payload) => {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return { data: { message: "تصویر با موفقیت آپلود شد" } };
+      },
+    }),
+    removeMotherboard: builder.mutation({
+      queryFn: async (payload) => {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return { data: { message: "Motherboard با موفقیت حذف شد" } };
+      },
+      invalidatesTags: ["motherboards"],
+    }),
+  }),
 });
 
-export const { useGetMotherboardsQuery, useLazyGetMotherboardsQuery, useLazyGetMotherboardQuery, useCreateMotherboardMutation, useAddMotherboardImageMutation, useRemoveMotherboardMutation } = motherboardApi;
+export const {
+  useGetMotherboardsQuery,
+  useLazyGetMotherboardsQuery,
+  useLazyGetMotherboardQuery,
+  useCreateMotherboardMutation,
+  useAddMotherboardImageMutation,
+  useRemoveMotherboardMutation,
+} = motherboardApi;

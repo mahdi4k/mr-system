@@ -1,20 +1,18 @@
-import React from 'react'
-import type { Metadata } from 'next'
+import React from "react";
+import type { Metadata } from "next";
 import ClientCase from "./clientCase";
 
 export const metadata: Metadata = {
-    title: 'لیست case',
-    description: '',
-}
+  title: "لیست case",
+  description: "",
+};
 
 const Case = () => {
+  return (
+    <>
+      <ClientCase />
+    </>
+  );
+};
 
-
-    return (
-        <>
-            <ClientCase />
-        </>
-    )
-}
-
-export default Case
+export default Case;

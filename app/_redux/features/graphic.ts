@@ -1,54 +1,80 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Motherboard } from "../services/motherboardApi";
-import { CPU } from "../services/cpuApi";
-import { Graphic } from "../services/graphicApi";
-import { POWER } from "../services/powerApi";
-
-
 
 type currentGraphic = {
-    id: number,
-    name: string
-}
+  id: number;
+  name: string;
+};
 
 type GraphicType = {
-    currentGraphic: currentGraphic; //this for add cpu in admin panel
-    selectedGraphic: Partial<Graphic>  // selected motherboard for show in box
-    relatedCpus: CPU[] //  related motherboard from selected cpu 
-    relatedPowers: POWER[]
+  currentGraphic: currentGraphic; //this for add cpu in admin panel
+  selectedGraphic: Partial<{
+    id: number;
+    name: string;
+    manufacturer?: string;
+    attributes?: string[];
+    links: string;
+    type?: string;
+    ram?: number;
+    image: string;
+    price?: string;
+    cpus: number[];
+    brand?: string;
+    psu: string;
+    powers: number[];
+  }>; // selected motherboard for show in box
+  relatedCpus: number[]; //  related motherboard from selected cpu
+  relatedPowers: number[];
 };
 
 const initialState = {
-    currentGraphic: {},
-    selectedGraphic: {},
-    relatedCpus: [],
-    relatedPowers:[]
-
+  currentGraphic: {},
+  selectedGraphic: {},
+  relatedCpus: [],
+  relatedPowers: [],
 } as unknown as GraphicType;
 
 export const graphicSlice = createSlice({
-    name: "graphic",
-    initialState,
-    reducers: {
-        currentGraphicOnSave: (state, action: PayloadAction<currentGraphic>) => {
-            state.currentGraphic = action.payload;
-        },
-        addselectedGraphic: (state, action: PayloadAction<Partial<Graphic>>) => {
-            state.selectedGraphic = action.payload
-        },
-        relatedCpuList: (state, action: PayloadAction<CPU[]>) => {
-            state.relatedCpus = action.payload
-        },
-        relatedPowerList: (state, action: PayloadAction<POWER[]>) => {
-            state.relatedPowers = action.payload
-        }
+  name: "graphic",
+  initialState,
+  reducers: {
+    currentGraphicOnSave: (state, action: PayloadAction<currentGraphic>) => {
+      state.currentGraphic = action.payload;
     },
+    addselectedGraphic: (
+      state,
+      action: PayloadAction<
+        Partial<{
+          id: number;
+          name: string;
+          manufacturer?: string;
+          attributes?: string[];
+          links: string;
+          type?: string;
+          ram?: number;
+          image: string;
+          price?: string;
+          cpus: number[];
+          brand?: string;
+          psu: string;
+          powers: number[];
+        }>
+      >,
+    ) => {
+      state.selectedGraphic = action.payload;
+    },
+    relatedCpuList: (state, action: PayloadAction<number[]>) => {
+      state.relatedCpus = action.payload;
+    },
+    relatedPowerList: (state, action: PayloadAction<number[]>) => {
+      state.relatedPowers = action.payload;
+    },
+  },
 });
 
 export const {
-    currentGraphicOnSave,
-    addselectedGraphic,
-    relatedCpuList,
-    relatedPowerList
+  currentGraphicOnSave,
+  addselectedGraphic,
+  relatedCpuList,
+  relatedPowerList,
 } = graphicSlice.actions;
 export default graphicSlice.reducer;
