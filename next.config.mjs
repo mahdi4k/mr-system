@@ -39,6 +39,11 @@ export default withPWA(withBundleAnalyzer({
         // hostname: 'app.kiwipart.ir',
         pathname: '**',
       },
+      {
+        protocol: 'https',
+        hostname: 'image.torob.com',
+        pathname: '/**',
+      },
     ],
   },
   // Add any additional Next.js config options here

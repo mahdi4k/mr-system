@@ -21,6 +21,7 @@
       "@/_redux/*": ["_redux/*"],
       "@/_utils/*": ["_utils/*"],
       "@/_cssModules/*": ["_cssModules/*"],
+      "@/_db/*": ["_db/*"]
     },
     "plugins": [{ "name": "next" }]
   },
