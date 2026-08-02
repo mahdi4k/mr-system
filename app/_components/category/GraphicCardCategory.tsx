@@ -29,7 +29,7 @@ import { POWER } from "@/_redux/services/powerApi";
 import AmdOrNvidiaFilter from "../filters/AmdOrNvidiaFilter";
 import CategoryLayout from "./CategoryLayout";
 import { theme } from "../../../theme";
-import { getMockCpuByIds, getMockPowerByIds } from "@/_redux/services/mockData";
+import { getCpusByIds, getPowersByIds } from "@/_data/productCatalog";
 const GraphicCardCategory = () => {
   const [value, setValue] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState<string>("");
@@ -48,9 +48,9 @@ const GraphicCardCategory = () => {
   const openModal = (ids: number[], name: string, type: "cpus" | "powers") => {
     open();
     if (type === "cpus") {
-      setModalData(getMockCpuByIds(ids));
+      setModalData(getCpusByIds(ids));
     } else {
-      setModalData(getMockPowerByIds(ids));
+      setModalData(getPowersByIds(ids));
     }
     setModalTitle(name);
     setModalType(type);

@@ -1,26 +1,26 @@
 import ClientPage from "./clientPage";
 import {
-  getMockCpu,
-  getMockGraphic,
-  getMockMotherboard,
-  getMockPower,
-} from "@/_redux/services/mockData";
+  getCpu,
+  getGraphic,
+  getMotherboard,
+  getPower,
+} from "@/_data/productCatalog";
 
 async function getData(params: { part: string; id: string }) {
   let product = null;
 
   switch (params.part) {
     case "cpu":
-      product = getMockCpu(params.id);
+      product = getCpu(params.id);
       break;
     case "graphic":
-      product = getMockGraphic(params.id);
+      product = getGraphic(params.id);
       break;
     case "motherboard":
-      product = getMockMotherboard(params.id);
+      product = getMotherboard(params.id);
       break;
     case "power":
-      product = getMockPower(params.id);
+      product = getPower(params.id);
       break;
   }
 

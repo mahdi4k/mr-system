@@ -1,6 +1,6 @@
 import { api } from "./api";
 import { IResult } from "./caseApi";
-import { mockSsds, getMockSsd } from "./mockData";
+import { getSsd, ssds } from "@/_data/productCatalog";
 
 export type SSD = {
   id: number;
@@ -16,32 +16,68 @@ export type SSD = {
   form: "M.2" | "2.5-inch";
   price?: string;
   links: string;
+  torobUrl?: string;
+};
+
+interface TorobProduct {
+  price?: number | null;
+  image?: string | null;
+  url: string;
+}
+
+interface TorobProductResponse {
+  success: boolean;
+  product?: TorobProduct;
+  error?: string;
+}
+
+const enrichSsdWithTorob = async (ssd: SSD): Promise<SSD> => {
+  if (!ssd.torobUrl) return ssd;
+
+  try {
+    const params = new URLSearchParams({ url: ssd.torobUrl });
+    const response = await fetch(`/api/torob-product?${params}`);
+    const result = (await response.json()) as TorobProductResponse;
+
+    if (!response.ok || !result.success || !result.product) {
+      throw new Error(result.error ?? "Failed to fetch Torob product");
+    }
+
+    return {
+      ...ssd,
+      price:
+        result.product.price == null ? ssd.price : String(result.product.price),
+      image: result.product.image ?? ssd.image,
+      links: result.product.url,
+    };
+  } catch {
+    return ssd;
+  }
 };
 
 export const SsdApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getSsds: builder.query<SSD[], { search?: string }>({
       queryFn: async ({ search }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        let data = mockSsds;
+        let data = ssds;
         if (search) {
           const searchLower = search.toLowerCase();
           data = data.filter((ssd) =>
             ssd.name.toLowerCase().includes(searchLower),
           );
         }
-        return { data };
+        return { data: await Promise.all(data.map(enrichSsdWithTorob)) };
       },
       providesTags: ["ssd"],
     }),
     getSsd: builder.query<IResult<SSD>, { id: string }>({
       queryFn: async ({ id }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        const ssd = getMockSsd(id);
+        const ssd = getSsd(id);
         if (ssd) {
-          return { data: { message: "SSD یافت شد", data: ssd } };
+          const data = await enrichSsdWithTorob(ssd);
+          return { data: { message: "SSD یافت شد", data } };
         }
-        return { data: { message: "SSD یافت نشد", data: mockSsds[0] } };
+        return { data: { message: "SSD یافت نشد", data: ssds[0] } };
       },
       providesTags: ["ssd"],
     }),

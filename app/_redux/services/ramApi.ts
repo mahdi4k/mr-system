@@ -1,6 +1,6 @@
 import { api } from "./api";
 import { IResult } from "./caseApi";
-import { mockRams, getMockRam } from "./mockData";
+import { getRam, rams } from "@/_data/productCatalog";
 
 export type RAM = {
   id: number;
@@ -13,21 +13,57 @@ export type RAM = {
   links: string;
   cpus: number[];
   motherboards: number[];
+  torobUrl?: string;
+};
+
+interface TorobProduct {
+  price?: number | null;
+  image?: string | null;
+  url: string;
+}
+
+interface TorobProductResponse {
+  success: boolean;
+  product?: TorobProduct;
+  error?: string;
+}
+
+const enrichRamWithTorob = async (ram: RAM): Promise<RAM> => {
+  if (!ram.torobUrl) return ram;
+
+  try {
+    const params = new URLSearchParams({ url: ram.torobUrl });
+    const response = await fetch(`/api/torob-product?${params}`);
+    const result = (await response.json()) as TorobProductResponse;
+
+    if (!response.ok || !result.success || !result.product) {
+      throw new Error(result.error ?? "Failed to fetch Torob product");
+    }
+
+    return {
+      ...ram,
+      price:
+        result.product.price == null ? ram.price : String(result.product.price),
+      image: result.product.image ?? ram.image,
+      links: result.product.url,
+    };
+  } catch {
+    return ram;
+  }
 };
 
 export const RamApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getRams: builder.query<RAM[], { search?: string }>({
       queryFn: async ({ search }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        let data = mockRams;
+        let data = rams;
         if (search) {
           const searchLower = search.toLowerCase();
           data = data.filter((ram) =>
             ram.name.toLowerCase().includes(searchLower),
           );
         }
-        return { data };
+        return { data: await Promise.all(data.map(enrichRamWithTorob)) };
       },
       providesTags: ["ram"],
     }),
@@ -40,12 +76,12 @@ export const RamApi = api.injectEndpoints({
     }),
     getRam: builder.query<IResult<RAM>, { id: string }>({
       queryFn: async ({ id }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        const ram = getMockRam(id);
+        const ram = getRam(id);
         if (ram) {
-          return { data: { message: "RAM یافت شد", data: ram } };
+          const data = await enrichRamWithTorob(ram);
+          return { data: { message: "RAM یافت شد", data } };
         }
-        return { data: { message: "RAM یافت نشد", data: mockRams[0] } };
+        return { data: { message: "RAM یافت نشد", data: rams[0] } };
       },
       providesTags: ["ram"],
     }),

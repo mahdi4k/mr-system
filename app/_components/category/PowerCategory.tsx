@@ -33,7 +33,7 @@ import PowerModularFilter from "../filters/PowerModularFilter";
 import CategoryLayout from "./CategoryLayout";
 import PowerStandardFilter from "../filters/PowerStandardFilter";
 import { theme } from "../../../theme";
-import { getMockGraphicByIds } from "@/_redux/services/mockData";
+import { getGraphicsByIds } from "@/_data/productCatalog";
 
 const PowerCategory = () => {
   const [value, setValue] = useState<string[]>([]);
@@ -57,7 +57,7 @@ const PowerCategory = () => {
 
   const openModal = (ids: number[], name: string, type: "graphics") => {
     open();
-    setModalData(getMockGraphicByIds(ids));
+    setModalData(getGraphicsByIds(ids));
     setModalTitle(name);
     setModalType(type);
   };

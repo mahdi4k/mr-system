@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { mockCases, getMockCase } from "./mockData";
+import { cases, getCase } from "@/_data/productCatalog";
 
 export interface IResult<T> {
   message: string;
@@ -18,30 +18,68 @@ export type CASE = {
   torob?: string;
   price?: string;
   links: string;
+  torobUrl?: string;
+};
+
+interface TorobProduct {
+  price?: number | null;
+  image?: string | null;
+  url: string;
+}
+
+interface TorobProductResponse {
+  success: boolean;
+  product?: TorobProduct;
+  error?: string;
+}
+
+const enrichCaseWithTorob = async (caseItem: CASE): Promise<CASE> => {
+  if (!caseItem.torobUrl) return caseItem;
+
+  try {
+    const params = new URLSearchParams({ url: caseItem.torobUrl });
+    const response = await fetch(`/api/torob-product?${params}`);
+    const result = (await response.json()) as TorobProductResponse;
+
+    if (!response.ok || !result.success || !result.product) {
+      throw new Error(result.error ?? "Failed to fetch Torob product");
+    }
+
+    return {
+      ...caseItem,
+      price:
+        result.product.price == null
+          ? caseItem.price
+          : String(result.product.price),
+      image: result.product.image ?? caseItem.image,
+      links: result.product.url,
+    };
+  } catch {
+    return caseItem;
+  }
 };
 
 export const CaseApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getCases: builder.query<CASE[], { search?: string }>({
       queryFn: async ({ search }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        let data = mockCases;
+        let data = cases;
         if (search) {
           const searchLower = search.toLowerCase();
           data = data.filter((c) => c.name.toLowerCase().includes(searchLower));
         }
-        return { data };
+        return { data: await Promise.all(data.map(enrichCaseWithTorob)) };
       },
       providesTags: ["case"],
     }),
     getCase: builder.query<IResult<CASE>, { id: string }>({
       queryFn: async ({ id }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        const caseItem = getMockCase(id);
+        const caseItem = getCase(id);
         if (caseItem) {
-          return { data: { message: "Case یافت شد", data: caseItem } };
+          const data = await enrichCaseWithTorob(caseItem);
+          return { data: { message: "Case یافت شد", data } };
         }
-        return { data: { message: "Case یافت نشد", data: mockCases[0] } };
+        return { data: { message: "Case یافت نشد", data: cases[0] } };
       },
       providesTags: ["case"],
     }),

@@ -28,7 +28,7 @@ import PowerModularFilter from "../filters/PowerModularFilter";
 import CategoryLayout from "./CategoryLayout";
 import { CPU } from "@/_redux/services/cpuApi";
 import { theme } from "../../../theme";
-import { getMockCpuByIds } from "@/_redux/services/mockData";
+import { getCpusByIds } from "@/_data/productCatalog";
 
 const FanCategory = () => {
   const [searchValue, setSearchValue] = useState<string>("");
@@ -47,7 +47,7 @@ const FanCategory = () => {
 
   const openModal = (ids: number[], name: string, type: "cpus") => {
     open();
-    setModalData(getMockCpuByIds(ids));
+    setModalData(getCpusByIds(ids));
     setModalTitle(name);
     setModalType(type);
   };

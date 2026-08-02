@@ -1,6 +1,6 @@
 import { api } from "./api";
 import { IResult } from "./caseApi";
-import { mockGraphics, filterMockGraphics, getMockGraphic } from "./mockData";
+import { filterGraphics, getGraphic, graphics } from "@/_data/productCatalog";
 
 export type Graphic = {
   id: number;
@@ -16,6 +16,45 @@ export type Graphic = {
   brand?: string;
   psu: string;
   powers: number[];
+  torobUrl?: string;
+};
+
+interface TorobProduct {
+  price?: number | null;
+  image?: string | null;
+  url: string;
+}
+
+interface TorobProductResponse {
+  success: boolean;
+  product?: TorobProduct;
+  error?: string;
+}
+
+const enrichGraphicWithTorob = async (graphic: Graphic): Promise<Graphic> => {
+  if (!graphic.torobUrl) return graphic;
+
+  try {
+    const params = new URLSearchParams({ url: graphic.torobUrl });
+    const response = await fetch(`/api/torob-product?${params}`);
+    const result = (await response.json()) as TorobProductResponse;
+
+    if (!response.ok || !result.success || !result.product) {
+      throw new Error(result.error ?? "Failed to fetch Torob product");
+    }
+
+    return {
+      ...graphic,
+      price:
+        result.product.price == null
+          ? graphic.price
+          : String(result.product.price),
+      image: result.product.image ?? graphic.image,
+      links: result.product.url,
+    };
+  } catch {
+    return graphic;
+  }
 };
 
 export const graphicApi = api.injectEndpoints({
@@ -25,20 +64,22 @@ export const graphicApi = api.injectEndpoints({
       { manufacturer?: string[] | never[]; search?: string }
     >({
       queryFn: async ({ manufacturer, search }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        const data = filterMockGraphics({ manufacturer, search });
+        const canonicalGraphics = filterGraphics({ manufacturer, search });
+        const data = await Promise.all(
+          canonicalGraphics.map(enrichGraphicWithTorob),
+        );
         return { data };
       },
       providesTags: ["graphic"],
     }),
     getGraphic: builder.query<IResult<Graphic>, { id: string }>({
       queryFn: async ({ id }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        const graphic = getMockGraphic(id);
+        const graphic = getGraphic(id);
         if (graphic) {
-          return { data: { message: "Graphic یافت شد", data: graphic } };
+          const data = await enrichGraphicWithTorob(graphic);
+          return { data: { message: "Graphic یافت شد", data } };
         }
-        return { data: { message: "Graphic یافت نشد", data: mockGraphics[0] } };
+        return { data: { message: "Graphic یافت نشد", data: graphics[0] } };
       },
       providesTags: ["graphic"],
     }),

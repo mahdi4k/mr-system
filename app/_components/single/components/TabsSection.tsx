@@ -10,11 +10,11 @@ import React, { FC, useEffect, useState } from "react";
 import Image from "next/image";
 import classes from "./tabs.module.css";
 import {
-  getMockCpuByIds,
-  getMockGraphicByIds,
-  getMockMotherboardByIds,
-  getMockPowerByIds,
-} from "@/_redux/services/mockData";
+  getCpusByIds,
+  getGraphicsByIds,
+  getMotherboardsByIds,
+  getPowersByIds,
+} from "@/_data/productCatalog";
 
 type Props = {
   tabLists: { title: string; img: string; value: string }[];
@@ -37,13 +37,13 @@ const TabsSection: FC<Props> = ({ tabLists, tabPanels, defaultValue }) => {
   const getItemsByType = (value: string, ids: number[]) => {
     switch (value) {
       case "cpus":
-        return getMockCpuByIds(ids) as CPU[];
+        return getCpusByIds(ids) as CPU[];
       case "graphics":
-        return getMockGraphicByIds(ids) as Graphic[];
+        return getGraphicsByIds(ids) as Graphic[];
       case "motherboards":
-        return getMockMotherboardByIds(ids) as Motherboard[];
+        return getMotherboardsByIds(ids) as Motherboard[];
       case "powers":
-        return getMockPowerByIds(ids) as POWER[];
+        return getPowersByIds(ids) as POWER[];
       default:
         return [];
     }

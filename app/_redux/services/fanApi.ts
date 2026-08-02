@@ -1,6 +1,6 @@
 import { api } from "./api";
 import { IResult } from "./caseApi";
-import { mockFans, getMockFan } from "./mockData";
+import { fans, getFan } from "@/_data/productCatalog";
 
 export type FAN = {
   id: number;
@@ -14,32 +14,68 @@ export type FAN = {
   links: string;
   cpus: number[];
   brand?: string;
+  torobUrl?: string;
+};
+
+interface TorobProduct {
+  price?: number | null;
+  image?: string | null;
+  url: string;
+}
+
+interface TorobProductResponse {
+  success: boolean;
+  product?: TorobProduct;
+  error?: string;
+}
+
+const enrichFanWithTorob = async (fan: FAN): Promise<FAN> => {
+  if (!fan.torobUrl) return fan;
+
+  try {
+    const params = new URLSearchParams({ url: fan.torobUrl });
+    const response = await fetch(`/api/torob-product?${params}`);
+    const result = (await response.json()) as TorobProductResponse;
+
+    if (!response.ok || !result.success || !result.product) {
+      throw new Error(result.error ?? "Failed to fetch Torob product");
+    }
+
+    return {
+      ...fan,
+      price:
+        result.product.price == null ? fan.price : String(result.product.price),
+      image: result.product.image ?? fan.image,
+      links: result.product.url,
+    };
+  } catch {
+    return fan;
+  }
 };
 
 export const FanApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getFans: builder.query<FAN[], { search?: string }>({
       queryFn: async ({ search }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        let data = mockFans;
+        let data = fans;
         if (search) {
           const searchLower = search.toLowerCase();
           data = data.filter((fan) =>
             fan.name.toLowerCase().includes(searchLower),
           );
         }
-        return { data };
+        return { data: await Promise.all(data.map(enrichFanWithTorob)) };
       },
       providesTags: ["fan"],
     }),
     getFan: builder.query<IResult<FAN>, { id: string }>({
       queryFn: async ({ id }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        const fan = getMockFan(id);
+        const fan = getFan(id);
         if (fan) {
-          return { data: { message: "Fan یافت شد", data: fan } };
+          const data = await enrichFanWithTorob(fan);
+          return { data: { message: "Fan یافت شد", data } };
         }
-        return { data: { message: "Fan یافت نشد", data: mockFans[0] } };
+        return { data: { message: "Fan یافت نشد", data: fans[0] } };
       },
       providesTags: ["fan"],
     }),

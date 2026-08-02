@@ -31,7 +31,7 @@ import classes from "./category.module.css";
 import CardPartPrice from "../shared/CardPartPrice";
 import CategoryLayout from "./CategoryLayout";
 import { theme } from "../../../theme";
-import { getMockCpuByIds } from "@/_redux/services/mockData";
+import { getCpusByIds } from "@/_data/productCatalog";
 
 const MotherboardCategory = () => {
   const [value, setValue] = useState<string[]>([]);
@@ -53,7 +53,7 @@ const MotherboardCategory = () => {
     open();
     setModalTitle(name);
     setModalType(type);
-    setModalData(getMockCpuByIds(ids));
+    setModalData(getCpusByIds(ids));
   };
 
   return (

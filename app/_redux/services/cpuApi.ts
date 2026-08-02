@@ -1,5 +1,6 @@
 import { api } from "./api";
 import { IResult } from "./caseApi";
+import { filterCpus, getCpu } from "@/_data/productCatalog";
 
 export type CPU = {
   id: number;
@@ -16,109 +17,73 @@ export type CPU = {
   links: string;
   brand?: string;
   rams: number[];
+  torobUrl?: string;
 };
 
 interface TorobProduct {
-  id?: string;
-  title?: string;
-  englishTitle?: string | null;
+  title: string;
   price?: number | null;
   image?: string | null;
-  url?: string | null;
+  url: string;
 }
 
-interface TorobProductsResponse {
+interface TorobProductResponse {
   success: boolean;
-  products?: TorobProduct[];
+  product?: TorobProduct;
   error?: string;
 }
 
-const getNumericId = (value: string): number => {
-  let hash = 0;
+const fetchTorobProduct = async (url: string): Promise<TorobProduct> => {
+  const params = new URLSearchParams({ url });
+  const response = await fetch(`/api/torob-product?${params}`);
+  const result = (await response.json()) as TorobProductResponse;
 
-  for (let index = 0; index < value.length; index += 1) {
-    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
+  if (!response.ok || !result.success || !result.product) {
+    throw new Error(result.error ?? "Failed to fetch Torob product");
   }
 
-  return hash;
+  return result.product;
 };
 
-const fetchTorobCpus = async (): Promise<CPU[]> => {
-  const response = await fetch("/api/test-torob-products", {
-    cache: "no-store",
-  });
-  const result = (await response.json()) as TorobProductsResponse;
+const enrichCpuWithTorob = async (cpu: CPU): Promise<CPU> => {
+  if (!cpu.torobUrl) return cpu;
 
-  if (!response.ok || !result.success || !Array.isArray(result.products)) {
-    throw new Error(result.error ?? "Failed to fetch Torob products");
+  try {
+    const product = await fetchTorobProduct(cpu.torobUrl);
+
+    return {
+      ...cpu,
+      price: product.price == null ? cpu.price : String(product.price),
+      image: product.image ?? cpu.image,
+      links: product.url,
+    };
+  } catch {
+    return cpu;
   }
-
-  return result.products.map((product, index) => ({
-    id: getNumericId(product.id ?? `${product.title}-${index}`),
-    name: product.title ?? product.englishTitle ?? "پردازنده بدون نام",
-    cpu_socket: "نامشخص",
-    integrated_graphic: "نامشخص",
-    manufacturer: "Intel",
-    price: product.price == null ? undefined : String(product.price),
-    attributes: product.englishTitle ? [product.englishTitle] : undefined,
-    image: product.image ?? "/svg/cpu.svg",
-    motherboards: [],
-    fans: [],
-    graphics: [],
-    links: product.url ?? "",
-    brand: "Intel",
-    rams: [],
-  }));
 };
-
-const toQueryError = (error: unknown) => ({
-  status: "CUSTOM_ERROR" as const,
-  error: error instanceof Error ? error.message : "Failed to fetch CPUs",
-});
 
 export const cpuApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getCpus: builder.query<CPU[], { manufacturer?: string[]; search?: string }>(
       {
         queryFn: async ({ manufacturer, search }) => {
-          try {
-            let data = await fetchTorobCpus();
-
-            if (manufacturer && manufacturer.length > 0) {
-              data = data.filter((cpu) =>
-                manufacturer.includes(cpu.manufacturer),
-              );
-            }
-
-            if (search) {
-              const normalizedSearch = search.toLowerCase();
-              data = data.filter((cpu) =>
-                cpu.name.toLowerCase().includes(normalizedSearch),
-              );
-            }
-
-            return { data };
-          } catch (error) {
-            return { error: toQueryError(error) };
-          }
+          const canonicalCpus = filterCpus({ manufacturer, search });
+          const data = await Promise.all(canonicalCpus.map(enrichCpuWithTorob));
+          return { data };
         },
         providesTags: ["cpu"],
       },
     ),
     getCpu: builder.query<IResult<CPU>, { id: string }>({
       queryFn: async ({ id }) => {
-        try {
-          const cpus = await fetchTorobCpus();
-          const cpu = cpus.find((item) => item.id === Number(id));
+        const cpu = getCpu(id);
 
-          if (!cpu) {
-            return { error: { status: 404, data: "CPU یافت نشد" } };
-          }
-
-          return { data: { message: "CPU یافت شد", data: cpu } };
-        } catch (error) {
-          return { error: toQueryError(error) };
+        if (!cpu) {
+          return { error: { status: 404, data: "CPU یافت نشد" } };
         }
+
+        const data = await enrichCpuWithTorob(cpu);
+        return { data: { message: "CPU یافت شد", data } };
       },
       providesTags: ["cpu"],
     }),

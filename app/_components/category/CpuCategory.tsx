@@ -25,10 +25,7 @@ import ModalItems from "./components/modalItems";
 import { Motherboard } from "@/_redux/services/motherboardApi";
 import CategoryLayout from "./CategoryLayout";
 import { theme } from "../../../theme";
-import {
-  getMockGraphicByIds,
-  getMockMotherboardByIds,
-} from "@/_redux/services/mockData";
+import { getGraphicsByIds, getMotherboardsByIds } from "@/_data/productCatalog";
 const CpuCategory = () => {
   const [value, setValue] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState<string>("");
@@ -52,9 +49,9 @@ const CpuCategory = () => {
   ) => {
     open();
     if (type === "graphics") {
-      setModalData(getMockGraphicByIds(ids));
+      setModalData(getGraphicsByIds(ids));
     } else {
-      setModalData(getMockMotherboardByIds(ids));
+      setModalData(getMotherboardsByIds(ids));
     }
     setModalTitle(name);
     setModalType(type);

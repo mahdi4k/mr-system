@@ -1,10 +1,10 @@
 import { api } from "./api";
 import { IResult } from "./caseApi";
 import {
-  mockMotherboards,
-  filterMockMotherboards,
-  getMockMotherboard,
-} from "./mockData";
+  filterMotherboards,
+  getMotherboard,
+  motherboards,
+} from "@/_data/productCatalog";
 
 export type Motherboard = {
   id: number;
@@ -23,6 +23,47 @@ export type Motherboard = {
   cpus: number[];
   rams: number[];
   attributes?: string[];
+  torobUrl?: string;
+};
+
+interface TorobProduct {
+  price?: number | null;
+  image?: string | null;
+  url: string;
+}
+
+interface TorobProductResponse {
+  success: boolean;
+  product?: TorobProduct;
+  error?: string;
+}
+
+const enrichMotherboardWithTorob = async (
+  motherboard: Motherboard,
+): Promise<Motherboard> => {
+  if (!motherboard.torobUrl) return motherboard;
+
+  try {
+    const params = new URLSearchParams({ url: motherboard.torobUrl });
+    const response = await fetch(`/api/torob-product?${params}`);
+    const result = (await response.json()) as TorobProductResponse;
+
+    if (!response.ok || !result.success || !result.product) {
+      throw new Error(result.error ?? "Failed to fetch Torob product");
+    }
+
+    return {
+      ...motherboard,
+      price:
+        result.product.price == null
+          ? motherboard.price
+          : String(result.product.price),
+      image: result.product.image ?? motherboard.image,
+      links: result.product.url,
+    };
+  } catch {
+    return motherboard;
+  }
 };
 
 type authTokenDTO = {
@@ -39,23 +80,28 @@ export const motherboardApi = api.injectEndpoints({
       { manufacturer?: string[] | never[]; search?: string }
     >({
       queryFn: async ({ manufacturer, search }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        const data = filterMockMotherboards({ manufacturer, search });
+        const canonicalMotherboards = filterMotherboards({
+          manufacturer,
+          search,
+        });
+        const data = await Promise.all(
+          canonicalMotherboards.map(enrichMotherboardWithTorob),
+        );
         return { data };
       },
       providesTags: ["motherboards"],
     }),
     getMotherboard: builder.query<IResult<Motherboard>, { id: string }>({
       queryFn: async ({ id }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        const motherboard = getMockMotherboard(id);
+        const motherboard = getMotherboard(id);
         if (motherboard) {
+          const data = await enrichMotherboardWithTorob(motherboard);
           return {
-            data: { message: "Motherboard یافت شد", data: motherboard },
+            data: { message: "Motherboard یافت شد", data },
           };
         }
         return {
-          data: { message: "Motherboard یافت نشد", data: mockMotherboards[0] },
+          data: { message: "Motherboard یافت نشد", data: motherboards[0] },
         };
       },
       providesTags: ["motherboards"],

@@ -1,6 +1,6 @@
 import { api } from "./api";
 import { IResult } from "./caseApi";
-import { mockPowers, filterMockPowers, getMockPower } from "./mockData";
+import { filterPowers, getPower, powers } from "@/_data/productCatalog";
 
 export type POWER = {
   id: number;
@@ -13,6 +13,45 @@ export type POWER = {
   brand?: string;
   psu: string;
   modular: number;
+  torobUrl?: string;
+};
+
+interface TorobProduct {
+  price?: number | null;
+  image?: string | null;
+  url: string;
+}
+
+interface TorobProductResponse {
+  success: boolean;
+  product?: TorobProduct;
+  error?: string;
+}
+
+const enrichPowerWithTorob = async (power: POWER): Promise<POWER> => {
+  if (!power.torobUrl) return power;
+
+  try {
+    const params = new URLSearchParams({ url: power.torobUrl });
+    const response = await fetch(`/api/torob-product?${params}`);
+    const result = (await response.json()) as TorobProductResponse;
+
+    if (!response.ok || !result.success || !result.product) {
+      throw new Error(result.error ?? "Failed to fetch Torob product");
+    }
+
+    return {
+      ...power,
+      price:
+        result.product.price == null
+          ? power.price
+          : String(result.product.price),
+      image: result.product.image ?? power.image,
+      links: result.product.url,
+    };
+  } catch {
+    return power;
+  }
 };
 
 export const PowerApi = api.injectEndpoints({
@@ -26,20 +65,22 @@ export const PowerApi = api.injectEndpoints({
       }
     >({
       queryFn: async ({ modular, eighty_plus, search }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        const data = filterMockPowers({ modular, eighty_plus, search });
+        const canonicalPowers = filterPowers({ modular, search });
+        const data = await Promise.all(
+          canonicalPowers.map(enrichPowerWithTorob),
+        );
         return { data };
       },
       providesTags: ["power"],
     }),
     getPower: builder.query<IResult<POWER>, { id: string }>({
       queryFn: async ({ id }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        const power = getMockPower(id);
+        const power = getPower(id);
         if (power) {
-          return { data: { message: "Power یافت شد", data: power } };
+          const data = await enrichPowerWithTorob(power);
+          return { data: { message: "Power یافت شد", data } };
         }
-        return { data: { message: "Power یافت نشد", data: mockPowers[0] } };
+        return { data: { message: "Power یافت نشد", data: powers[0] } };
       },
       providesTags: ["power"],
     }),
