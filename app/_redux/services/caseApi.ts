@@ -1,12 +1,13 @@
 import { api } from "./api";
 import { cases, getCase } from "@/_data/productCatalog";
+import type { RecommendableProduct } from "@/_data/products/types";
 
 export interface IResult<T> {
   message: string;
   data: T;
 }
 
-export type CASE = {
+export type CASE = RecommendableProduct & {
   id: number;
   name: string;
   max_total_fan: string;

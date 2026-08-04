@@ -1,8 +1,9 @@
 import { api } from "./api";
 import { IResult } from "./caseApi";
 import { filterGraphics, getGraphic, graphics } from "@/_data/productCatalog";
+import type { RecommendableProduct } from "@/_data/products/types";
 
-export type Graphic = {
+export type Graphic = RecommendableProduct & {
   id: number;
   name: string;
   manufacturer: string;

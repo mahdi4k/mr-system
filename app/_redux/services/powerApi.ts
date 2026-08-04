@@ -1,8 +1,9 @@
 import { api } from "./api";
 import { IResult } from "./caseApi";
 import { filterPowers, getPower, powers } from "@/_data/productCatalog";
+import type { RecommendableProduct } from "@/_data/products/types";
 
-export type POWER = {
+export type POWER = RecommendableProduct & {
   id: number;
   name: string;
   attributes?: string[];

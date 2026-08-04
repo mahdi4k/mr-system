@@ -1,8 +1,9 @@
 import { api } from "./api";
 import { IResult } from "./caseApi";
 import { filterCpus, getCpu } from "@/_data/productCatalog";
+import type { RecommendableProduct } from "@/_data/products/types";
 
-export type CPU = {
+export type CPU = RecommendableProduct & {
   id: number;
   name: string;
   cpu_socket: string;

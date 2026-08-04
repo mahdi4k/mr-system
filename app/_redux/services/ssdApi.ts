@@ -1,8 +1,9 @@
 import { api } from "./api";
 import { IResult } from "./caseApi";
 import { getSsd, ssds } from "@/_data/productCatalog";
+import type { RecommendableProduct } from "@/_data/products/types";
 
-export type SSD = {
+export type SSD = RecommendableProduct & {
   id: number;
   name: string;
   size: string;

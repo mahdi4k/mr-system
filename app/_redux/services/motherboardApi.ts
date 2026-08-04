@@ -5,8 +5,9 @@ import {
   getMotherboard,
   motherboards,
 } from "@/_data/productCatalog";
+import type { RecommendableProduct } from "@/_data/products/types";
 
-export type Motherboard = {
+export type Motherboard = RecommendableProduct & {
   id: number;
   name: string;
   size: string;

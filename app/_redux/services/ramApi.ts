@@ -1,8 +1,9 @@
 import { api } from "./api";
 import { IResult } from "./caseApi";
 import { getRam, rams } from "@/_data/productCatalog";
+import type { RecommendableProduct } from "@/_data/products/types";
 
-export type RAM = {
+export type RAM = RecommendableProduct & {
   id: number;
   name: string;
   frequency: string;

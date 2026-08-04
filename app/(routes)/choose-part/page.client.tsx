@@ -77,7 +77,7 @@ const PageClient: React.FC = () => {
     useLazyGetPowersQuery();
 
   const handleModalOpen = (dataQuery: any, type: string) => {
-    dataQuery({}, { skip: false });
+    dataQuery({}, true);
     setSelectedType(type);
     open();
   };

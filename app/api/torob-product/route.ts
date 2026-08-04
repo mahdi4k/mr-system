@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 interface TorobJsonLdProduct {
   "@type"?: string;
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const response = await fetch(productUrl, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 86400 },
       headers: {
         Accept: "text/html",
         "User-Agent": "Mozilla/5.0",
@@ -96,15 +96,23 @@ export async function GET(request: NextRequest) {
       "_/280x280.webp",
     );
 
-    return NextResponse.json({
-      success: true,
-      product: {
-        title: product.name ?? "",
-        price,
-        image: optimizedImage,
-        url: product.url ?? productUrl,
+    return NextResponse.json(
+      {
+        success: true,
+        product: {
+          title: product.name ?? "",
+          price,
+          image: optimizedImage,
+          url: product.url ?? productUrl,
+        },
       },
-    });
+      {
+        headers: {
+          "Cache-Control":
+            "public, max-age=86400, s-maxage=86400, stale-while-revalidate=3600",
+        },
+      },
+    );
   } catch (error) {
     console.error("Error fetching Torob product:", error);
 

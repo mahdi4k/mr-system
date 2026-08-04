@@ -6,12 +6,14 @@ import { Motherboard } from "@/_redux/services/motherboardApi";
 import { POWER } from "@/_redux/services/powerApi";
 import { RAM } from "@/_redux/services/ramApi";
 import { SSD } from "@/_redux/services/ssdApi";
-import { Card, Modal, SimpleGrid, Skeleton, Text } from "@mantine/core";
+import type { PartType, RecommendableProduct } from "@/_data/products/types";
+import { Badge, Card, Modal, SimpleGrid, Skeleton, Text } from "@mantine/core";
 import React, { FC, useEffect, useState } from "react";
 import classes from "./choosePart.module.css";
 import CardPartPrice from "../shared/CardPartPrice";
 import { useRouter, useSearchParams } from "next/navigation";
 import KiwiImage from "../shared/KiwiImage";
+import { IconSparkles } from "@tabler/icons-react";
 
 type Props = {
   opened: boolean;
@@ -55,7 +57,7 @@ type Props = {
   type: string;
 };
 
-type dataProp = {
+type dataProp = RecommendableProduct & {
   name: string;
   id: number;
   price?: string;
@@ -86,6 +88,31 @@ const ModalPart: FC<Props> = ({
   const ramParam = searchParams.get("ram");
   const graphicParam = searchParams.get("graphic");
   const powerParam = searchParams.get("power");
+  const selectedPartIds: Partial<Record<PartType, number>> = {
+    cpu: Number(cpuParam) || undefined,
+    motherboard: Number(motherboardParam) || undefined,
+    ram: Number(ramParam) || undefined,
+    graphic: Number(graphicParam) || undefined,
+    power: Number(powerParam) || undefined,
+    fan: Number(searchParams.get("fan")) || undefined,
+    ssd: Number(searchParams.get("ssd")) || undefined,
+    case: Number(searchParams.get("case")) || undefined,
+  };
+
+  const isRecommended = (item: dataProp): boolean =>
+    (Object.entries(item.recommendations ?? {}) as [PartType, number[]][]).some(
+      ([partType, productIds]) => {
+        const selectedId = selectedPartIds[partType];
+        return selectedId !== undefined && productIds.includes(selectedId);
+      },
+    );
+
+  const visibleData = dataList
+    ? [...dataList].sort(
+        (first, second) =>
+          Number(isRecommended(second)) - Number(isRecommended(first)),
+      )
+    : undefined;
   useEffect(() => {
     if (opened) {
       setDataList([]);
@@ -234,34 +261,49 @@ const ModalPart: FC<Props> = ({
         py={"lg"}
         cols={{ base: 2, lg: 4 }}
       >
-        {dataList && dataList.length > 0
-          ? dataList.map((item) => (
-              <Card
-                onClick={() => handleCardClick(item.id)}
-                key={item.id}
-                className={classes.partItem}
-              >
-                <Card.Section
-                  className={classes.categoryImage}
-                  mt={"0"}
-                  ta={"center"}
-                >
-                  {item.image && (
-                    <KiwiImage
-                      width={300}
-                      height={300}
-                      img={item.image}
-                      alt={item.name}
-                    />
-                  )}
-                </Card.Section>
+        {visibleData && visibleData.length > 0
+          ? visibleData.map((item) => {
+              const recommended = isRecommended(item);
 
-                <Text ta={"center"} mt={"lg"} size="md">
-                  {item.name}
-                </Text>
-                <CardPartPrice price={item.price} />
-              </Card>
-            ))
+              return (
+                <Card
+                  onClick={() => handleCardClick(item.id)}
+                  key={item.id}
+                  pos="relative"
+                  className={`${classes.partItem} ${recommended ? classes.recommendedPart : ""}`}
+                >
+                  {recommended && (
+                    <Badge
+                      className={classes.recommendationBadge}
+                      leftSection={<IconSparkles size={12} stroke={2.2} />}
+                      size="sm"
+                      radius="sm"
+                    >
+                      پیشنهاد ویژه
+                    </Badge>
+                  )}
+                  <Card.Section
+                    className={classes.categoryImage}
+                    mt={"0"}
+                    ta={"center"}
+                  >
+                    {item.image && (
+                      <KiwiImage
+                        width={300}
+                        height={300}
+                        img={item.image}
+                        alt={item.name}
+                      />
+                    )}
+                  </Card.Section>
+
+                  <Text ta={"center"} mt={"lg"} size="md">
+                    {item.name}
+                  </Text>
+                  <CardPartPrice price={item.price} />
+                </Card>
+              );
+            })
           : ""}
       </SimpleGrid>
       {dataList?.length === 0 && (

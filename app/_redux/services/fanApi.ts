@@ -1,8 +1,9 @@
 import { api } from "./api";
 import { IResult } from "./caseApi";
 import { fans, getFan } from "@/_data/productCatalog";
+import type { RecommendableProduct } from "@/_data/products/types";
 
-export type FAN = {
+export type FAN = RecommendableProduct & {
   id: number;
   name: string;
   fan_noise?: string;
