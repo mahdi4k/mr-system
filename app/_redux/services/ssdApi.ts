@@ -57,6 +57,7 @@ const enrichSsdWithTorob = async (ssd: SSD): Promise<SSD> => {
 };
 
 export const SsdApi = api.injectEndpoints({
+  overrideExisting: process.env.NODE_ENV === "development",
   endpoints: (builder) => ({
     getSsds: builder.query<SSD[], { search?: string }>({
       queryFn: async ({ search }) => {

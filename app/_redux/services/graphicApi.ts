@@ -61,6 +61,7 @@ const enrichGraphicWithTorob = async (graphic: Graphic): Promise<Graphic> => {
 };
 
 export const graphicApi = api.injectEndpoints({
+  overrideExisting: process.env.NODE_ENV === "development",
   endpoints: (builder) => ({
     getGraphics: builder.query<
       Graphic[],

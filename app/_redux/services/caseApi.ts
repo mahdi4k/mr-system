@@ -62,6 +62,7 @@ const enrichCaseWithTorob = async (caseItem: CASE): Promise<CASE> => {
 };
 
 export const CaseApi = api.injectEndpoints({
+  overrideExisting: process.env.NODE_ENV === "development",
   endpoints: (builder) => ({
     getCases: builder.query<CASE[], { search?: string }>({
       queryFn: async ({ search }) => {

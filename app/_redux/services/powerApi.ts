@@ -56,6 +56,7 @@ const enrichPowerWithTorob = async (power: POWER): Promise<POWER> => {
 };
 
 export const PowerApi = api.injectEndpoints({
+  overrideExisting: process.env.NODE_ENV === "development",
   endpoints: (builder) => ({
     getPowers: builder.query<
       POWER[],

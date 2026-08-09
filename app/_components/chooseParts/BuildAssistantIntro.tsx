@@ -9,7 +9,7 @@ const BuildAssistantIntro = () => {
         aria-labelledby="build-assistant-intro-title"
         className={classes.introSection}
       >
-        <Paper className={classes.intro} radius="xl" shadow="md" withBorder>
+        <Paper className={classes.intro} radius="lg" shadow="md" withBorder>
           <Group justify="space-between" wrap="nowrap">
             <Group gap="sm" wrap="nowrap">
               <div className={classes.assistantMark}>

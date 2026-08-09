@@ -76,6 +76,7 @@ type authTokenDTO = {
   };
 };
 export const motherboardApi = api.injectEndpoints({
+  overrideExisting: process.env.NODE_ENV === "development",
   endpoints: (builder) => ({
     getMotherboards: builder.query<
       Motherboard[],

@@ -37,7 +37,7 @@
     background-size: cover;
     transition: all 500ms ease;
     background-position: center;
-    filter: brightness(0.5);
+    filter: brightness(0.9);
 }
 
 .imageBig {

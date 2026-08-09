@@ -1,7 +1,6 @@
 .introSection {
-  width: calc(100% - rem(32px));
-  max-width: rem(1200px);
-  margin: var(--mantine-spacing-xl) auto;
+  width: 100%;
+  margin-block: var(--mantine-spacing-xl);
 }
 
 .floatingButton {
@@ -64,18 +63,27 @@
 .chatHeader {
   min-height: 58px;
   padding-inline: var(--mantine-spacing-md);
-  border-bottom: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-5));
+  border-bottom: 1px solid
+    light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-5));
 }
 
 .intro {
   position: relative;
+  overflow: hidden;
   padding: 28px;
   color: light-dark(var(--mantine-color-dark-8), var(--mantine-color-gray-0));
   background:
-    radial-gradient(circle at 0 0, rgb(255 255 255 / 72%), transparent 32%),
-    linear-gradient(145deg, rgb(223 247 183 / 94%), rgb(134 214 160 / 64%));
+    radial-gradient(
+      circle at 0 0,
+      light-dark(rgb(255 255 255 / 72%), rgb(130 201 30 / 11%)),
+      transparent 34%
+    ),
+    linear-gradient(
+      145deg,
+      light-dark(rgb(223 247 183 / 94%), var(--mantine-color-dark-6)),
+      light-dark(rgb(134 214 160 / 64%), var(--mantine-color-dark-8))
+    );
 }
-
 
 .assistantMark {
   display: grid;
@@ -83,11 +91,11 @@
   height: 46px;
   flex: 0 0 auto;
   place-items: center;
-  border: 1px solid rgb(18 61 36 / 12%);
+  border: 1px solid light-dark(rgb(18 61 36 / 12%), var(--mantine-color-dark-4));
   border-radius: 14px;
-  color: #123d24;
-  box-shadow: 0 8px 22px rgb(35 125 72 / 14%);
-  background: rgb(255 255 255 / 72%);
+  color: light-dark(#123d24, var(--mantine-color-lime-3));
+  box-shadow: 0 8px 22px light-dark(rgb(35 125 72 / 14%), rgb(0 0 0 / 24%));
+  background: light-dark(rgb(255 255 255 / 72%), var(--mantine-color-dark-5));
 }
 
 .statusBadge {
@@ -123,9 +131,9 @@
   height: 22px;
   place-items: center;
   border-radius: 50%;
-  color: white;
+  color: light-dark(white, var(--mantine-color-dark-9));
   font-size: 10px;
-  background: #276b3f;
+  background: light-dark(#276b3f, var(--mantine-color-lime-4));
 }
 
 .chat {
@@ -135,11 +143,15 @@
   min-height: 0;
   flex-direction: column;
   background:
-    linear-gradient(light-dark(rgb(255 255 255 / 82%), rgb(26 27 30 / 92%)),
-      light-dark(rgb(255 255 255 / 82%), rgb(26 27 30 / 92%))),
-    radial-gradient(circle at 10px 10px,
+    linear-gradient(
+      light-dark(rgb(255 255 255 / 82%), rgb(26 27 30 / 92%)),
+      light-dark(rgb(255 255 255 / 82%), rgb(26 27 30 / 92%))
+    ),
+    radial-gradient(
+      circle at 10px 10px,
       rgb(130 201 30 / 16%) 1px,
-      transparent 0);
+      transparent 0
+    );
   background-size:
     auto,
     20px 20px;
@@ -176,8 +188,10 @@
 .assistantMessage {
   align-self: flex-start;
   border-bottom-right-radius: 4px;
-  background: light-dark(var(--mantine-color-gray-1),
-      var(--mantine-color-dark-5));
+  background: light-dark(
+    var(--mantine-color-gray-1),
+    var(--mantine-color-dark-5)
+  );
 }
 
 .userMessage {
@@ -189,7 +203,8 @@
 
 .buildPreview {
   width: min(440px, 100%);
-  border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  border: 1px solid
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
   background: light-dark(rgb(255 255 255 / 86%), rgb(20 21 23 / 72%));
 }
 
@@ -206,12 +221,15 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
   padding: 12px 16px 4px;
-  border-top: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-5));
+  border-top: 1px solid
+    light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-5));
 }
 
 .input :global(.mantine-TextInput-input) {
-  border-color: light-dark(var(--mantine-color-gray-3),
-      var(--mantine-color-dark-4));
+  border-color: light-dark(
+    var(--mantine-color-gray-3),
+    var(--mantine-color-dark-4)
+  );
   box-shadow: 0 4px 16px rgb(0 0 0 / 5%);
 }
 
@@ -228,7 +246,6 @@
 
 @media (max-width: $mantine-breakpoint-sm) {
   .introSection {
-    width: calc(100% - rem(24px));
     margin-block: var(--mantine-spacing-md);
   }
 

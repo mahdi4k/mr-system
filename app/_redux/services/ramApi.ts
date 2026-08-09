@@ -55,6 +55,7 @@ const enrichRamWithTorob = async (ram: RAM): Promise<RAM> => {
 };
 
 export const RamApi = api.injectEndpoints({
+  overrideExisting: process.env.NODE_ENV === "development",
   endpoints: (builder) => ({
     getRams: builder.query<RAM[], { search?: string }>({
       queryFn: async ({ search }) => {

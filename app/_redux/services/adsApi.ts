@@ -51,6 +51,7 @@ export interface ApiResponse {
 }
 
 export const AdsApi = api.injectEndpoints({
+  overrideExisting: process.env.NODE_ENV === "development",
   endpoints: (builder) => ({
     getAdsList: builder.query<ApiResponse, { page?: number }>({
       queryFn: async ({ page }) => {

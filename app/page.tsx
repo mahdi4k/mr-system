@@ -11,11 +11,35 @@ import { Metadata, Viewport } from "next";
 import SuggestSection from "./_components/suggestSection/SuggestSection";
 import AdsSection from "./_components/adsSection/AdsSection";
 import { cookies } from "next/headers";
-import { Button, Container, Group, Text } from "@mantine/core";
-import { IconArrowLeft } from "@tabler/icons-react";
-import PageClient from "./(routes)/choose-part/page.client";
+import { Container, Group, Text } from "@mantine/core";
+import { IconArrowLeft, IconCircleCheck } from "@tabler/icons-react";
 import BuildAssistantIntro from "@/_components/chooseParts/BuildAssistantIntro";
+import Image from "next/image";
+import Link from "next/link";
 import classes from "./page.module.css";
+
+const exampleParts = [
+  {
+    type: "پردازنده",
+    name: "Intel Core i5-14400F",
+    image: "/svg/cpu.svg",
+  },
+  {
+    type: "کارت گرافیک",
+    name: "ASUS Prime RTX 5060 8GB",
+    image: "/svg/graphic.svg",
+  },
+  {
+    type: "مادربرد",
+    name: "ASUS Prime B760-Plus D4",
+    image: "/svg/motherboard.svg",
+  },
+  {
+    type: "حافظه رم",
+    name: "Crucial 16GB DDR4-3200",
+    image: "/svg/ram.svg",
+  },
+];
 
 export const viewport: Viewport = {
   themeColor: "#87A10C",
@@ -70,39 +94,79 @@ const page = async () => {
   return (
     <div>
       <BuildAssistantIntro />
-      <div className={classes.builderPreview}>
-        <div className={classes.builderContent}>
-          <PageClient />
-        </div>
-        <div className={classes.builderAction}>
-          <div className={classes.builderActionPanel}>
-            <Text className={classes.builderActionText} fw={600} size="sm">
-              قطعات سازگار را کنار هم بچین و سیستم ایده‌آلت را بساز
-            </Text>
-            <Button
-              className={classes.builderButton}
-              color="lime"
-              component="a"
-              href="/choose-part"
-              radius="xl"
-              rightSection={<IconArrowLeft size={18} stroke={2} />}
-              size="md"
-            >
-              سیستم خودت را بساز
-            </Button>
+      <Container className={classes.builderContainer} size="lg">
+        <Link
+          aria-label="ساخت سیستم شخصی"
+          className={classes.builderPreview}
+          href="/choose-part"
+        >
+          <div className={classes.previewHeader}>
+            <div>
+              <Text className={classes.eyebrow} fw={800} size="xs">
+                نمونه سیستم پیشنهادی
+              </Text>
+              <Text className={classes.previewTitle} fw={900}>
+                یک ترکیب متعادل برای بازی و کار روزمره
+              </Text>
+              <Text c="dimmed" mt={4} size="sm">
+                نمونه‌ای از نتیجه‌ای که با انتخاب هوشمند قطعات دریافت می‌کنید
+              </Text>
+            </div>
+            <div className={classes.compatibilityStatus}>
+              <IconCircleCheck size={20} stroke={2.2} />
+              کاملا سازگار
+            </div>
           </div>
-        </div>
-      </div>
+
+          <div className={classes.partsGrid}>
+            {exampleParts.map((part, index) => (
+              <div className={classes.partCard} key={part.type}>
+                <div className={classes.partImage}>
+                  <Image
+                    alt={part.type}
+                    height={72}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    src={part.image}
+                    width={82}
+                  />
+                </div>
+                <div className={classes.partDetails}>
+                  <Text c="dimmed" fw={700} size="xs">
+                    {part.type}
+                  </Text>
+                  <Text className={classes.partName} fw={800} size="sm">
+                    {part.name}
+                  </Text>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className={classes.previewFooter}>
+            <div>
+              <Text c="dimmed" size="xs">
+                قیمت تقریبی این ترکیب
+              </Text>
+              <Text className={classes.totalPrice} fw={900}>
+                حدود ۸۲ میلیون تومان
+              </Text>
+            </div>
+            <span className={classes.builderButton}>
+              سیستم خودت بساز
+              <IconArrowLeft size={18} stroke={2} />
+            </span>
+          </div>
+        </Link>
+      </Container>
       <SuggestSection />
 
       <AdsSection token={token} />
-      <Container my={"xl"} size="lg">
+      {/* <Container my={"xl"} size="lg">
         <Group>
           <CpuMotherboard />
           <CpuGraphic />
         </Group>
-        {/* <GraphicPower /> */}
-      </Container>
+      </Container> */}
       <BannerSection />
       {/* <CardService /> */}
       <ArticleSection />

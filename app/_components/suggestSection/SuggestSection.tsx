@@ -1,15 +1,12 @@
 "use client";
 
-import {
-  Card,
-  Container,
-  Grid,
-  rem,
-  SimpleGrid,
-  Text,
-} from "@mantine/core";
+import { Card, Container, Grid, rem, SimpleGrid, Text } from "@mantine/core";
 import React from "react";
 import classes from "./ImageCard.module.css";
+import {
+  getSuggestedBuildHref,
+  suggestedBuilds,
+} from "@/_data/suggestedBuilds";
 
 const PRIMARY_COL_HEIGHT = rem(300);
 
@@ -27,19 +24,19 @@ const SuggestSection = () => {
               className={classes.card}
               radius="md"
               component="a"
-              href="/choose-part?cpu=3&graphic=21&motherboard=2&power=12&ram=1&fan=5&ssd=3&case=2"
+              href={getSuggestedBuildHref(suggestedBuilds[0])}
             >
               <div
                 className={classes.image}
                 style={{
-                  backgroundImage: "url(/pc-suggest-mid.png)",
+                  backgroundImage: `url(${suggestedBuilds[0].image})`,
                 }}
               />
               <div className={classes.overlay} />
               <div className={classes.content}>
                 <div>
                   <Text size="lg" className={classes.title} fw={500}>
-                    کامپیوتر گیمینگ میان رده
+                    {suggestedBuilds[0].title}
                   </Text>
                 </div>
               </div>
@@ -52,19 +49,19 @@ const SuggestSection = () => {
               className={classes.card}
               radius="md"
               component="a"
-              href="/choose-part?cpu=7&graphic=26&motherboard=7&power=13&ram=7&fan=6&ssd=3&case=5"
+              href={getSuggestedBuildHref(suggestedBuilds[1])}
             >
               <div
                 className={classes.image}
                 style={{
-                  backgroundImage: "url(/high-end.png)",
+                  backgroundImage: `url(${suggestedBuilds[1].image})`,
                 }}
               />
               <div className={classes.overlay} />
               <div className={classes.content}>
                 <div>
                   <Text size="lg" className={classes.title} fw={500}>
-                    کامپیوتر گیمینگ بالا رده
+                    {suggestedBuilds[1].title}
                   </Text>
                 </div>
               </div>
@@ -79,19 +76,19 @@ const SuggestSection = () => {
               className={classes.card}
               radius="md"
               component="a"
-              href="/choose-part?cpu=3&graphic=22&motherboard=2&power=9&ram=1&fan=5&ssd=3&case=2"
+              href={getSuggestedBuildHref(suggestedBuilds[2])}
             >
               <div
                 className={classes.image}
                 style={{
-                  backgroundImage: "url(/low-end.png)",
+                  backgroundImage: `url(${suggestedBuilds[2].image})`,
                 }}
               />
               <div className={classes.overlay} />
               <div className={classes.content}>
                 <div>
                   <Text size="lg" className={classes.title} fw={500}>
-                    کامپیوتر گیمینگ اقتصادی
+                    {suggestedBuilds[2].title}
                   </Text>
                 </div>
               </div>
@@ -104,19 +101,19 @@ const SuggestSection = () => {
               className={classes.card}
               radius="md"
               component="a"
-              href="/choose-part?cpu=8&graphic=22&motherboard=9&power=9&ram=8&fan=7&ssd=1&case=4"
+              href={getSuggestedBuildHref(suggestedBuilds[3])}
             >
               <div
                 className={classes.image}
                 style={{
-                  backgroundImage: "url(/extra-low-end.png)",
+                  backgroundImage: `url(${suggestedBuilds[3].image})`,
                 }}
               />
               <div className={classes.overlay} />
               <div className={classes.content}>
                 <div>
                   <Text size="lg" className={classes.title} fw={500}>
-                    کامپیوتر گیمینگ فوق اقتصادی
+                    {suggestedBuilds[3].title}
                   </Text>
                 </div>
               </div>

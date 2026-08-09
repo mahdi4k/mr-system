@@ -66,6 +66,7 @@ const enrichCpuWithTorob = async (cpu: CPU): Promise<CPU> => {
 };
 
 export const cpuApi = api.injectEndpoints({
+  overrideExisting: process.env.NODE_ENV === "development",
   endpoints: (builder) => ({
     getCpus: builder.query<CPU[], { manufacturer?: string[]; search?: string }>(
       {

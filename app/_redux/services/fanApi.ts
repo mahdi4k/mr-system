@@ -57,6 +57,7 @@ const enrichFanWithTorob = async (fan: FAN): Promise<FAN> => {
 };
 
 export const FanApi = api.injectEndpoints({
+  overrideExisting: process.env.NODE_ENV === "development",
   endpoints: (builder) => ({
     getFans: builder.query<FAN[], { search?: string }>({
       queryFn: async ({ search }) => {
