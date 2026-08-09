@@ -1,5 +1,4 @@
-import { IResult } from "./caseApi";
-import { Product, Category, User, ApiResponse } from "./adsApi";
+import type { Category } from "./adsApi";
 
 const mockAdCategories: Category[] = [
   { id: 1, name: "پردازنده (CPU)", value: "cpu", icon: "cpu" },
@@ -13,105 +12,6 @@ const mockAdCategories: Category[] = [
 ];
 
 export { mockAdCategories };
-
-const mockUsers: User[] = [
-  { id: 1, name: "کاربر تست", username: "test_user", phone: "09123456789" },
-  { id: 2, name: "فروشنده ۱", username: "seller_user", phone: "09123456790" },
-];
-
-const mockProducts: Product[] = [
-  {
-    id: 1,
-    title: "کامپیوتر گیمینگ حرفه‌ای",
-    description: "سیستم گیمینگ قدرتمند با آخرین نسل سخت‌افزار",
-    category: mockAdCategories[0],
-    user: mockUsers[0],
-    image: '["/svg/cpu.svg"]',
-    price: "45000000",
-    created_at: "2024-01-15T10:30:00Z",
-    status: "active",
-    city: "تهران",
-    ostan: "1",
-  },
-  {
-    id: 2,
-    title: "سیستم اداری",
-    description: "کامپیوتر مناسب برای کارهای اداری و روزانه",
-    category: mockAdCategories[1],
-    user: mockUsers[1],
-    image: '["/svg/graphic.svg"]',
-    price: "15000000",
-    created_at: "2024-01-14T14:20:00Z",
-    status: "active",
-    city: "اصفهان",
-    ostan: "4",
-  },
-  {
-    id: 3,
-    title: "کارت گرافیک NVIDIA RTX 4070",
-    description: "کارت گرافیک نو و پلمپ",
-    category: mockAdCategories[1],
-    user: mockUsers[1],
-    image: '["/svg/graphic.svg"]',
-    price: "35000000",
-    created_at: "2024-01-13T09:15:00Z",
-    status: "active",
-    city: "تهران",
-    ostan: "1",
-  },
-  {
-    id: 4,
-    title: "پردازنده Intel Core i9",
-    description: "پردازنده نو و اوریجینال",
-    category: mockAdCategories[0],
-    user: mockUsers[0],
-    image: '["/svg/cpu.svg"]',
-    price: "58000000",
-    created_at: "2024-01-12T16:45:00Z",
-    status: "active",
-    city: "تبریز",
-    ostan: "3",
-  },
-  {
-    id: 5,
-    title: "مادربرد ASUS ROG",
-    description: "مادربرد گیمینگ ASUS ROG Z790",
-    category: mockAdCategories[2],
-    user: mockUsers[1],
-    image: '["/svg/motherboard.svg"]',
-    price: "28000000",
-    created_at: "2024-01-11T11:30:00Z",
-    status: "pending",
-    city: "مشهد",
-    ostan: "2",
-  },
-  {
-    id: 6,
-    title: "حافظه رم 32GB DDR5",
-    description: "رم Corsair Vengeance 32GB DDR5 6000MHz",
-    category: mockAdCategories[3],
-    user: mockUsers[0],
-    image: '["/svg/ram.svg"]',
-    price: "8500000",
-    created_at: "2024-01-10T13:00:00Z",
-    status: "active",
-    city: "تهران",
-    ostan: "1",
-  },
-];
-
-export const mockApiResponse: ApiResponse = {
-  data: mockProducts,
-  current_page: 1,
-  last_page: 3,
-  per_page: 6,
-  total: 18,
-};
-
-export const mockIResultProduct: IResult<Product> = {
-  message: "Product یافت شد",
-  data: mockProducts[0],
-};
 
 export type featuredmedia = {
   id: number;
@@ -277,46 +177,3 @@ export const mockBlogCategories: categoriesMO[] = [
   { id: "3", slug: "guide", name: "راهنما" },
   { id: "4", slug: "news", name: "اخبار" },
 ];
-
-export const getMockProduct = (id: string): Product | undefined => {
-  return mockProducts.find((p) => p.id === parseInt(id));
-};
-
-export const filterMockProducts = (filters: {
-  category?: string;
-  search?: string;
-  price_from?: string;
-  price_to?: string;
-  page?: string;
-  ostan?: string;
-}): ApiResponse => {
-  let result = [...mockProducts];
-
-  if (filters.category) {
-    result = result.filter((p) =>
-      p.category.name.toLowerCase().includes(filters.category!.toLowerCase()),
-    );
-  }
-  if (filters.search) {
-    const searchLower = filters.search.toLowerCase();
-    result = result.filter((p) => p.title.toLowerCase().includes(searchLower));
-  }
-  if (filters.price_from) {
-    result = result.filter(
-      (p) => parseInt(p.price) >= parseInt(filters.price_from!),
-    );
-  }
-  if (filters.price_to) {
-    result = result.filter(
-      (p) => parseInt(p.price) <= parseInt(filters.price_to!),
-    );
-  }
-
-  return {
-    data: result,
-    current_page: 1,
-    last_page: Math.ceil(result.length / 6),
-    per_page: 6,
-    total: result.length,
-  };
-};

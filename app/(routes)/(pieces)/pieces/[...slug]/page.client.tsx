@@ -15,7 +15,6 @@ import {
   Title,
 } from "@mantine/core";
 import useLoading from "@/_utils/customHook/useLoading";
-import { useAuth } from "@/_utils/customHook/useAuth";
 import usePiecePc from "@/_utils/customHook/usePiecePc";
 import { PiecesProps } from "./page";
 import classes from "@/_components/pieces/pieces.module.css";
@@ -30,8 +29,6 @@ type Icategory = {
   slug: string;
 };
 const PageClient: React.FC<PiecesProps> = ({ params }) => {
-  useAuth();
-
   const firstPiece = usePiecePc(params.slug[0]);
   const secondPiece = usePiecePc(params.slug[1]);
   const loadingEnd = useLoading();

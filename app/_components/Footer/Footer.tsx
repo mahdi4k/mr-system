@@ -49,7 +49,7 @@ const data = [
           <Flex align={"center"}>
             <IconBrandTelegram color="green" size={16} />
             <Text mr={"5px"} fz={"sm"}>
-              kiwipart_support@
+              پشتیبانی ریگورا
             </Text>
           </Flex>
         ),
@@ -115,7 +115,7 @@ export function Footer() {
         <div className={classes.logo}>
           <Image
             style={{ objectFit: "contain" }}
-            alt="kiwi part"
+            alt="ریگورا"
             src={logoSrc}
             width={80}
             height={40}

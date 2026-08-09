@@ -41,16 +41,15 @@ import { Carousel, Embla } from "@mantine/carousel";
 import AdsRelated from "@/_components/adsSection/AdsRelated";
 import AdsGalleryModal from "@/_components/adsSection/AdsGalleryModal";
 import { useChat } from "@/_utils/customHook/useChat";
-import { UserResponse } from "@/_components/profile/UserDetail";
 import { useDisclosure } from "@mantine/hooks";
 import LoginModal from "@/_components/loginModal/LoginModal";
 
 type props = {
   product: Product;
-  token?: string;
+  currentUserId?: string;
 };
 
-const PageClient: FC<props> = ({ product, token }) => {
+const PageClient: FC<props> = ({ product, currentUserId }) => {
   const dispatch: AppDispatch = useDispatch();
   const { ostan, city, status } = useSelector((state: RootState) => state.ads);
   const [
@@ -65,7 +64,6 @@ const PageClient: FC<props> = ({ product, token }) => {
   const [embla, setEmbla] = useState<Embla | null>(null);
   const [openedImageModal, setOpenedImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
-  const success = useSelector((state: RootState) => state.auth.success);
   const [openedModal, { open: openModalLogin, close: closeModal }] =
     useDisclosure(false);
 
@@ -84,24 +82,6 @@ const PageClient: FC<props> = ({ product, token }) => {
     }
   }, [ostan, city, dispatch]);
 
-  const [userData, setUserData] = useState<UserResponse>();
-
-  // get current user detail
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch("/api/user-profile");
-        if (response.ok) {
-          const data = await response.json();
-          setUserData(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch user data", error);
-      }
-    };
-
-    fetchUserData();
-  }, []);
   useEffect(() => {
     if (product) adsQuery({ category: product.category.value });
   }, [product]);
@@ -141,7 +121,7 @@ const PageClient: FC<props> = ({ product, token }) => {
                   >
                     <KiwiImage
                       objectFit="cover"
-                      url={`/${img}`}
+                      url={img}
                       width={300}
                       height={300}
                       img={img}
@@ -158,10 +138,10 @@ const PageClient: FC<props> = ({ product, token }) => {
       return <></>;
     }
   };
-  const { createConversation } = useChat(userData?.userData.id);
+  const { createConversation } = useChat(currentUserId);
 
   const handleStartChat = () => {
-    if (token || success) {
+    if (currentUserId) {
       createConversation(`${product.id}`);
     } else {
       openModalLogin();
@@ -189,39 +169,7 @@ const PageClient: FC<props> = ({ product, token }) => {
         </Text>
       </Breadcrumbs>
 
-      <Carousel
-        slideSize={{ base: "62%", sm: "40%", lg: "21%" }}
-        slideGap={{ base: "sm", sm: "md" }}
-        getEmblaApi={setEmbla}
-        align="start"
-        dragFree
-        withControls={false}
-      >
-        <Carousel.Slide mt={"sm"}>
-          <Group wrap="nowrap" justify="center" className={classes.adsImages}>
-            <KiwiImage
-              objectFit="cover"
-              url="/pc-suggest-mid.png"
-              width={300}
-              height={300}
-              img="pc-suggest-mid.png"
-              alt="pc-suggest"
-            />
-          </Group>
-        </Carousel.Slide>
-        <Carousel.Slide mt={"sm"}>
-          <Group wrap="nowrap" justify="center" className={classes.adsImages}>
-            <KiwiImage
-              objectFit="cover"
-              url="/big.png"
-              width={300}
-              height={300}
-              img="big.png"
-              alt="big"
-            />
-          </Group>
-        </Carousel.Slide>
-      </Carousel>
+      {handleImageAds(product.image, product.title)}
 
       <Grid gutter={"xl"} mt={{ base: "lg", md: "60px" }} mb={"xl"}>
         <Grid.Col span={{ base: 12, lg: 8 }}>
@@ -231,7 +179,7 @@ const PageClient: FC<props> = ({ product, token }) => {
             </Text>
             <Badge
               rightSection={
-                product.status === "approved" ? (
+                product.status === "published" ? (
                   <IconDiscountCheckFilled
                     style={{ width: rem(17), height: rem(17) }}
                   />
@@ -239,9 +187,9 @@ const PageClient: FC<props> = ({ product, token }) => {
                   ""
                 )
               }
-              color={product.status === "approved" ? "green" : "orange"}
+              color={product.status === "published" ? "green" : "orange"}
             >
-              {product.status === "approved" ? "منتشر شده" : "در انتظار تایید"}
+              {product.status === "published" ? "منتشر شده" : "منتشر نشده"}
             </Badge>
           </Group>
           <Flex
@@ -321,7 +269,7 @@ const PageClient: FC<props> = ({ product, token }) => {
                 w={"100%"}
                 leftSection={<IconPhone size={20} />}
               >
-                {product.user.phone}
+                {product.user.phone || "شماره تماس ثبت نشده"}
               </Button>
             </Flex>
             <Button

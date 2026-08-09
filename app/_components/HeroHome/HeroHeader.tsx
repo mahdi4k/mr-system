@@ -16,7 +16,7 @@ import ListItem from "./ListItem";
 import Image from "next/image";
 import SVG from "react-inlinesvg";
 
-export function HeroHeader({ token }: { token?: string }) {
+export function HeroHeader({ isAuthenticated }: { isAuthenticated: boolean }) {
   return (
     <Container size="lg">
       <div className={classes.inner}>
@@ -48,7 +48,7 @@ export function HeroHeader({ token }: { token?: string }) {
               color="var(--mantine-color-kiwi-8)"
             />
           </Title>
-          <ListItem token={token} />
+          <ListItem isAuthenticated={isAuthenticated} />
         </div>
       </div>
     </Container>

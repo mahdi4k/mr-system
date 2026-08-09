@@ -11,7 +11,6 @@ import {
   Modal,
   Alert,
 } from "@mantine/core";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
@@ -24,20 +23,11 @@ import {
 } from "@/_redux/services/fanApi";
 
 const ClientFan = () => {
-  const [loadingSession, setLoadingSession] = useState(false);
-  const session = useSession();
-  const {
-    isSuccess,
-    data = [],
-    error,
-  } = useGetFansQuery({}, { skip: !loadingSession });
+  const { isSuccess, data = [], error } = useGetFansQuery({});
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedFanID, setSelectedFanID] = useState<number>();
   const [removeFan, response] = useRemoveFanMutation();
 
-  useEffect(() => {
-    setLoadingSession(!!session.data);
-  }, [session.data]);
   const openModalRemove = (id: number) => {
     setSelectedFanID(id);
     open();

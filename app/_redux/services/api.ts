@@ -1,25 +1,7 @@
 import { createApi, fetchBaseQuery, retry } from "@reduxjs/toolkit/query/react";
-import queryString from "query-string";
-
-type authTokenDTO = {
-  auth: {
-    userToken: {
-      user: string;
-    };
-  };
-};
 // Create our baseQuery instance
 const baseQuery = fetchBaseQuery({
-  baseUrl: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`,
-  prepareHeaders: (headers, { getState }) => {
-    // By default, if we have a token in the store, let's use that for authenticated requests
-    const token = getState() as authTokenDTO;
-    headers.set("Accept", `application/json`);
-    headers.set("Authorization", `Bearer ${token.auth.userToken}`);
-    return headers;
-  },
-  paramsSerializer: (params: Record<string, unknown>) =>
-    queryString.stringify(params, { arrayFormat: "bracket" }),
+  baseUrl: "/api",
 });
 
 const baseQueryWithRetry = retry(baseQuery, { maxRetries: 2 });

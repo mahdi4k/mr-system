@@ -12,10 +12,10 @@ import "@mantine/carousel/styles.css";
 import { ReduxProviders } from "@/_redux/provider";
 import { Header } from "@/_components/Header/Header";
 import { Footer } from "@/_components/Footer/Footer";
-import Providers from "./(routes)/dashboard/Provider";
 import NextTopLoader from "nextjs-toploader";
 import "./global.css";
-import { cookies } from "next/headers";
+import { Notifications } from "@mantine/notifications";
+import { getCurrentUser } from "./_lib/supabase/auth";
 
 const iranyekan = localFont({
   src: [
@@ -35,24 +35,24 @@ const iranyekan = localFont({
 });
 
 export const metadata = {
-  title: "کیوی پارت",
-  description: "kiwi-part pc building",
+  title: "ریگورا",
+  description: "Rigora PC hardware platform",
 };
 
 export default async function RootLayout({
   children,
   modal,
 }: {
-  children: any;
-  modal: any;
+  children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
-  const token = (await cookies()).get("authToken")?.value;
+  const user = await getCurrentUser();
 
   return (
     <html
       style={{ height: "100%" }}
       dir="rtl"
-      lang="en"
+      lang="fa"
       className={iranyekan.variable}
       suppressHydrationWarning
     >
@@ -70,13 +70,11 @@ export default async function RootLayout({
         <DirectionProvider>
           <MantineProvider theme={theme}>
             <ReduxProviders>
-              <Providers>
-                <Header token={token} />
-                {children}
-                {modal}
-
-                <Footer />
-              </Providers>
+              <Notifications />
+              <Header isAuthenticated={Boolean(user)} />
+              {children}
+              {modal}
+              <Footer />
             </ReduxProviders>
           </MantineProvider>
         </DirectionProvider>

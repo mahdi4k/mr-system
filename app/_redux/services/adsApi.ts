@@ -1,125 +1,139 @@
 import { api } from "./api";
 import {
-  mockApiResponse,
-  filterMockProducts,
-  mockIResultProduct,
-} from "./mockData";
+  deleteAd,
+  getAdById,
+  getAds,
+  moderateAd,
+} from "../../_features/ads/data";
+import { createClient } from "../../_lib/supabase/client";
+import type {
+  AdsFilters,
+  AdsResponse,
+  Category,
+  Product,
+} from "../../_features/ads/types";
+
+export type { Category, Product } from "../../_features/ads/types";
 
 export interface IResult<T> {
   message: string;
   data: T;
 }
 
-export interface Product {
-  id: number;
-  title: string;
-  description: string;
-  category: Category;
-  user: User;
-  image?: string;
-  price: string;
-  created_at: string;
-  status: string;
-  city: string;
-  ostan: string;
-}
-
-export interface Category {
-  id: number;
-  name: string;
-  value: string;
-  icon: string;
-}
-
-export interface User {
-  id: number;
-  name?: string;
-  username: string;
-  phone: string;
-  email?: string | null;
-  email_verified_at?: string | null;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface ApiResponse {
-  data: Product[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-}
+export type ApiResponse = AdsResponse;
 
 export const AdsApi = api.injectEndpoints({
   overrideExisting: process.env.NODE_ENV === "development",
   endpoints: (builder) => ({
     getAdsList: builder.query<ApiResponse, { page?: number }>({
       queryFn: async ({ page }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        return { data: mockApiResponse };
+        try {
+          return {
+            data: await getAds({ page }, createClient(), undefined, true),
+          };
+        } catch (error) {
+          return {
+            error: {
+              status: "CUSTOM_ERROR",
+              error:
+                error instanceof Error
+                  ? error.message
+                  : "خطا در دریافت آگهی‌ها",
+            },
+          };
+        }
       },
       providesTags: ["ads"],
     }),
-    getAdsListCategory: builder.query<
-      ApiResponse,
-      {
-        category?: string;
-        search?: string;
-        price_from?: string;
-        price_to?: string;
-        sort?: string;
-        page?: string;
-        ostan?: string;
-      }
-    >({
-      queryFn: async ({
-        category,
-        search,
-        price_from,
-        price_to,
-        sort,
-        page,
-        ostan,
-      }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        const data = filterMockProducts({
-          category,
-          search,
-          price_from,
-          price_to,
-          page,
-          ostan,
-        });
-        return { data };
+    getAdsListCategory: builder.query<ApiResponse, AdsFilters>({
+      queryFn: async (filters) => {
+        try {
+          return { data: await getAds(filters) };
+        } catch (error) {
+          return {
+            error: {
+              status: "CUSTOM_ERROR",
+              error:
+                error instanceof Error
+                  ? error.message
+                  : "خطا در دریافت آگهی‌ها",
+            },
+          };
+        }
       },
       providesTags: ["ads"],
     }),
 
-    approveAdsItem: builder.mutation({
-      queryFn: async (payload) => {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        return { data: { message: "آگهی با موفقیت تأیید شد" } };
+    approveAdsItem: builder.mutation<{ message: string }, { id: string }>({
+      queryFn: async ({ id }) => {
+        try {
+          await moderateAd(id, "published");
+          return { data: { message: "آگهی با موفقیت تأیید شد" } };
+        } catch (error) {
+          return {
+            error: {
+              status: "CUSTOM_ERROR",
+              error:
+                error instanceof Error
+                  ? error.message
+                  : "تأیید آگهی ناموفق بود",
+            },
+          };
+        }
       },
       invalidatesTags: ["ads"],
     }),
-    rejectAdsItem: builder.mutation({
-      queryFn: async (payload) => {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        return { data: { message: "آگهی رد شد" } };
+    rejectAdsItem: builder.mutation<{ message: string }, { id: string }>({
+      queryFn: async ({ id }) => {
+        try {
+          await moderateAd(id, "rejected");
+          return { data: { message: "آگهی رد شد" } };
+        } catch (error) {
+          return {
+            error: {
+              status: "CUSTOM_ERROR",
+              error:
+                error instanceof Error ? error.message : "رد آگهی ناموفق بود",
+            },
+          };
+        }
       },
       invalidatesTags: ["ads"],
     }),
     getAds: builder.query<IResult<Product>, { id: string }>({
       queryFn: async ({ id }) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        return { data: mockIResultProduct };
+        try {
+          const product = await getAdById(id, createClient());
+          if (!product) {
+            return { error: { status: 404, data: "آگهی یافت نشد" } };
+          }
+          return { data: { message: "", data: product } };
+        } catch (error) {
+          return {
+            error: {
+              status: "CUSTOM_ERROR",
+              error:
+                error instanceof Error ? error.message : "خطا در دریافت آگهی",
+            },
+          };
+        }
       },
-      providesTags: ["case"],
+      providesTags: ["ads"],
     }),
-    removeAds: builder.mutation({
-      queryFn: async (payload) => {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        return { data: { message: "آگهی با موفقیت حذف شد" } };
+    removeAds: builder.mutation<{ message: string }, string>({
+      queryFn: async (id) => {
+        try {
+          await deleteAd(id);
+          return { data: { message: "آگهی با موفقیت حذف شد" } };
+        } catch (error) {
+          return {
+            error: {
+              status: "CUSTOM_ERROR",
+              error:
+                error instanceof Error ? error.message : "حذف آگهی ناموفق بود",
+            },
+          };
+        }
       },
       invalidatesTags: ["ads"],
     }),
@@ -129,6 +143,7 @@ export const AdsApi = api.injectEndpoints({
 export const {
   useGetAdsListQuery,
   useLazyGetAdsListCategoryQuery,
+  useGetAdsQuery,
   useApproveAdsItemMutation: useApproveAdsItem,
   useRejectAdsItemMutation: useRejectAdsItem,
   useRemoveAdsMutation: useRemoveAds,

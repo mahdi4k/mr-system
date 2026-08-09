@@ -81,7 +81,7 @@ export async function generateMetadata(props: {
   const product = await getData(params);
 
   return {
-    title: ` ${product.data.name} - کیوی پارت`,
+    title: ` ${product.data.name} - ریگورا`,
   };
 }
 export default async function Page(props: {

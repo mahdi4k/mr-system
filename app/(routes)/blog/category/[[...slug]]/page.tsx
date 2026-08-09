@@ -11,7 +11,7 @@ export type categoriesMO = {
 
 export async function generateMetadata() {
   return {
-    title: `  کیوی پارت - مقالات`,
+    title: `ریگورا - مقالات`,
   };
 }
 async function getPosts(slug: string, categories: categoriesMO[]) {

@@ -11,7 +11,6 @@ import {
   Modal,
   Alert,
 } from "@mantine/core";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
@@ -24,20 +23,11 @@ import {
 } from "@/_redux/services/ramApi";
 
 const ClientRam = () => {
-  const [loadingSession, setLoadingSession] = useState(false);
-  const session = useSession();
-  const {
-    isSuccess,
-    data = [],
-    error,
-  } = useGetRamsQuery({}, { skip: !loadingSession });
+  const { isSuccess, data = [], error } = useGetRamsQuery({});
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedRamID, setSelectedRamID] = useState<number>();
   const [removeRam, response] = useRemoveRamMutation();
 
-  useEffect(() => {
-    setLoadingSession(!!session.data);
-  }, [session.data]);
   const openModalRemove = (id: number) => {
     setSelectedRamID(id);
     open();

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { cookies } from "next/headers";
+import { createClient } from "../../_lib/supabase/server";
+import { getAdById } from "../../_features/ads/data";
 
 export interface Apiconversation {
   data: Transaction[];
@@ -93,9 +94,11 @@ const mockTransactions: Transaction[] = [
 ];
 
 export async function POST(request: Request) {
-  const token = (await cookies()).get("authToken")?.value;
-
-  if (!token) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
@@ -108,12 +111,25 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+    const ad = await getAdById(String(adId), supabase);
+    if (!ad) {
+      return NextResponse.json(
+        { error: "Advertisement not found" },
+        { status: 404 },
+      );
+    }
+    if (ad.user_id === user.id) {
+      return NextResponse.json(
+        { error: "You cannot start a conversation for your own advertisement" },
+        { status: 400 },
+      );
+    }
 
     const mockResponse = {
       id: 1,
       product_id: adId,
-      user_id: 1,
-      seller_id: 2,
+      user_id: user.id,
+      seller_id: ad.user_id,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -133,9 +149,11 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  const token = (await cookies()).get("authToken")?.value;
-
-  if (!token) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 

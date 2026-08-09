@@ -10,13 +10,13 @@ import BannerSection from "./_components/BannerSection/BannerSection";
 import { Metadata, Viewport } from "next";
 import SuggestSection from "./_components/suggestSection/SuggestSection";
 import AdsSection from "./_components/adsSection/AdsSection";
-import { cookies } from "next/headers";
 import { Container, Group, Text } from "@mantine/core";
 import { IconArrowLeft, IconCircleCheck } from "@tabler/icons-react";
 import BuildAssistantIntro from "@/_components/chooseParts/BuildAssistantIntro";
 import Image from "next/image";
 import Link from "next/link";
 import classes from "./page.module.css";
+import { getCurrentUser } from "./_lib/supabase/auth";
 
 const exampleParts = [
   {
@@ -46,50 +46,51 @@ export const viewport: Viewport = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   return {
-    metadataBase: new URL("https://kiwipart.ir"),
-    title: "کیوی پارت | انتخاب هوشمند",
+    metadataBase: new URL(siteUrl),
+    title: "ریگورا | انتخاب هوشمند",
     manifest: "/manifest.json",
     description:
       "انتخاب هوشمند قطعات کامبپوتر - کمترین قیمت موجود در بازار - کارت گرافیک - پاور - مادربرد - cpu",
     authors: [
       {
-        name: "kiwipart",
-        url: "https://kiwipart.ir",
+        name: "Rigora",
+        url: siteUrl,
       },
     ],
     twitter: {
       card: "summary_large_image",
-      creator: "kiwipart",
-      images: "https://kiwipart.ir/kiwipart.png",
+      creator: "Rigora",
+      images: `${siteUrl}/logo.png`,
     },
     robots: "index, follow",
     alternates: {
-      canonical: `https://kiwipart.ir`,
+      canonical: siteUrl,
       languages: {
         "fa-IR": "/",
       },
     },
     openGraph: {
       type: "website",
-      url: `https://kiwipart.ir`,
+      url: siteUrl,
       title:
-        "انتخاب هوشمند قطعات با کیوی پارت | مادربرد | cpu | کارت گرافیک | پاور",
+        "انتخاب هوشمند قطعات با ریگورا | مادربرد | cpu | کارت گرافیک | پاور",
       description:
         "انتخاب هوشمند قطعات کامبپوتر - کمترین قیمت موجود در بازار - کارت گرافیک - پاور - مادربرد - cpu",
-      siteName: "کیوی پارت",
+      siteName: "ریگورا",
       images: [
         {
-          url: "https://kiwipart.ir/kiwipart.png",
+          url: `${siteUrl}/logo.png`,
         },
       ],
     },
-    keywords: ["کیوی پارت"],
+    keywords: ["ریگورا"],
   };
 }
 
 const page = async () => {
-  const token = (await cookies()).get("authToken")?.value;
+  const user = await getCurrentUser();
 
   return (
     <div>
@@ -160,7 +161,7 @@ const page = async () => {
       </Container>
       <SuggestSection />
 
-      <AdsSection token={token} />
+      <AdsSection isAuthenticated={Boolean(user)} />
       {/* <Container my={"xl"} size="lg">
         <Group>
           <CpuMotherboard />

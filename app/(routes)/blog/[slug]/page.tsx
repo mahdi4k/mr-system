@@ -8,7 +8,7 @@ export async function generateMetadata(props: {
 }) {
   const params = await props.params;
   return {
-    title: ` ${params.slug} - کیوی پارت`,
+    title: ` ${params.slug} - ریگورا`,
   };
 }
 async function getData(slug: string): Promise<postsMO[]> {

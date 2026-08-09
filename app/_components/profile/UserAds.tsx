@@ -1,144 +1,156 @@
-import { Badge, Card, Flex, Group, SimpleGrid, Text } from "@mantine/core";
-import { useState, useEffect } from "react";
+"use client";
+
+import {
+  Badge,
+  Button,
+  Card,
+  Flex,
+  Group,
+  Loader,
+  Modal,
+  SimpleGrid,
+  Text,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Product } from "@/_redux/services/adsApi";
-import CardPartPrice from "../shared/CardPartPrice";
-import classes from "./UserProfile.module.css";
-import { Carousel, Embla } from "@mantine/carousel";
-import ImgNoProduct from "../../../public/no-product.png";
 import Link from "next/link";
+import type { Product } from "../../_features/ads/types";
+import { deleteAd, getAds } from "../../_features/ads/data";
+import { createClient } from "../../_lib/supabase/client";
+import CardPartPrice from "../shared/CardPartPrice";
+import ImgNoProduct from "../../../public/no-product.png";
 
-type prop = {
-  message: string;
-  userData: Product[];
-};
+export default function UserAds() {
+  const [ads, setAds] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
+  const [selectedId, setSelectedId] = useState<string>();
+  const [opened, { open, close }] = useDisclosure(false);
 
-const UserAds = () => {
-  const [userAds, setUserads] = useState<Product[]>([]);
-  const [error, setError] = useState(null);
-  const [embla, setEmbla] = useState<Embla | null>(null);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch("/api/profile-ads", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        // Check if the request was successful
-        if (response.ok) {
-          const data = await response.json();
-          setUserads(data.userData); // Assuming userData is in the response
-        } else {
-          const errorData = await response.json();
-          setError(errorData.message || "Something went wrong");
-        }
-      } catch (error) {
-        // setError(error.message || 'An error occurred');
-      }
-    };
-
-    fetchUserData();
-  }, []);
-
-  const handleImageAds = (image: string, title: string) => {
-    const images: string[] = JSON.parse(image);
-
-    if (images.length > 0) {
-      return (
-        <>
-          {images.map((img, index) => (
-            <Carousel.Slide key={index}>
-              <Image
-                alt={title}
-                width={100}
-                height={100}
-                src={`/public/storage/${img}`}
-              />
-            </Carousel.Slide>
-          ))}
-        </>
-      );
-    } else {
-      return (
-        <Image
-          style={{ objectFit: "contain" }}
-          width={90}
-          height={80}
-          alt="no img"
-          src={ImgNoProduct}
-        />
-      );
+  const loadAds = async () => {
+    setLoading(true);
+    try {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Unauthorized");
+      const result = await getAds({}, supabase, user.id);
+      setAds(result.data);
+    } catch {
+      notifications.show({
+        color: "red",
+        message: "دریافت آگهی‌های شما ناموفق بود.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (embla) {
-      embla?.reInit({ direction: "rtl" });
+    void loadAds();
+  }, []);
+
+  const confirmDelete = (id: string) => {
+    setSelectedId(id);
+    open();
+  };
+
+  const handleDelete = async () => {
+    if (!selectedId) return;
+    setDeleting(true);
+    try {
+      await deleteAd(selectedId);
+      setAds((current) => current.filter((ad) => ad.id !== selectedId));
+      notifications.show({ color: "green", message: "آگهی حذف شد." });
+      close();
+    } catch (error) {
+      notifications.show({
+        color: "red",
+        message:
+          error instanceof Error ? error.message : "حذف آگهی ناموفق بود.",
+      });
+    } finally {
+      setDeleting(false);
     }
-  }, [embla]);
+  };
+
+  if (loading) return <Loader color="green" />;
 
   return (
-    <div>
-      <SimpleGrid mb={"xl"} cols={{ base: 1, xs: 2, sm: 3, xl: 2 }}>
-        {userAds && userAds.length > 0 ? (
-          userAds.map((item) => (
-            <Link href={`/ads/${item.id}`}>
+    <>
+      <SimpleGrid mb="xl" cols={{ base: 1, xs: 2, sm: 3, xl: 2 }}>
+        {ads.length ? (
+          ads.map((item) => {
+            const images = item.image
+              ? (JSON.parse(item.image) as string[])
+              : [];
+            return (
               <Card key={item.id} withBorder>
                 <Group wrap="nowrap">
-                  <Carousel
-                    w={100}
-                    getEmblaApi={setEmbla}
-                    withIndicators
-                    loop={false}
-                    classNames={{
-                      root: classes.carousel,
-                      controls: classes.carouselControls,
-                      indicator: classes.carouselIndicator,
-                    }}
-                  >
-                    {handleImageAds(item.image as string, item.title)}
-                  </Carousel>
-                  <Flex w={"100%"} direction={"column"}>
-                    <Text fz="sm">{item.title}</Text>
-                    <Flex
-                      mt={"xl"}
-                      justify={"space-between"}
-                      align={"center"}
-                      w={"100%"}
-                    >
-                      <CardPartPrice
-                        mb={"0"}
-                        mt={"0"}
-                        tomanHeight={17}
-                        tomanWidth={17}
-                        textSize={14}
-                        isAds
-                        price={item.price}
-                      />
-                      <Badge mr={"auto"}>
-                        {item.status === "approved"
+                  <Image
+                    alt={item.title}
+                    width={100}
+                    height={100}
+                    style={{ objectFit: "cover" }}
+                    src={images[0] || ImgNoProduct}
+                  />
+                  <Flex w="100%" direction="column">
+                    <Text component={Link} href={`/ads/${item.id}`} fz="sm">
+                      {item.title}
+                    </Text>
+                    <Flex mt="xl" justify="space-between" align="center">
+                      <CardPartPrice isAds price={item.price} />
+                      <Badge>
+                        {item.status === "published"
                           ? "منتشر شده"
                           : "در حال بررسی"}
                       </Badge>
                     </Flex>
                   </Flex>
                 </Group>
+                <Group mt="md" justify="flex-end">
+                  <Button
+                    component={Link}
+                    href={`/ads/${item.id}/edit`}
+                    size="xs"
+                    variant="light"
+                  >
+                    ویرایش
+                  </Button>
+                  <Button
+                    onClick={() => confirmDelete(item.id)}
+                    size="xs"
+                    color="red"
+                    variant="light"
+                  >
+                    حذف
+                  </Button>
+                </Group>
               </Card>
-            </Link>
-          ))
+            );
+          })
         ) : (
           <Card withBorder>
-            <Text w={"100%"} ta={"center"} fw={"bold"}>
-              {"آگهی یافت نشد"}
+            <Text ta="center" fw="bold">
+              آگهی یافت نشد
             </Text>
           </Card>
         )}
       </SimpleGrid>
-    </div>
+      <Modal opened={opened} onClose={close} title="حذف آگهی">
+        <Text>آیا از حذف این آگهی مطمئن هستید؟</Text>
+        <Group mt="lg" justify="flex-end">
+          <Button variant="default" onClick={close}>
+            انصراف
+          </Button>
+          <Button color="red" loading={deleting} onClick={handleDelete}>
+            حذف
+          </Button>
+        </Group>
+      </Modal>
+    </>
   );
-};
-export default UserAds;
+}

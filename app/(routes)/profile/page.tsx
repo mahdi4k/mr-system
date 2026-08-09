@@ -1,18 +1,11 @@
 import UserDetail from "@/_components/profile/UserDetail";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation"; // Import redirect utility
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "../../_lib/supabase/auth";
 
-interface ProfilePageProps {
-  token: string;
-}
+export const dynamic = "force-dynamic";
 
-const Page: React.FC = () => {
-  // const token = cookies().get('authToken')?.value;
-  // if (!token) {
-  //     // If token doesn't exist, redirect to the home page
-  //     redirect('/');
-  // }
-
+const Page = async () => {
+  if (!(await getCurrentUser())) redirect("/login?next=/profile");
   return <UserDetail />;
 };
 

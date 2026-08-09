@@ -11,7 +11,6 @@ import {
   Modal,
   Alert,
 } from "@mantine/core";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
@@ -24,20 +23,11 @@ import {
 } from "@/_redux/services/caseApi";
 
 const ClientCase = () => {
-  const [loadingSession, setLoadingSession] = useState(false);
-  const session = useSession();
-  const {
-    isSuccess,
-    data = [],
-    error,
-  } = useGetCasesQuery({}, { skip: !loadingSession });
+  const { isSuccess, data = [], error } = useGetCasesQuery({});
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedCaseID, setSelectedCaseID] = useState<number>();
   const [removeCase, response] = useRemoveCaseMutation();
 
-  useEffect(() => {
-    setLoadingSession(!!session.data);
-  }, [session.data]);
   const openModalRemove = (id: number) => {
     setSelectedCaseID(id);
     open();

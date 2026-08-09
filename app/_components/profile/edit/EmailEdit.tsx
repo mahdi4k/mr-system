@@ -7,11 +7,10 @@ import notifClasses from "@/_cssModules/notification.module.css";
 type props = {
   opened: boolean;
   close: () => void;
-  token?: string;
   fetchUserData?: () => Promise<void>;
 };
 
-const EmailEdit: FC<props> = ({ opened, close, token, fetchUserData }) => {
+const EmailEdit: FC<props> = ({ opened, close, fetchUserData }) => {
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
@@ -28,30 +27,17 @@ const EmailEdit: FC<props> = ({ opened, close, token, fetchUserData }) => {
       const response = await fetch(`/api/profile-edit`, {
         method: "PATCH",
         body: JSON.stringify({ email: values.email }),
-        headers: {
-          Authorization: `Bearer ${token}`, // Replace with your token
-        },
+        headers: { "Content-Type": "application/json" },
       });
       if (!response.ok) {
         // The request failed, check for specific status codes
         const errorMessage = await response.text(); // Extract the error message
-        if (response.status === 419) {
-          console.error("CSRF Token Mismatch: Error 419");
-          notifications.show({
-            color: "red",
-            title: "خطایی رخ داده است لطفا دوباره تلاش کنید",
-            message: "",
-            classNames: notifClasses,
-          });
-        } else {
-          console.error(`Error ${response.status}: ${errorMessage}`);
-          notifications.show({
-            color: "red",
-            title: "خطایی رخ داده است لطفا دوباره تلاش کنید",
-            message: "",
-            classNames: notifClasses,
-          });
-        }
+        notifications.show({
+          color: "red",
+          title: "خطایی رخ داده است لطفا دوباره تلاش کنید",
+          message: "",
+          classNames: notifClasses,
+        });
         return; // Prevent the success flow when there's an error
       } else {
         fetchUserData?.();
@@ -63,8 +49,8 @@ const EmailEdit: FC<props> = ({ opened, close, token, fetchUserData }) => {
         });
         close();
       }
-    } catch (error) {
-      console.error("Error uploading images:", error);
+    } catch {
+      notifications.show({ color: "red", message: "ویرایش ایمیل ناموفق بود." });
     }
   };
   return (

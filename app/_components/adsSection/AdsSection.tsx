@@ -34,7 +34,7 @@ import classess from "./ads.module.css";
 
 type AppDispatch = ThunkDispatch<RootState, void, AnyAction>;
 
-const AdsSection = ({ token }: { token?: string }) => {
+const AdsSection = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const [embla, setEmbla] = useState<Embla | null>(null);
   const router = useRouter();
   const parts = usePcparts();
@@ -53,7 +53,6 @@ const AdsSection = ({ token }: { token?: string }) => {
   const dispatch: AppDispatch = useDispatch();
   const { ostan, city, status } = useSelector((state: RootState) => state.ads);
 
-  const success = useSelector((state: RootState) => state.auth.success);
   useEffect(() => {
     router.prefetch("/ads/create");
   }, [router]);

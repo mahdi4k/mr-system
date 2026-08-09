@@ -62,7 +62,7 @@ const AdsGalleryModal: FC<props> = ({
               <Image
                 fill
                 style={{ objectFit: "contain" }}
-                src={`/public/storage/${img}`}
+                src={img}
                 alt={`Large Image ${index}`}
               />
             </Carousel.Slide>
@@ -73,7 +73,7 @@ const AdsGalleryModal: FC<props> = ({
           {images.map((img, index) => (
             <Image
               key={index}
-              src={`/public/storage/${img}`}
+              src={img}
               alt={`Thumbnail ${index}`}
               width={80}
               height={80}

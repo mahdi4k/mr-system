@@ -1,300 +1,247 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  Alert,
   Box,
-  TextInput,
-  Group,
   Button,
-  useMantineColorScheme,
   Flex,
   PinInput,
+  SegmentedControl,
   Text,
-  Alert,
-  ActionIcon,
+  TextInput,
+  useMantineColorScheme,
 } from "@mantine/core";
-import Image from "next/image";
 import { useForm } from "@mantine/form";
-import { IconArrowLeft } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
+import Image from "next/image";
+import { createClient } from "../../_lib/supabase/client";
+import { convertToEnglishNumber } from "../../_utils/utils";
 import classes from "@/_components/adsSection/ads.module.css";
-import { useDispatch } from "react-redux";
-import { setSuccessLogin } from "@/_redux/features/auth";
-import { convertToEnglishNumber } from "@/_utils/utils";
 
-export default function LoginModal({
-  onLoginSuccess,
-  close,
-  isAdsSection,
-  setIsModalOpen,
-  style,
-}: {
-  style?: React.CSSProperties;
-  onLoginSuccess?: () => void;
+interface LoginModalProps {
   close: () => void;
   isAdsSection?: boolean;
+  onLoginSuccess?: () => void;
   setIsModalOpen?: Dispatch<SetStateAction<boolean>>;
-}) {
-  const [otpSent, setOtpSent] = useState<boolean>(false);
-  const [showErrorOtp, setShowErrorOtp] = useState<boolean>(false);
+  style?: React.CSSProperties;
+}
+
+function toE164(phone: string): string {
+  const localNumber = phone.startsWith("0") ? phone.slice(1) : phone;
+  return `+98${localNumber}`;
+}
+
+export default function LoginModal({
+  close,
+  isAdsSection,
+  onLoginSuccess,
+  setIsModalOpen,
+  style,
+}: LoginModalProps) {
+  const [mode, setMode] = useState<"login" | "register">("login");
+  const [otpSent, setOtpSent] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { colorScheme } = useMantineColorScheme();
-  const OTP_RESEND_TIME = 130;
-
-  const [timeLeft, setTimeLeft] = useState(OTP_RESEND_TIME);
-  const [canResend, setCanResend] = useState(false);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (otpSent && timeLeft > 0) {
-      const timerId = setInterval(() => {
-        setTimeLeft((prevTime) => prevTime - 1);
-      }, 1000);
-
-      // Clear interval when the component unmounts or the timer reaches 0
-      return () => clearInterval(timerId);
-    } else if (timeLeft === 0) {
-      setCanResend(true); // Enable resend button when timer reaches 0
-    }
-  }, [otpSent, timeLeft]);
-
-  const handleResendOtp = () => {
-    setCanResend(false); // Disable the resend button
-    setTimeLeft(OTP_RESEND_TIME); // Reset the countdown timer
-
-    // Call your OTP resend API here
-
-    handlePhoneSubmit();
-    // Reset the timer and start countdown
-  };
-
   const form = useForm({
-    initialValues: {
-      code: "",
-      phone: "",
-    },
+    initialValues: { displayName: "", phone: "", code: "" },
     validate: {
-      code: (value: string) =>
-        value ? (value.length !== 6 ? "code not complete" : null) : null,
+      displayName: (value: string) =>
+        mode === "register" &&
+        (value.trim().length < 2 || value.trim().length > 80)
+          ? "نام باید بین ۲ تا ۸۰ نویسه باشد"
+          : null,
       phone: (value: string) =>
-        /^0?(9\d{9})$/.test(value)
-          ? null
-          : "شماره موبایل وارد شده معتبر نمی‌باشد",
+        /^0?9\d{9}$/.test(value) ? null : "شماره موبایل معتبر وارد کنید",
+      code: (value: string) =>
+        otpSent && !/^\d{6}$/.test(value) ? "کد تایید باید ۶ رقم باشد" : null,
     },
   });
 
-  const handlePhoneSubmit = async () => {
-    setOtpSent(true);
-    try {
-      const response = await fetch("/api/request-otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ phone: form.values.phone }),
-      });
+  const sendOtp = async () => {
+    const validation = form.validate();
+    if (validation.hasErrors) return;
 
-      if (response.ok) {
-        notifications.show({
-          message: "کد با موفقیت ارسال شد",
-          classNames: classes,
-        });
-      } else {
-        const data = await response.json();
-        notifications.show({
-          message: "خطایی پیش آمده لطفا دوباره تلاش کنید",
-          color: "red",
-          classNames: classes,
-        });
-      }
-    } catch (error) {
-      console.error("Error sending OTP:", error);
+    setLoading(true);
+    try {
+      const { error } = await createClient().auth.signInWithOtp({
+        phone: toE164(form.values.phone),
+        options: {
+          shouldCreateUser: mode === "register",
+          data:
+            mode === "register"
+              ? {
+                  display_name: form.values.displayName.trim(),
+                  phone: form.values.phone,
+                }
+              : undefined,
+        },
+      });
+      if (error) throw error;
+      setOtpSent(true);
+      notifications.show({ color: "green", message: "کد تایید ارسال شد." });
+    } catch {
       notifications.show({
-        message: "خطایی پیش آمده لطفا دوباره تلاش کنید",
         color: "red",
+        message:
+          mode === "login"
+            ? "حسابی با این شماره یافت نشد یا ارسال کد ناموفق بود."
+            : "ارسال کد ناموفق بود. شماره موبایل را بررسی کنید.",
         classNames: classes,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleOtpSubmit = async () => {
+  const verifyOtp = async () => {
+    if (!/^\d{6}$/.test(form.values.code)) {
+      form.setFieldError("code", "کد تایید باید ۶ رقم باشد");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const response = await fetch("/api/verify-otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          phone: form.values.phone,
-          otp: form.values.code ? form.values.code : undefined,
-        }),
+      const { error } = await createClient().auth.verifyOtp({
+        phone: toE164(form.values.phone),
+        token: form.values.code,
+        type: "sms",
       });
+      if (error) throw error;
 
-      if (response.ok) {
-        if (onLoginSuccess) {
-          onLoginSuccess(); // Call the callback if it exists
-        }
-
-        if (setIsModalOpen) {
-          setIsModalOpen(false); // close modal
-        }
-        router.back(); // Navigate back to the root page
-
-        setShowErrorOtp(false);
-        notifications.show({
-          message: "با موفقیت وارد شدید",
-          classNames: classes,
-        });
-        dispatch(setSuccessLogin(true));
-        close();
-        setTimeout(async () => {
-          const authResponse = await fetch("/api/check-auth");
-          const { token } = await authResponse.json();
-
-          if (token) {
-            // const redirectPath = sessionStorage.getItem('redirectPath');
-            // if (redirectPath) {
-            //     router.push(redirectPath);
-            //     sessionStorage.removeItem('redirectPath');
-            // } else {
-            //     router.push('/');
-            // }
-          } else {
-            router.push("/"); // Redirect to home if no token
-          }
-        }, 1000);
-      } else {
-        setShowErrorOtp(true);
-        const data = await response.json();
+      notifications.show({ color: "green", message: "با موفقیت وارد شدید." });
+      onLoginSuccess?.();
+      setIsModalOpen?.(false);
+      close();
+      router.refresh();
+      const next = new URLSearchParams(window.location.search).get("next");
+      if (
+        next?.startsWith("/") &&
+        !next.startsWith("//") &&
+        !next.includes("\\")
+      ) {
+        router.replace(next);
+      } else if (window.location.pathname === "/login") {
+        router.replace("/profile");
       }
-    } catch (error) {
-      setShowErrorOtp(true);
+    } catch {
+      notifications.show({
+        color: "red",
+        message: "کد تایید اشتباه یا منقضی شده است.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleNumberChange = (value: string) => {
-    // Convert Persian/Arabic digits to English digits
-    let inputValue = convertToEnglishNumber(value);
-    // Remove non-numeric characters (except commas for formatted values)
-    inputValue = inputValue.replace(/\D/g, "");
-
-    // Update the state
-    form.setFieldValue("phone", inputValue);
+  const handlePhoneChange = (value: string) => {
+    form.setFieldValue(
+      "phone",
+      convertToEnglishNumber(value).replace(/\D/g, ""),
+    );
   };
 
   return (
-    <Box style={style} pos={"relative"} mb={"xs"} mx="auto">
-      {!otpSent && (
-        <Flex
-          pos={"relative"}
-          top={"-3px"}
-          mb={"lg"}
-          align={"center"}
-          justify={"center"}
-        >
-          <Image
-            style={{ objectFit: "contain" }}
-            alt="kiwi part"
-            src={colorScheme === "dark" ? "/logo-dark.png" : "/logo.png"}
-            width={180}
-            height={60}
-          />
-        </Flex>
-      )}
-      {isAdsSection ? (
-        <Alert mb={"lg"} p={"xs"} color="green" variant="light">
-          <Text fz={"xs"}>لطفاً برای ثبت آگهی ابتدا وارد سایت شوید</Text>
+    <Box style={style} pos="relative" mb="xs" mx="auto">
+      <Flex mb="lg" align="center" justify="center">
+        <Image
+          style={{ objectFit: "contain" }}
+          alt="ریگورا"
+          src={colorScheme === "dark" ? "/logo-dark.png" : "/logo.png"}
+          width={180}
+          height={60}
+        />
+      </Flex>
+      {isAdsSection && (
+        <Alert mb="lg" p="xs" color="green" variant="light">
+          <Text fz="xs">لطفاً برای ثبت آگهی ابتدا وارد سایت شوید</Text>
         </Alert>
-      ) : (
-        ""
       )}
       {!otpSent ? (
-        <form onSubmit={form.onSubmit(handlePhoneSubmit)}>
-          <TextInput
-            mt={"xl"}
-            size="md"
-            data-autofocus
-            label="لطفاً شماره موبایلتان را وارد کنید"
-            placeholder=" شماره موبایل"
-            value={form.values.phone}
-            onChange={(event) => handleNumberChange(event.currentTarget.value)}
-            required
-            withAsterisk={false}
-            mb="md"
+        <>
+          <SegmentedControl
+            fullWidth
+            mb="lg"
+            value={mode}
+            onChange={(value) => setMode(value as "login" | "register")}
+            data={[
+              { label: "ورود", value: "login" },
+              { label: "ثبت نام", value: "register" },
+            ]}
           />
-          <Group w={"100%"} align="center">
+          <form onSubmit={form.onSubmit(sendOtp)}>
+            {mode === "register" && (
+              <TextInput
+                mb="md"
+                label="نام نمایشی"
+                autoComplete="name"
+                {...form.getInputProps("displayName")}
+              />
+            )}
+            <TextInput
+              mb="lg"
+              label="شماره موبایل"
+              inputMode="tel"
+              autoComplete="tel"
+              value={form.values.phone}
+              onChange={(event) => handlePhoneChange(event.currentTarget.value)}
+              error={form.errors.phone}
+              placeholder="09123456789"
+            />
             <Button
-              size="md"
-              color="var(--mantine-color-kiwi-9)"
-              w={"100%"}
+              loading={loading}
+              disabled={loading}
+              fullWidth
               type="submit"
             >
-              ارسال کد
+              ارسال کد تایید
             </Button>
-          </Group>
-        </form>
+          </form>
+        </>
       ) : (
-        <form onSubmit={form.onSubmit(handleOtpSubmit)}>
-          <Text fz={"xl"}>کُد تایید را وارد کنید: </Text>
-          <Text c="dimmed" mt={"xs"} fz={"sm"}>
-            این کُد برای شماره {form.values.phone} پیامک شده است.
+        <form onSubmit={form.onSubmit(verifyOtp)}>
+          <Text fz="sm" mb="md">
+            کد ارسال‌شده به {form.values.phone} را وارد کنید.
           </Text>
-          <Button
-            onClick={() => setOtpSent(false)}
-            color="var(--mantine-color-kiwi-9)"
-            size="xs"
-            variant="transparent"
-            pr={"0"}
-            rightSection={<IconArrowLeft size={15} />}
-          >
-            تغییر شماره موبایل
-          </Button>
           <PinInput
-            {...form.getInputProps("code")}
-            onComplete={handleOtpSubmit}
-            dir={"ltr"}
-            mt={"xl"}
-            style={{ justifyContent: "center" }}
-            size={"md"}
-            placeholder={""}
-            type={"number"}
+            length={6}
+            type="number"
+            inputMode="numeric"
             oneTimeCode
             autoFocus
-            inputMode={"numeric"}
-            name={"verify-code"}
-            data-autofocus
-            aria-autocomplete={"none"}
-            length={6}
+            dir="ltr"
+            mx="auto"
+            mb="xs"
+            {...form.getInputProps("code")}
           />
-          {showErrorOtp && (
-            <Text fz={"sm"} c={"red"} mt={"lg"}>
-              کد وارد شده اشتباه است یا منقضی شده است.
+          {form.errors.code && (
+            <Text c="red" fz="xs" ta="center" mb="sm">
+              {form.errors.code}
             </Text>
           )}
-          <Flex mt={"md"} justify={"center"} align={"center"}>
+          <Button loading={loading} disabled={loading} fullWidth type="submit">
+            تایید و ورود
+          </Button>
+          <Flex mt="sm" justify="space-between">
             <Button
+              variant="subtle"
               size="xs"
-              variant="transparent"
-              onClick={handleResendOtp}
-              disabled={!canResend}
+              onClick={() => setOtpSent(false)}
             >
-              {canResend ? (
-                "دریافت کد جدید"
-              ) : (
-                <Text fz={"xs"}> {timeLeft}s ثانیه مانده تا تلاش مجدد </Text>
-              )}
+              تغییر شماره
+            </Button>
+            <Button
+              variant="subtle"
+              size="xs"
+              onClick={sendOtp}
+              loading={loading}
+            >
+              ارسال دوباره کد
             </Button>
           </Flex>
-          <Group mt={"lg"} w={"100%"} align="center">
-            <Button
-              color="var(--mantine-color-kiwi-9)"
-              w={"100%"}
-              type="submit"
-            >
-              تایید
-            </Button>
-          </Group>
         </form>
       )}
     </Box>

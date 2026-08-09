@@ -30,7 +30,7 @@ const ClientAds = () => {
   const { data, isLoading, isSuccess } = useGetAdsListQuery({
     page: currentPage,
   });
-  const [opened, setOpened] = useState<{ [key: number]: boolean }>({});
+  const [opened, setOpened] = useState<{ [key: string]: boolean }>({});
   const [openedImageModal, setOpenedImageModal] = useState(false);
 
   const [approve, { isSuccess: isSuccessApprove }] = useApproveAdsItem();
@@ -42,18 +42,18 @@ const ClientAds = () => {
     setCurrentPage(page);
   };
 
-  const acceptAds = (id: number) => {
+  const acceptAds = (id: string) => {
     if (id) {
       approve({ id });
     }
   };
 
-  const rejectAds = (id: number) => {
+  const rejectAds = (id: string) => {
     if (id) {
       reject({ id });
     }
   };
-  const removeAds = (id: number) => {
+  const removeAds = (id: string) => {
     if (id) {
       remove(id);
     }
@@ -89,11 +89,11 @@ const ClientAds = () => {
     }
   }, [isSuccessRemove]);
 
-  const handleOpen = (id: number) => {
+  const handleOpen = (id: string) => {
     setOpened((prevState) => ({ ...prevState, [id]: true }));
   };
 
-  const handleClose = (id: number) => {
+  const handleClose = (id: string) => {
     setOpened((prevState) => ({ ...prevState, [id]: false }));
   };
 
@@ -109,7 +109,7 @@ const ClientAds = () => {
               width={30}
               onClick={() => openModal(img)} // Opens modal on click
               height={30}
-              src={`/public/storage/${img}`}
+              src={img}
             />
           ))}
         </>
@@ -120,7 +120,7 @@ const ClientAds = () => {
   };
 
   const openModal = (img: string) => {
-    setSelectedImage(`/public/storage/${img}`);
+    setSelectedImage(img);
     setOpenedImageModal(true);
   };
 
@@ -140,12 +140,12 @@ const ClientAds = () => {
         </Text>
       </Table.Td>
       <Table.Td>{product.category.name}</Table.Td>
-      <Table.Td>{product.user.username}</Table.Td>
+      <Table.Td>{product.user.name}</Table.Td>
       <Table.Td>
         {new Intl.NumberFormat("fa-IR").format(Number(product.price))}
       </Table.Td>
       <Table.Td>
-        {product.status === "approved" ? (
+        {product.status === "published" ? (
           <Text fz="xs" c="green">
             Approved
           </Text>

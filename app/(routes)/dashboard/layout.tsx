@@ -10,11 +10,8 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Navbar from "./(navbar)/Navbar";
-import { signOut, useSession } from "next-auth/react";
 import { IconLogout2 } from "@tabler/icons-react";
-import { useDispatch } from "react-redux";
-import { addToken } from "../../_redux/features/auth";
-import { useEffect } from "react";
+import { createClient } from "../../_lib/supabase/client";
 
 interface Props {
   children: React.ReactNode;
@@ -23,17 +20,9 @@ interface Props {
 export default function DashboardLayout({ children }: Props) {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
-  const dispatch = useDispatch();
-  const { data } = useSession();
-  dispatch(addToken(data));
-  useEffect(() => {
-    if (data) {
-      dispatch(addToken(data.user));
-    }
-  }, [data, dispatch]);
-
-  const logout = () => {
-    signOut();
+  const logout = async () => {
+    await createClient().auth.signOut();
+    window.location.href = "/";
   };
 
   return (

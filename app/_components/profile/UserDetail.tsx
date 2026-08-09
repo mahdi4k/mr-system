@@ -6,7 +6,6 @@ import React, { useEffect, useState } from "react";
 import NameEdit from "./edit/NameEdit";
 import { useDisclosure } from "@mantine/hooks";
 import EmailEdit from "./edit/EmailEdit";
-import { useRouter } from "next/navigation";
 
 export interface UserResponse {
   message: string;
@@ -14,12 +13,11 @@ export interface UserResponse {
 }
 
 interface UserData {
-  id: number;
+  id: string;
   name: string;
-  username: string;
   phone: string;
   email: string | null;
-  email_verified_at: string | null;
+  avatar_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -30,28 +28,6 @@ const UserDetail = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const [openedEmail, { open: openEmail, close: closeEmail }] =
     useDisclosure(false);
-  const router = useRouter();
-  const [loading, setLoading] = useState(true); // Add a loading state
-  const [token, setToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const authResponse = await fetch("/api/check-auth"); // Call your API to check the token
-        const { token } = await authResponse.json();
-
-        if (!token.value) {
-          // router.push('/'); // Redirect if no token
-        } else {
-          setToken(token.value); // Set the token
-        }
-      } catch (error) {
-        router.push("/"); // Redirect on error
-      }
-    };
-
-    checkAuth();
-  }, [router]);
 
   const fetchUserData = async () => {
     try {
@@ -131,24 +107,12 @@ const UserDetail = () => {
                         <IconEdit size={20} />
                     </ActionIcon> */}
         </Flex>
-        {token ? (
-          <>
-            <NameEdit
-              fetchUserData={fetchUserData}
-              close={close}
-              opened={opened}
-              token={token}
-            />
-            <EmailEdit
-              fetchUserData={fetchUserData}
-              close={closeEmail}
-              opened={openedEmail}
-              token={token}
-            />
-          </>
-        ) : (
-          ""
-        )}
+        <NameEdit fetchUserData={fetchUserData} close={close} opened={opened} />
+        <EmailEdit
+          fetchUserData={fetchUserData}
+          close={closeEmail}
+          opened={openedEmail}
+        />
       </SimpleGrid>
     </Card>
   );

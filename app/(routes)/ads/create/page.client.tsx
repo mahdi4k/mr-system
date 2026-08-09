@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   TextInput,
   Text,
@@ -14,9 +14,6 @@ import {
   SimpleGrid,
   Select,
   Textarea,
-  Modal,
-  Flex,
-  ActionIcon,
 } from "@mantine/core";
 import classes from "./ActionGrid.module.css";
 import { isNotEmpty, useForm } from "@mantine/form";
@@ -32,10 +29,10 @@ import {
 import AdsImageForm from "@/_components/adsSection/AdsImageForm";
 import { notifications } from "@mantine/notifications";
 import notifClasses from "@/_cssModules/notification.module.css";
-import { useRouter } from "next/navigation";
-import LoginModal from "@/_components/loginModal/LoginModal";
-import { IconArrowLeft } from "@tabler/icons-react";
-import Link from "next/link";
+import { createAd } from "../../../_features/ads/data";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../../../_redux/store";
+import { api } from "../../../_redux/services/api";
 
 export default function PageClient() {
   const [provinces, setProvinces] = useState<Province[]>([]);
@@ -49,37 +46,7 @@ export default function PageClient() {
   const [priceInWords, setPriceInWords] = useState("");
   const [loading, setLoading] = useState(false);
   const { items, activeCategory } = UseAdsCategory();
-  const [token, setToken] = useState<string | null>(null);
-  const [openedLogin, { open: openLogin, close: closeLogin }] =
-    useDisclosure(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const router = useRouter();
-
-  const checkAuth = useCallback(async () => {
-    try {
-      const authResponse = await fetch("/api/check-auth"); // Call your API to check the token
-      const { token } = await authResponse.json();
-
-      if (!token) {
-        setIsModalOpen(true); // Open modal if no token
-      } else {
-        setToken(token.value); // Save the token
-        setIsModalOpen(false); // Close modal
-      }
-    } catch (error) {
-      router.push("/"); // Redirect on error
-    }
-  }, [router]);
-
-  useEffect(() => {
-    checkAuth(); // Call checkAuth on component mount
-  }, [checkAuth]);
-
-  const handleLoginSuccess = () => {
-    // Trigger re-checking the token after login
-    checkAuth();
-  };
+  const dispatch: AppDispatch = useDispatch();
 
   const form = useForm({
     initialValues: {
@@ -91,8 +58,14 @@ export default function PageClient() {
       description: "",
     },
     validate: {
-      title: isNotEmpty("فیلد عنوان اجباری است"),
-      description: isNotEmpty("فیلد توضیحات اجباری است"),
+      title: (value: string) =>
+        value.trim().length >= 3 && value.trim().length <= 120
+          ? null
+          : "عنوان باید بین ۳ تا ۱۲۰ نویسه باشد",
+      description: (value: string) =>
+        value.trim().length >= 10 && value.trim().length <= 5000
+          ? null
+          : "توضیحات باید بین ۱۰ تا ۵۰۰۰ نویسه باشد",
       city: isNotEmpty("فیلد شهر اجباری است"),
     },
   });
@@ -128,22 +101,40 @@ export default function PageClient() {
 
   const handleSubmit = async (values: typeof form.values) => {
     setLoading(true);
-    const formData = new FormData();
-    formData.append("title", values.title);
-    formData.append("category_id", `${activeCategory}`);
-    formData.append("city", values.city ? values.city : "");
-    formData.append("ostan", selectedProvince ? `${selectedProvince}` : "");
-    formData.append("price", values.price.replace(/,/g, ""));
-    formData.append("description", values.description);
-    images.forEach((file) => formData.append("image[]", file));
-
     try {
-      setLoading(false);
+      if (!activeCategory || !selectedProvince || !values.city) {
+        validateOtherField();
+        return;
+      }
+      const rawPrice = values.price.replace(/,/g, "");
+      await createAd({
+        title: values.title,
+        description: values.description,
+        categoryId: activeCategory,
+        provinceId: selectedProvince,
+        cityId: Number(values.city),
+        price: rawPrice ? Number(rawPrice) : null,
+        images,
+      });
+      dispatch(api.util.invalidateTags(["ads"]));
       open();
       setImages([]);
       form.reset();
+      setSelectedProvince(null);
+      notifications.show({
+        color: "green",
+        message: "آگهی ثبت شد و پس از بررسی منتشر می‌شود.",
+        classNames: notifClasses,
+      });
     } catch (error) {
-      console.error("Error:", error);
+      notifications.show({
+        color: "red",
+        message:
+          error instanceof Error ? error.message : "ثبت آگهی ناموفق بود.",
+        classNames: notifClasses,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -168,13 +159,6 @@ export default function PageClient() {
       : setShowErrorCategory(false);
   };
 
-  const HandleModalLoginOpen = () => {
-    if (token) {
-      closeLogin();
-    } else {
-      openLogin();
-    }
-  };
   return (
     <Container w={{ base: "100%", lg: "700px" }} size={"xxl"}>
       <Paper
@@ -292,28 +276,6 @@ export default function PageClient() {
         </Box>
       </Paper>
       <ModalSubmit opened={opened} close={close} />
-
-      <Modal
-        styles={{ title: { width: "100%" } }}
-        withCloseButton={false}
-        opened={isModalOpen}
-        onClose={HandleModalLoginOpen}
-        title={
-          <Flex w={"100%"} justify={"space-between"} align={"center"}>
-            <Text>ورود / ثبت نام</Text>{" "}
-            <ActionIcon variant="subtle" component={Link} href={"/"}>
-              <IconArrowLeft />
-            </ActionIcon>
-          </Flex>
-        }
-      >
-        <LoginModal
-          onLoginSuccess={handleLoginSuccess}
-          isAdsSection={true}
-          setIsModalOpen={setIsModalOpen}
-          close={HandleModalLoginOpen}
-        />
-      </Modal>
     </Container>
   );
 }

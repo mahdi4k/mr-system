@@ -68,13 +68,6 @@ const enrichMotherboardWithTorob = async (
   }
 };
 
-type authTokenDTO = {
-  auth: {
-    userToken: {
-      user: string;
-    };
-  };
-};
 export const motherboardApi = api.injectEndpoints({
   overrideExisting: process.env.NODE_ENV === "development",
   endpoints: (builder) => ({

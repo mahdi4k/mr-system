@@ -1,13 +1,15 @@
 import PageClient from "./page.client";
-import { cookies } from "next/headers";
-import { getMockProduct } from "@/_redux/services/mockData";
-import { Product } from "@/_redux/services/adsApi";
+import { notFound } from "next/navigation";
+import { getAdById } from "../../../_features/ads/data";
+import type { Product } from "../../../_features/ads/types";
+import { createClient } from "../../../_lib/supabase/server";
+import { getCurrentUser } from "../../../_lib/supabase/auth";
 
 async function getData(params: { id: string }): Promise<Product> {
-  const product = getMockProduct(params.id);
+  const product = await getAdById(params.id, await createClient());
 
   if (!product) {
-    throw new Error("Product not found");
+    notFound();
   }
 
   return product;
@@ -19,17 +21,17 @@ export async function generateMetadata(props: {
   const params = await props.params;
   const product = await getData(params);
   return {
-    title: ` ${product.title} - کیوی پارت`,
+    title: ` ${product.title} - ریگورا`,
   };
 }
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const token = (await cookies()).get("authToken")?.value;
+  const user = await getCurrentUser();
   const data = await getData(params);
   return (
     <main style={{ flex: "1" }}>
-      <PageClient product={data} token={token} />
+      <PageClient product={data} currentUserId={user?.id} />
     </main>
   );
 }

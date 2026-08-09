@@ -365,7 +365,7 @@ const ChatPage = () => {
                         <Flex
                           key={message.id}
                           justify={
-                            message.user_id === userData?.userData.id
+                            String(message.user_id) === userData?.userData.id
                               ? "flex-start"
                               : "flex-end"
                           }
@@ -376,7 +376,8 @@ const ChatPage = () => {
                             radius="md"
                             style={{
                               backgroundColor:
-                                message.user_id === userData?.userData.id
+                                String(message.user_id) ===
+                                userData?.userData.id
                                   ? "light-dark(#E3F2FD,  #041622)"
                                   : "light-dark(#F5F5F5,  #053555)",
                               maxWidth: "60%",

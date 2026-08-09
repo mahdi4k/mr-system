@@ -15,7 +15,6 @@ import {
   useGetMotherboardsQuery,
   useRemoveMotherboardMutation,
 } from "@/_redux/services/motherboardApi";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
@@ -24,20 +23,11 @@ import notifClasses from "@/_cssModules/notification.module.css";
 import Image from "next/image";
 
 const ClientMotherBoard = () => {
-  const [loadingSession, setLoadingSession] = useState(false);
-  const session = useSession();
-  const {
-    isSuccess,
-    data = [],
-    error,
-  } = useGetMotherboardsQuery({}, { skip: !loadingSession });
+  const { isSuccess, data = [], error } = useGetMotherboardsQuery({});
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedMotherboardID, setSelectedMotherboardID] = useState<number>();
   const [removeMotherboard, response] = useRemoveMotherboardMutation();
 
-  useEffect(() => {
-    setLoadingSession(!!session.data);
-  }, [session.data]);
   const openModalRemove = (id: number) => {
     setSelectedMotherboardID(id);
     open();

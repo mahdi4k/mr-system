@@ -1,59 +1,61 @@
-# 🖥️ Kiwipart
+# Rigora / ریگورا
 
-[![Live Site](https://img.shields.io/badge/Live%20Site-kiwipart.ir-brightgreen?style=for-the-badge&logo=vercel)](https://kiwipart.ir)
+Rigora is a Next.js PC hardware platform for browsing parts, building systems, reading content, and publishing user-owned hardware advertisements.
 
-**Kiwipart** is a powerful platform built for Iranian PC users to assemble computer parts intelligently, buy and sell PC components, and browse updated product prices. It also features a blog section to share insights, guides, and news in the tech world.
+## Stack
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/mahdi4k/mr-system/master/public/screenshot.png" alt="Homepage Preview" width="800"/>
-</p>
+- Next.js 16 App Router with TypeScript
+- React 18 and Mantine 7
+- Redux Toolkit and RTK Query
+- Supabase Auth, PostgreSQL, Storage, and Row Level Security
+- Jest and React Testing Library
 
+## Local Setup
 
-
-## 🌟 Key Features
-
-### 🔧 Smart PC Assembly
-- Intelligent PC builder that suggests compatible parts.
-- Allows users to configure and build their dream setup.
-- Real-time compatibility checks and price calculations.
-
-### 📢 PC Parts Marketplace (Ads)
-- Users can post ads to sell or buy PC components.
-- Clean, easy-to-browse layout for different categories (CPU, GPU, RAM, etc.).
-- Contact info and negotiation options included.
-
-### 🛍️ Product Listings with Live Price Sync
-- Live prices pulled from sources like **Torob** and **Emalls**.
-- Product pages with specifications and price history.
-
-### 📰 Blog Section
-- Headless WordPress blog for sharing news, reviews, and tutorials.
-- Clean and accessible reading experience.
-
----
-
-## 🧰 Tech Stack
-
-### Frontend
-- **Next.js 14 (Pages Router)**
-- **Mantine UI** (components, forms, hooks, notifications, etc.)
-- **Redux Toolkit** for state management
-- **Mantine Hook Form** for form handling
-- **Jest + React Testing Library** for testing
-
----
-
-## ⚙️ Installation
+Requirements: Node.js 20.9+ and npm.
 
 ```bash
-# Clone the repository
-git clone https://github.com/mahdi4k/kiwipart.git
+npm install
+copy .env.example .env.local
+npm run dev
+```
 
-# Navigate into the project
-cd kiwipart
+Set these values in `.env.local`:
 
-# Install dependencies
-yarn install
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
 
-# Run the development server
-yarn dev
+`NEXT_PUBLIC_WORDPRESS_API` is optional and is retained only for the existing blog comment feature. Never place a Supabase service-role key, database password, or other private credential in a `NEXT_PUBLIC_*` variable.
+
+## Supabase Setup
+
+1. Create a Supabase project.
+2. Open **Project Settings > API** and copy the Project URL and Publishable key into `.env.local`.
+3. Open **SQL Editor**, paste the complete contents of `supabase/migrations/20260809000000_initial_rigora.sql`, and run it once.
+4. Open **Authentication > URL Configuration**.
+5. Set the Site URL to `http://localhost:3000` for local development.
+6. Add `http://localhost:3000/auth/confirm` and the equivalent production URL to Redirect URLs.
+7. In **Authentication > Providers > Phone**, enable phone authentication and configure a supported SMS provider. Rigora uses Supabase phone OTP and does not store passwords or OTP codes.
+8. Restart Next.js after changing environment variables.
+
+To grant dashboard moderation access, set a trusted user's Auth `app_metadata.role` to `admin` from the Supabase Dashboard, then have that user sign out and back in to refresh the JWT. Users cannot edit `app_metadata` through the Rigora client. Normal marketplace users do not need this role.
+
+The migration creates `profiles`, `ad_categories`, `ads`, `ad_images`, the public `ad-images` Storage bucket, indexes, timestamps, profile creation trigger, and all RLS/Storage policies. It can also be applied with the Supabase CLI because it uses the standard `supabase/migrations` layout.
+
+## Auth And Ads
+
+The browser and server clients live under `app/_lib/supabase`. `proxy.ts` refreshes auth cookies and redirects unauthenticated requests from protected routes. Supabase Auth is the only user session source; tokens are not manually stored in Redux or local storage.
+
+Public queries return published ads. Authenticated owners can create, read, update, and delete their own ads. New ads begin as pending, and only users with trusted `app_metadata.role = admin` can publish or reject them. Ownership is derived from `supabase.auth.getUser()` and enforced again by PostgreSQL RLS. Images are stored in Supabase Storage and represented by ordered URL records in `ad_images`.
+
+## Checks
+
+```bash
+npm run prettier:check
+npm run typecheck
+npm run jest
+npm run build
+```

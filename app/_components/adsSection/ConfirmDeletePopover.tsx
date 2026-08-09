@@ -6,8 +6,8 @@ const ConfirmDeletePopover = ({
   productId,
   onDelete,
 }: {
-  productId: number;
-  onDelete: (id: number) => void;
+  productId: string;
+  onDelete: (id: string) => void;
 }) => {
   const [opened, { open, close }] = useDisclosure(false);
 

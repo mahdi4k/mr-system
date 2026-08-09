@@ -11,7 +11,6 @@ import {
   Modal,
   Alert,
 } from "@mantine/core";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
@@ -24,20 +23,11 @@ import {
 import Image from "next/image";
 
 const ClientCpu = () => {
-  const [loadingSession, setLoadingSession] = useState(false);
-  const session = useSession();
-  const {
-    isSuccess,
-    data = [],
-    error,
-  } = useGetCpusQuery({}, { skip: !loadingSession });
+  const { isSuccess, data = [], error } = useGetCpusQuery({});
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedCpuID, setSelectedCpuID] = useState<number>();
   const [removeCpu, response] = useRemoveCpuMutation();
 
-  useEffect(() => {
-    setLoadingSession(!!session.data);
-  }, [session.data]);
   const openModalRemove = (id: number) => {
     setSelectedCpuID(id);
     open();

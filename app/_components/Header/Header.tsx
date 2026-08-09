@@ -34,10 +34,8 @@ import DrawerHeader from "./Drawer";
 import LoginModal from "../loginModal/LoginModal";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
-import { RootState } from "@/_redux/store";
 
-export function Header({ token }: { token?: string }) {
+export function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
   const [opened, { open, close }] = useDisclosure(false);
   const [openedModal, { open: openModal, close: closeModal }] =
     useDisclosure(false);
@@ -47,7 +45,6 @@ export function Header({ token }: { token?: string }) {
   });
   const isLoading = UseLoading();
   const router = useRouter();
-  const success = useSelector((state: RootState) => state.auth.success);
   const [logoSrc, setLogoSrc] = useState<string | null>(null); // Default to null
 
   const pathname = usePathname();
@@ -58,7 +55,7 @@ export function Header({ token }: { token?: string }) {
   }, [router]);
 
   const handleAddAdsPage = () => {
-    if (token || success) {
+    if (isAuthenticated) {
       router.push("/profile", { scroll: true });
     } else {
       router.push("/login", { scroll: true });
@@ -66,7 +63,7 @@ export function Header({ token }: { token?: string }) {
   };
 
   const handleToChatPage = () => {
-    if (token || success) {
+    if (isAuthenticated) {
       router.push("/chat", { scroll: true });
     } else {
       openModal();
@@ -101,7 +98,7 @@ export function Header({ token }: { token?: string }) {
           >
             <Image
               style={{ objectFit: "contain" }}
-              alt="kiwi part"
+              alt="ریگورا"
               src={logoSrc}
               width={80}
               height={40}

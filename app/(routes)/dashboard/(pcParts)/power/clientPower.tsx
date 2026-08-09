@@ -11,7 +11,6 @@ import {
   Modal,
   Alert,
 } from "@mantine/core";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
@@ -24,20 +23,11 @@ import {
 import Image from "next/image";
 
 const ClientPower = () => {
-  const [loadingSession, setLoadingSession] = useState(false);
-  const session = useSession();
-  const {
-    isSuccess,
-    data = [],
-    error,
-  } = useGetPowersQuery({}, { skip: !loadingSession });
+  const { isSuccess, data = [], error } = useGetPowersQuery({});
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedPowerID, setSelectedPowerID] = useState<number>();
   const [removePower, response] = useRemovePowerMutation();
 
-  useEffect(() => {
-    setLoadingSession(!!session.data);
-  }, [session.data]);
   const openModalRemove = (id: number) => {
     setSelectedPowerID(id);
     open();

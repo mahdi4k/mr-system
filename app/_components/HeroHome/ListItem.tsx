@@ -3,19 +3,16 @@ import { Box, Group, List, Modal, Text, ThemeIcon } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import Link from "next/link";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/_redux/store";
 import { useRouter } from "next/navigation";
 import { useDisclosure } from "@mantine/hooks";
 import LoginModal from "../loginModal/LoginModal";
 
-const ListItem = ({ token }: { token?: string }) => {
-  const success = useSelector((state: RootState) => state.auth.success);
+const ListItem = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const router = useRouter();
   const [opened, { open, close }] = useDisclosure(false);
 
   const handleAddAdsPage = () => {
-    if (token || success) {
+    if (isAuthenticated) {
       router.push("/ads/create", { scroll: true });
     } else {
       open();

@@ -8,7 +8,7 @@ export async function generateMetadata(props: {
 }) {
   const params = await props.params;
   return {
-    title: `لیست ${params.partName} - کیوی پارت`,
+    title: `لیست ${params.partName} - ریگورا`,
   };
 }
 

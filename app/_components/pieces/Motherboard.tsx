@@ -352,7 +352,6 @@ const Motherboard: FC<ImotherboardProps> = ({
                     withBorder
                   >
                     <Card.Section style={{ textAlign: "center" }} mt={"md"}>
-                      {/* {el.image && <Image alt={el.name} width={80} height={80} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/public/${el.image}`} />} */}
                       {el.image && (
                         <Image
                           alt={el.name}

@@ -16,7 +16,8 @@ import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { useDisclosure } from "@mantine/hooks";
 import { useDispatch } from "react-redux";
-import { setSuccessLogin } from "@/_redux/features/auth";
+import { createClient } from "../../_lib/supabase/client";
+import { api } from "../../_redux/services/api";
 
 interface ProfileLayoutProps {
   children: ReactNode;
@@ -30,16 +31,12 @@ export default function ProfileLayout({ children }: ProfileLayoutProps) {
 
   const handleLogout = async () => {
     try {
-      // Call the logout API to clear the cookie
-      const response = await fetch("/api/logout", { method: "GET" });
-      if (response.ok) {
-        dispatch(setSuccessLogin(false));
-        window.location.href = "/"; // Redirect to login after logout
-      } else {
-        console.error("Failed to log out");
-      }
-    } catch (error) {
-      console.error("Error logging out:", error);
+      const { error } = await createClient().auth.signOut();
+      if (error) throw error;
+      dispatch(api.util.resetApiState());
+      window.location.href = "/";
+    } catch {
+      close();
     }
   };
   return (
