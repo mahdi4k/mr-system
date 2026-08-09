@@ -116,13 +116,21 @@ const GraphicCard: FC<IgraphicProps> = ({
   };
   useEffect(() => {
     setSelectedGraphic(
-      graphicListFromSelectedCpu.length ? graphicListFromSelectedCpu : data,
+      graphicListFromSelectedCpu.length
+        ? data.filter((graphic) =>
+            graphicListFromSelectedCpu.includes(graphic.id),
+          )
+        : data,
     );
   }, [graphicListFromSelectedCpu, isSuccess]);
 
   useEffect(() => {
     setSelectedGraphic(
-      graphicListFromSelectedPower.length ? graphicListFromSelectedPower : data,
+      graphicListFromSelectedPower.length
+        ? data.filter((graphic) =>
+            graphicListFromSelectedPower.includes(graphic.id),
+          )
+        : data,
     );
   }, [graphicListFromSelectedPower, isSuccess]);
 

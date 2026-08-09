@@ -17,6 +17,8 @@ export type Graphic = RecommendableProduct & {
   brand?: string;
   psu: string;
   powers: number[];
+  boardPowerW: number;
+  minimumCaseForm: "Micro Tower" | "Mid Tower" | "Full Tower";
   torobUrl?: string;
 };
 

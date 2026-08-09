@@ -1,0 +1,272 @@
+.introSection {
+  width: calc(100% - rem(32px));
+  max-width: rem(1200px);
+  margin: var(--mantine-spacing-xl) auto;
+}
+
+.floatingButton {
+  position: fixed;
+  z-index: 200;
+  inset-inline-end: max(20px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  color: var(--mantine-color-dark-9);
+  box-shadow: 0 12px 32px rgb(81 125 16 / 35%);
+  overflow: hidden;
+}
+
+.floatingButton::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  bottom: -60%;
+  left: 0;
+  width: 40%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgb(255 255 255 / 0) 30%,
+    rgb(255 255 255 / 75%) 50%,
+    rgb(255 255 255 / 0) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+  transform: translateX(-300%) skewX(-18deg);
+  animation: button-shine 15s ease-out infinite;
+}
+
+.floatingButton.open::after {
+  animation: none;
+}
+
+@keyframes button-shine {
+  0%,
+  88% {
+    transform: translateX(-300%) skewX(-18deg);
+  }
+
+  96% {
+    transform: translateX(320%) skewX(-18deg);
+  }
+
+  100% {
+    transform: translateX(320%) skewX(-18deg);
+  }
+}
+
+.popoverDropdown {
+  width: min(430px, calc(100vw - 24px)) !important;
+  height: min(570px, calc(100dvh - 110px));
+  overflow: hidden;
+  padding: 0;
+  border-radius: var(--mantine-radius-xl);
+}
+
+.chatHeader {
+  min-height: 58px;
+  padding-inline: var(--mantine-spacing-md);
+  border-bottom: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-5));
+}
+
+.intro {
+  position: relative;
+  padding: 28px;
+  color: light-dark(var(--mantine-color-dark-8), var(--mantine-color-gray-0));
+  background:
+    radial-gradient(circle at 0 0, rgb(255 255 255 / 72%), transparent 32%),
+    linear-gradient(145deg, rgb(223 247 183 / 94%), rgb(134 214 160 / 64%));
+}
+
+
+.assistantMark {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgb(18 61 36 / 12%);
+  border-radius: 14px;
+  color: #123d24;
+  box-shadow: 0 8px 22px rgb(35 125 72 / 14%);
+  background: rgb(255 255 255 / 72%);
+}
+
+.statusBadge {
+  flex: 0 0 auto;
+}
+
+.introText {
+  position: relative;
+  z-index: 1;
+  margin-top: 24px;
+  line-height: 2;
+}
+
+.benefits {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.benefit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.benefit span {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border-radius: 50%;
+  color: white;
+  font-size: 10px;
+  background: #276b3f;
+}
+
+.chat {
+  display: flex;
+  height: calc(100% - 58px);
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  background:
+    linear-gradient(light-dark(rgb(255 255 255 / 82%), rgb(26 27 30 / 92%)),
+      light-dark(rgb(255 255 255 / 82%), rgb(26 27 30 / 92%))),
+    radial-gradient(circle at 10px 10px,
+      rgb(130 201 30 / 16%) 1px,
+      transparent 0);
+  background-size:
+    auto,
+    20px 20px;
+}
+
+.messages {
+  height: 280px;
+  flex: 1;
+}
+
+.quickPrompts {
+  padding: 0 16px 12px;
+}
+
+.quickPrompt {
+  height: auto;
+  min-height: 32px;
+  padding-block: 6px;
+  white-space: normal;
+}
+
+.quickPrompt :global(.mantine-Button-label) {
+  text-align: right;
+}
+
+.message {
+  width: fit-content;
+  max-width: min(92%, 560px);
+  padding: 10px 13px;
+  border-radius: 15px;
+  line-height: 1.9;
+}
+
+.assistantMessage {
+  align-self: flex-start;
+  border-bottom-right-radius: 4px;
+  background: light-dark(var(--mantine-color-gray-1),
+      var(--mantine-color-dark-5));
+}
+
+.userMessage {
+  align-self: flex-end;
+  border-bottom-left-radius: 4px;
+  color: var(--mantine-color-dark-9);
+  background: var(--mantine-color-lime-4);
+}
+
+.buildPreview {
+  width: min(440px, 100%);
+  border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  background: light-dark(rgb(255 255 255 / 86%), rgb(20 21 23 / 72%));
+}
+
+.partName {
+  overflow: hidden;
+  max-width: 290px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.composer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 12px 16px 4px;
+  border-top: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-5));
+}
+
+.input :global(.mantine-TextInput-input) {
+  border-color: light-dark(var(--mantine-color-gray-3),
+      var(--mantine-color-dark-4));
+  box-shadow: 0 4px 16px rgb(0 0 0 / 5%);
+}
+
+.scopeNote {
+  padding: 4px 16px 10px;
+  text-align: center;
+}
+
+@media (max-width: $mantine-breakpoint-md) {
+  .intro {
+    padding: 22px;
+  }
+}
+
+@media (max-width: $mantine-breakpoint-sm) {
+  .introSection {
+    width: calc(100% - rem(24px));
+    margin-block: var(--mantine-spacing-md);
+  }
+
+  .intro {
+    padding: 18px;
+  }
+
+  .statusBadge {
+    display: none;
+  }
+
+  .benefits {
+    grid-template-columns: 1fr;
+  }
+
+  .floatingButton {
+    inset-inline-end: max(12px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+  }
+
+  .popoverDropdown {
+    height: min(540px, calc(100dvh - 92px));
+  }
+
+  .messages {
+    height: 310px;
+  }
+
+  .quickPrompts :global(.mantine-Group-root) {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .quickPrompt {
+    width: 100%;
+  }
+
+  .partName {
+    max-width: 180px;
+  }
+}

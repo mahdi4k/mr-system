@@ -11,6 +11,7 @@ import {
   CASE,
   POWER,
 } from "@/_redux/services";
+import { parseRamQuantity } from "@/_utils/pcAssistant";
 
 interface TotalPriceCalculatorProps {
   cpuData?: IResult<CPU> | undefined;
@@ -36,6 +37,7 @@ const TotalPriceCalculator: React.FC<TotalPriceCalculatorProps> = ({
   setTotalPrice,
 }) => {
   const searchParams = useSearchParams();
+  const ramQuantity = parseRamQuantity(searchParams.get("ramQuantity"));
 
   useEffect(() => {
     const newTotalPrice = [
@@ -46,7 +48,7 @@ const TotalPriceCalculator: React.FC<TotalPriceCalculatorProps> = ({
         : 0,
       searchParams.has("fan") ? Number(fanData?.data?.price) : 0,
       searchParams.has("ssd") ? Number(ssdData?.data?.price) : 0,
-      searchParams.has("ram") ? Number(ramData?.data?.price) : 0,
+      searchParams.has("ram") ? Number(ramData?.data?.price) * ramQuantity : 0,
       searchParams.has("case") ? Number(caseData?.data?.price) : 0,
       searchParams.has("power") ? Number(powerData?.data?.price) : 0,
     ].reduce((acc, price) => acc + price, 0);
@@ -54,6 +56,7 @@ const TotalPriceCalculator: React.FC<TotalPriceCalculatorProps> = ({
     setTotalPrice(`${newTotalPrice}`);
   }, [
     searchParams,
+    ramQuantity,
     cpuData?.data?.price,
     graphicData?.data?.price,
     motherboardData?.data?.price,

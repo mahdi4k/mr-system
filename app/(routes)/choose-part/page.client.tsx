@@ -3,12 +3,14 @@
 import ChoosePartItem from "@/_components/chooseParts/ChoosePartItem";
 import {
   Box,
+  Button,
   Container,
   Flex,
   LoadingOverlay,
   SimpleGrid,
   Text,
 } from "@mantine/core";
+import { useRouter } from "next/navigation";
 import { useDisclosure } from "@mantine/hooks";
 import React, { Suspense, useEffect, useState } from "react";
 import classes from "./style.module.css";
@@ -37,8 +39,15 @@ import {
 } from "@/_redux/services";
 import SearchParamsHandler from "@/_components/chooseParts/SearchParamHandler";
 import TotalPriceCalculator from "@/_components/chooseParts/TotalPriceCalculator";
+import BuildAssistant from "@/_components/chooseParts/BuildAssistant";
+import { IconRotate } from "@tabler/icons-react";
 
-const PageClient: React.FC = () => {
+interface PageClientProps {
+  showAssistant?: boolean;
+}
+
+const PageClient: React.FC<PageClientProps> = ({ showAssistant = false }) => {
+  const router = useRouter();
   const [opened, { open, close }] = useDisclosure(false);
 
   const [selectedType, setSelectedType] = useState("");
@@ -155,9 +164,30 @@ const PageClient: React.FC = () => {
           styles={{ root: { flex: "1 0 auto" } }}
           size={"lg"}
         >
-          <Text px={"sm"} mb={"50px"} fw={"bold"} fz={"xl"} ta={"center"}>
-            هوشمندانه انتخاب کنید{" "}
-          </Text>
+          <Flex
+            align="center"
+            justify="center"
+            mb={"24px"}
+            pos="relative"
+            px={"sm"}
+          >
+            <Text fw={"bold"} fz={"xl"} ta={"center"}>
+              هوشمندانه انتخاب کنید{" "}
+            </Text>
+            {Object.values(isPartEmpty).every((isEmpty) => !isEmpty) && (
+              <Button
+                color="red"
+                leftSection={<IconRotate size={18} />}
+                onClick={() => router.push("/choose-part")}
+                pos="absolute"
+                size="xs"
+                styles={{ root: { insetInlineStart: 0 } }}
+                variant="light"
+              >
+                حذف همه
+              </Button>
+            )}
+          </Flex>
           <SimpleGrid
             spacing={{ base: "sm", lg: "xl" }}
             verticalSpacing={{ base: "sm", lg: "xl" }}
@@ -361,6 +391,7 @@ const PageClient: React.FC = () => {
             caseData={caseData}
             totalPrice={totalPrice}
           />
+          {showAssistant && <BuildAssistant />}
         </Container>
 
         <ModalPart

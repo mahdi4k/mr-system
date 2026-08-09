@@ -9,11 +9,7 @@ export type categoriesMO = {
   name: string;
 };
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export async function generateMetadata() {
   return {
     title: `  کیوی پارت - مقالات`,
   };
@@ -32,7 +28,8 @@ async function getCategories() {
   return mockBlogCategories;
 }
 
-const Page = async ({ params }: { params: { slug: string } }) => {
+const Page = async (props: { params: Promise<{ slug?: string[] }> }) => {
+  const params = await props.params;
   const categories: categoriesMO[] = await getCategories();
   const posts: postsMO[] = await getPosts(
     params.slug ? params.slug[0] : "",

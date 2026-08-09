@@ -4,17 +4,11 @@ import Image from "next/image";
 import classes from "@/_cssModules/PcSection.module.css";
 import React from "react";
 import TabsSection from "./components/TabsSection";
-import { useGetGraphicsQuery } from "@/_redux/services/graphicApi";
 import { RAM } from "@/_redux/services/ramApi";
-import { IconCheck, IconX } from "@tabler/icons-react";
 import SingleProductImage from "./components/SingleProductImage";
 import LinksProducts from "./LinksProducts";
 
 const RamSingle = ({ product }: { product: RAM }) => {
-  const torobLink = JSON.parse(product.links)[0];
-  const EmallsLink = JSON.parse(product.links)[1];
-
-  const { data: graphics } = useGetGraphicsQuery({});
   return (
     <>
       <Grid mt={"xl"}>
@@ -55,24 +49,26 @@ const RamSingle = ({ product }: { product: RAM }) => {
           ) : (
             ""
           )}
-          <LinksProducts EmallsLink={EmallsLink} torobLink={torobLink} />
+          <LinksProducts links={product.links} />
         </Grid.Col>
       </Grid>
 
       {/* tab section */}
-      {graphics && (
-        <TabsSection
-          defaultValue="graphics"
-          tabLists={[
-            {
-              title: "کارت گرافیک مطابق",
-              img: "/svg/graphic.svg",
-              value: "graphics",
-            },
-          ]}
-          tabPanels={[{ value: "graphics", item: graphics }]}
-        />
-      )}
+      <TabsSection
+        defaultValue="cpus"
+        tabLists={[
+          { title: "پردازنده‌های مطابق", img: "/svg/cpu.svg", value: "cpus" },
+          {
+            title: "مادربردهای مطابق",
+            img: "/svg/motherboard.svg",
+            value: "motherboards",
+          },
+        ]}
+        tabPanels={[
+          { value: "cpus", item: product.cpus },
+          { value: "motherboards", item: product.motherboards },
+        ]}
+      />
     </>
   );
 };

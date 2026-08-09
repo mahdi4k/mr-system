@@ -115,26 +115,6 @@ export const AdsApi = api.injectEndpoints({
       },
       providesTags: ["case"],
     }),
-    createCase: builder.mutation({
-      queryFn: async (payload) => {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        return { data: { message: "آگهی با موفقیت ایجاد شد", data: payload } };
-      },
-      invalidatesTags: ["case"],
-    }),
-    updateCase: builder.mutation({
-      queryFn: async (payload) => {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        return { data: { message: "آگهی با موفقیت ویرایش شد", data: payload } };
-      },
-      invalidatesTags: ["case"],
-    }),
-    addCaseImage: builder.mutation({
-      queryFn: async (payload) => {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        return { data: { message: "تصویر با موفقیت آپلود شد" } };
-      },
-    }),
     removeAds: builder.mutation({
       queryFn: async (payload) => {
         await new Promise((resolve) => setTimeout(resolve, 500));

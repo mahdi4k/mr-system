@@ -21,8 +21,6 @@ import SingleProductImage from "./components/SingleProductImage";
 import LinksProducts from "./LinksProducts";
 
 const PowerSingle = ({ product }: { product: POWER }) => {
-  const torobLink = JSON.parse(product.links)[0];
-  const EmallsLink = JSON.parse(product.links)[1];
   return (
     <>
       <Grid mt={"xl"}>
@@ -73,7 +71,7 @@ const PowerSingle = ({ product }: { product: POWER }) => {
           ) : (
             ""
           )}
-          <LinksProducts EmallsLink={EmallsLink} torobLink={torobLink} />
+          <LinksProducts links={product.links} />
         </Grid.Col>
       </Grid>
 

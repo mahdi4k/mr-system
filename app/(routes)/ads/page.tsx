@@ -8,22 +8,18 @@ export interface CategoryProdcut {
   name: string;
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export async function generateMetadata() {
   return {
     title: "آگهی قطعات",
   };
 }
 
-async function getData(slug: string) {
+async function getData() {
   return mockAdCategories;
 }
 
-const Page = async ({ params }: { params: { slug: string } }) => {
-  const categories: CategoryProdcut[] = await getData(params.slug);
+const Page = async () => {
+  const categories: CategoryProdcut[] = await getData();
 
   return <PageClient categories={categories} />;
 };

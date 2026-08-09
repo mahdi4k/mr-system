@@ -93,14 +93,16 @@ const Cpu: FC<IcpuProps> = ({ setActiveCpu, activeCpu }) => {
   useEffect(() => {
     setSelectedCpu(
       cpuListFromSelectedMotherboard.length
-        ? cpuListFromSelectedMotherboard
+        ? data.filter((cpu) => cpuListFromSelectedMotherboard.includes(cpu.id))
         : data,
     );
   }, [cpuListFromSelectedMotherboard, isSuccess]);
 
   useEffect(() => {
     setSelectedCpu(
-      cpuListFromSelectedGraphic.length ? cpuListFromSelectedGraphic : data,
+      cpuListFromSelectedGraphic.length
+        ? data.filter((cpu) => cpuListFromSelectedGraphic.includes(cpu.id))
+        : data,
     );
   }, [cpuListFromSelectedGraphic, isSuccess]);
 

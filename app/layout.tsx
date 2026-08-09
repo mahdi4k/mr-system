@@ -39,14 +39,14 @@ export const metadata = {
   description: "kiwi-part pc building",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
   modal,
 }: {
   children: any;
   modal: any;
 }) {
-  const token = cookies().get("authToken")?.value;
+  const token = (await cookies()).get("authToken")?.value;
 
   return (
     <html
@@ -54,6 +54,7 @@ export default function RootLayout({
       dir="rtl"
       lang="en"
       className={iranyekan.variable}
+      suppressHydrationWarning
     >
       <head>
         <ColorSchemeScript />

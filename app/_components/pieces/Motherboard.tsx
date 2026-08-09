@@ -95,7 +95,9 @@ const Motherboard: FC<ImotherboardProps> = ({
   useEffect(() => {
     setSelectedMotherboard(
       MotherboardListFromSelectedCpu.length
-        ? MotherboardListFromSelectedCpu
+        ? data.filter((motherboard) =>
+            MotherboardListFromSelectedCpu.includes(motherboard.id),
+          )
         : data,
     );
   }, [MotherboardListFromSelectedCpu, isSuccess]);

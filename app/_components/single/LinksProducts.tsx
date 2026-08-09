@@ -4,11 +4,33 @@ import React, { FC } from "react";
 import Image from "next/image";
 
 type Props = {
-  torobLink: string;
-  EmallsLink: string;
+  links: string;
 };
 
-const LinksProducts: FC<Props> = ({ torobLink, EmallsLink }) => {
+function parseProductLinks(links: string): [string?, string?] {
+  try {
+    const parsed: unknown = JSON.parse(links);
+
+    if (Array.isArray(parsed)) {
+      const validLinks = parsed.filter(
+        (link): link is string => typeof link === "string",
+      );
+      return [validLinks[0], validLinks[1]];
+    }
+
+    if (typeof parsed === "string") {
+      return [parsed];
+    }
+  } catch {
+    // Current catalog entries store the Torob URL directly.
+  }
+
+  return links ? [links] : [];
+}
+
+const LinksProducts: FC<Props> = ({ links }) => {
+  const [torobLink, emallsLink] = parseProductLinks(links);
+
   return (
     <Flex justify={"end"} my={"xl"}>
       {torobLink && (
@@ -32,8 +54,8 @@ const LinksProducts: FC<Props> = ({ torobLink, EmallsLink }) => {
         </Link>
       )}
 
-      {EmallsLink && (
-        <Link href={EmallsLink} target="_blank">
+      {emallsLink && (
+        <Link href={emallsLink} target="_blank">
           <Button
             mr={"lg"}
             color="indigo"

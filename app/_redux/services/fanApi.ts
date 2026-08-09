@@ -14,6 +14,8 @@ export type FAN = RecommendableProduct & {
   price?: string;
   links: string;
   cpus: number[];
+  coolingCapacityW?: number;
+  powerDrawW: number;
   brand?: string;
   torobUrl?: string;
 };

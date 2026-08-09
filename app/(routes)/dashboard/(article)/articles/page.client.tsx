@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { PiecesProps } from "./page";
-import dynamic from "next/dynamic";
+import React from "react";
 // const MapComponent = dynamic(() => import('@/_components/textEditor/Tiptap'), { ssr: false })
 
-const PageClient: React.FC<PiecesProps> = ({ params }) => {
+const PageClient: React.FC = () => {
   return <div>{/* <MapComponent /> */}</div>;
 };
 

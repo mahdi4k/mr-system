@@ -93,7 +93,7 @@ const mockTransactions: Transaction[] = [
 ];
 
 export async function POST(request: Request) {
-  const token = cookies().get("authToken")?.value;
+  const token = (await cookies()).get("authToken")?.value;
 
   if (!token) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -133,7 +133,7 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  const token = cookies().get("authToken")?.value;
+  const token = (await cookies()).get("authToken")?.value;
 
   if (!token) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

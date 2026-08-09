@@ -23,6 +23,7 @@ import { FAN } from "@/_redux/services/fanApi";
 import { CASE } from "@/_redux/services/caseApi";
 import { RAM } from "@/_redux/services/ramApi";
 import KiwiImage from "../shared/KiwiImage";
+import ProductConditionBadge from "../shared/ProductConditionBadge";
 
 type Props = {
   data: CPU | Motherboard | Graphic | POWER | SSD | FAN | CASE | RAM;
@@ -53,6 +54,7 @@ const CategoryLayout: FC<Props> = ({ data, children, type }) => {
           className={classes.categorySection}
           href={`/products/${type}/${data.id}`}
         >
+          <ProductConditionBadge condition={data.condition} />
           <Card.Section
             className={classes.categoryImage}
             mt={"0"}

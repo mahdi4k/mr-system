@@ -8,12 +8,13 @@ import { CASE } from "@/_redux/services/caseApi";
 import { useGetGraphicsQuery } from "@/_redux/services/graphicApi";
 import SingleProductImage from "./components/SingleProductImage";
 import LinksProducts from "./LinksProducts";
+import { isPartialBuildCompatible } from "@/_utils/pcAssistant";
 
 const CaseSingle = ({ product }: { product: CASE }) => {
-  const torobLink = JSON.parse(product.links)[0];
-  const EmallsLink = JSON.parse(product.links)[1];
-
   const { data: graphics } = useGetGraphicsQuery({});
+  const compatibleGraphics = graphics
+    ?.filter((graphic) => isPartialBuildCompatible({ graphic, case: product }))
+    .map((graphic) => graphic.id);
   return (
     <>
       <Grid mt={"xl"}>
@@ -56,12 +57,12 @@ const CaseSingle = ({ product }: { product: CASE }) => {
           ) : (
             ""
           )}
-          <LinksProducts EmallsLink={EmallsLink} torobLink={torobLink} />
+          <LinksProducts links={product.links} />
         </Grid.Col>
       </Grid>
 
       {/* tab section */}
-      {graphics && (
+      {compatibleGraphics && (
         <TabsSection
           defaultValue="graphics"
           tabLists={[
@@ -71,7 +72,7 @@ const CaseSingle = ({ product }: { product: CASE }) => {
               value: "graphics",
             },
           ]}
-          tabPanels={[{ value: "graphics", item: graphics }]}
+          tabPanels={[{ value: "graphics", item: compatibleGraphics }]}
         />
       )}
     </>

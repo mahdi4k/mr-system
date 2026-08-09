@@ -18,7 +18,7 @@ export type postsMO = {
 };
 
 async function getData() {
-  const host = headers().get("host"); // Get current domain
+  const host = (await headers()).get("host"); // Get current domain
   const protocol = process.env.NODE_ENV === "production" ? "http" : "http";
   const url = `${protocol}://${host}/api/articles`; // Construct absolute URL
 

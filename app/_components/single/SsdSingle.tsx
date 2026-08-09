@@ -10,9 +10,6 @@ import SingleProductImage from "./components/SingleProductImage";
 import LinksProducts from "./LinksProducts";
 
 const SsdSingle = ({ product }: { product: SSD }) => {
-  const torobLink = JSON.parse(product.links)[0];
-  const EmallsLink = JSON.parse(product.links)[1];
-
   const { data: graphics } = useGetGraphicsQuery({});
   return (
     <>
@@ -69,7 +66,7 @@ const SsdSingle = ({ product }: { product: SSD }) => {
           ) : (
             ""
           )}
-          <LinksProducts EmallsLink={EmallsLink} torobLink={torobLink} />
+          <LinksProducts links={product.links} />
         </Grid.Col>
       </Grid>
 

@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  const token = cookies().get("authToken")?.value;
+  const token = (await cookies()).get("authToken")?.value;
 
   if (!token) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

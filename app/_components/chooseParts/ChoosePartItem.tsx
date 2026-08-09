@@ -9,6 +9,8 @@ import ShopsLink from "../pieces/shared/ShopsLink";
 import { IconX } from "@tabler/icons-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import KiwiImage from "../shared/KiwiImage";
+import ProductConditionBadge from "../shared/ProductConditionBadge";
+import { parseRamQuantity } from "@/_utils/pcAssistant";
 
 interface Props {
   svg: string;
@@ -30,6 +32,7 @@ const ChoosePartItem: FC<Props> = ({
   const [currentItemData, setCurrentItemData] = useState<
     Partial<CPU> | undefined
   >(itemData);
+  const ramQuantity = parseRamQuantity(searchParams.get("ramQuantity"));
 
   useEffect(() => {
     if (itemData) {
@@ -46,6 +49,9 @@ const ChoosePartItem: FC<Props> = ({
     params.delete(`${itemData?.id}`); // Remove the id parameter
     if (type === "cpu") {
       params.delete("motherboard");
+    }
+    if (type === "ram") {
+      params.delete("ramQuantity");
     }
 
     router.push(`/choose-part?${params.toString()}`);
@@ -88,6 +94,7 @@ const ChoosePartItem: FC<Props> = ({
             >
               <IconX size={18} />
             </ActionIcon>
+            <ProductConditionBadge condition={currentItemData.condition} />
             <Box w={"100%"} ta={"center"} className={classes.categoryImage}>
               {currentItemData.image && (
                 <KiwiImage
@@ -99,10 +106,18 @@ const ChoosePartItem: FC<Props> = ({
               )}
             </Box>
             <Text lineClamp={2} h={"43px"} ta={"center"} mt={"lg"} size="sm">
+              {type === "ram" ? `${ramQuantity}x ` : ""}
               {currentItemData.name}
             </Text>
             <Flex justify={"center"} align={"center"}>
-              <CardPartPrice justify="center" price={currentItemData.price} />
+              <CardPartPrice
+                justify="center"
+                price={
+                  type === "ram" && currentItemData.price
+                    ? String(Number(currentItemData.price) * ramQuantity)
+                    : currentItemData.price
+                }
+              />
             </Flex>
             <Divider mt={"xl"} />
             <ShopsLink justIcon={true} currentPiece={currentItemData} />
@@ -120,7 +135,13 @@ const ChoosePartItem: FC<Props> = ({
             style={{ borderRadius: "10px" }}
             component="div"
           >
-            <Image width={110} height={100} src={svg} alt={title} />
+            <Image
+              width={110}
+              height={100}
+              src={svg}
+              alt={title}
+              loading={type === "cpu" ? "eager" : "lazy"}
+            />
           </Box>
         </Tooltip>
       )}

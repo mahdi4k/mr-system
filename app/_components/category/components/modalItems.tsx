@@ -8,6 +8,7 @@ import Link from "next/link";
 import CardPartPrice from "../../shared/CardPartPrice";
 import classes from "../category.module.css";
 import KiwiImage from "@/_components/shared/KiwiImage";
+import ProductConditionBadge from "@/_components/shared/ProductConditionBadge";
 
 type Iprops = {
   items: Graphic[] | Motherboard[] | CPU[] | POWER[] | undefined;
@@ -37,6 +38,7 @@ const ModalItems: FC<Iprops> = ({ title, items, type }) => {
                   className={classes.categorySection}
                   href={`/products/${type}/${item.id}`}
                 >
+                  <ProductConditionBadge condition={item.condition} />
                   <Card.Section
                     className={classes.categoryImage}
                     mt={"0"}

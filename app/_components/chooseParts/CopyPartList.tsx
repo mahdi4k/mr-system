@@ -14,6 +14,7 @@ import { IconCheck, IconCopy } from "@tabler/icons-react";
 import React from "react";
 import { TelegramShareButton, TelegramIcon } from "react-share";
 import { useSearchParams } from "next/navigation";
+import { parseRamQuantity } from "@/_utils/pcAssistant";
 import {
   Motherboard,
   CPU,
@@ -80,6 +81,7 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
   const ssdParam = searchParams.get("ssd");
   const fanParam = searchParams.get("fan");
   const caseParam = searchParams.get("case");
+  const ramQuantity = parseRamQuantity(searchParams.get("ramQuantity"));
 
   const hasParts =
     searchParams.has("motherboard") ||
@@ -269,13 +271,15 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
                 fz="sm"
                 fw="bold"
               >
+                {/* ... */}
                 <Text fw={"bold"} fz={"xs"}>
                   {ramData?.data.price
-                    ? `${Intl.NumberFormat("fa", {}).format(Number(ramData.data.price))} تومان`
+                    ? `${Intl.NumberFormat("fa", {}).format(Number(ramData.data.price) * ramQuantity)} تومان`
                     : ""}
                 </Text>
                 <Box w={215}>
                   <Text truncate="start" fz={"xs"} fw={"bold"}>
+                    {ramQuantity > 1 ? `${ramQuantity}x ` : ""}
                     {removePersianWords(ramData?.data.name as string)}
                   </Text>
                 </Box>

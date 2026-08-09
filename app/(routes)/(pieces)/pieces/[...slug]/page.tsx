@@ -14,7 +14,8 @@ export const metadata: Metadata = {
   title: "انتخاب قطعات",
   description: "",
 };
-const Page: React.FC<PiecesProps> = ({ params }) => {
+const Page = async (props: { params: Promise<PiecesProps["params"]> }) => {
+  const params = await props.params;
   return <PageClient params={params} />;
 };
 

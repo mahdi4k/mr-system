@@ -15,6 +15,7 @@ import {
   getMotherboardsByIds,
   getPowersByIds,
 } from "@/_data/productCatalog";
+import ProductConditionBadge from "@/_components/shared/ProductConditionBadge";
 
 type Props = {
   tabLists: { title: string; img: string; value: string }[];
@@ -93,6 +94,7 @@ const TabsSection: FC<Props> = ({ tabLists, tabPanels, defaultValue }) => {
                           radius="md"
                           withBorder
                         >
+                          <ProductConditionBadge condition={data.condition} />
                           <Card.Section mt={"0"} ta={"center"}>
                             {data.image && (
                               <Image

@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { conversationId: string } },
+  props: { params: Promise<{ conversationId: string }> },
 ) {
+  const params = await props.params;
   const token = request.cookies.get("authToken")?.value;
 
   if (!token) {
@@ -50,8 +51,9 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { conversationId: string } },
+  props: { params: Promise<{ conversationId: string }> },
 ) {
+  const params = await props.params;
   const token = request.cookies.get("authToken")?.value;
 
   if (!token) {

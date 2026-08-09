@@ -93,7 +93,11 @@ const Power: FC<IPowerProps> = ({ setActivePower, activePower }) => {
   };
   useEffect(() => {
     setSelectedPower(
-      powerListFromSelectedGraphic.length ? powerListFromSelectedGraphic : data,
+      powerListFromSelectedGraphic.length
+        ? data.filter((power) =>
+            powerListFromSelectedGraphic.includes(power.id),
+          )
+        : data,
     );
   }, [powerListFromSelectedGraphic, isSuccess]);
 

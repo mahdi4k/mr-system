@@ -18,6 +18,8 @@ export type CPU = RecommendableProduct & {
   links: string;
   brand?: string;
   rams: number[];
+  maxTurboPowerW: number;
+  minimumRamGb: number;
   torobUrl?: string;
 };
 

@@ -23,6 +23,7 @@ export type Motherboard = RecommendableProduct & {
   image: string;
   cpus: number[];
   rams: number[];
+  storageForms: ("M.2" | "2.5-inch")[];
   attributes?: string[];
   torobUrl?: string;
 };

@@ -3,17 +3,17 @@ import ClientPage from "./clientPage";
 
 type Iprop = "motherboard" | "cpu" | "graphic" | "power";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { partName: Iprop };
+export async function generateMetadata(props: {
+  params: Promise<{ partName: Iprop }>;
 }) {
+  const params = await props.params;
   return {
     title: `لیست ${params.partName} - کیوی پارت`,
   };
 }
 
-const Page = ({ params }: { params: { partName: Iprop } }) => {
+const Page = async (props: { params: Promise<{ partName: Iprop }> }) => {
+  const params = await props.params;
   return <ClientPage partName={params.partName} />;
 };
 

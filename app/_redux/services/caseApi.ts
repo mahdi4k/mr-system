@@ -13,6 +13,7 @@ export type CASE = RecommendableProduct & {
   max_total_fan: string;
   brand?: string;
   form: string;
+  motherboardSizes: ("ATX" | "Micro-ATX")[];
   rgb: boolean;
   image: string;
   emalls?: string;

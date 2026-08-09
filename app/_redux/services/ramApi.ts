@@ -14,6 +14,7 @@ export type RAM = RecommendableProduct & {
   links: string;
   cpus: number[];
   motherboards: number[];
+  capacityGb: number;
   torobUrl?: string;
 };
 

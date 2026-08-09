@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function PATCH(req: Request) {
-  const token = cookies().get("authToken")?.value;
+  const token = (await cookies()).get("authToken")?.value;
   if (!token) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }

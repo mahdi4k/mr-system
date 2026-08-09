@@ -1,15 +1,14 @@
-import bundleAnalyzer from '@next/bundle-analyzer';
+import bundleAnalyzer from "@next/bundle-analyzer";
 import withPWAInit from "@ducanh2912/next-pwa";
 
 const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
+  enabled: process.env.ANALYZE === "true",
 });
 
 const withPWA = withPWAInit({
   cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,
   reloadOnOnline: true,
-  swcMinify: true,
   dest: "public",
   fallbacks: {
     //image: "/static/images/fallback.png",
@@ -24,27 +23,28 @@ const withPWA = withPWAInit({
 });
 
 // Compose the configurations
-export default withPWA(withBundleAnalyzer({
-  reactStrictMode: false,
-  output:'standalone',
-  experimental: {
-    optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
-    webpackBuildWorker: true
-  },
-  images: {
-    remotePatterns: [ 
-      {
-        protocol: 'http',
-        hostname: '127.0.0.1',
-        // hostname: 'app.kiwipart.ir',
-        pathname: '**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'image.torob.com',
-        pathname: '/**',
-      },
-    ],
-  },
-  // Add any additional Next.js config options here
-}));
+export default withPWA(
+  withBundleAnalyzer({
+    reactStrictMode: false,
+    output: "standalone",
+    experimental: {
+      optimizePackageImports: ["@mantine/core", "@mantine/hooks"],
+    },
+    images: {
+      remotePatterns: [
+        {
+          protocol: "http",
+          hostname: "127.0.0.1",
+          // hostname: 'app.kiwipart.ir',
+          pathname: "**",
+        },
+        {
+          protocol: "https",
+          hostname: "image.torob.com",
+          pathname: "/**",
+        },
+      ],
+    },
+    // Add any additional Next.js config options here
+  }),
+);

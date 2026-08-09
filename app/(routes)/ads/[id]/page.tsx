@@ -13,15 +13,19 @@ async function getData(params: { id: string }): Promise<Product> {
   return product;
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
+export async function generateMetadata(props: {
+  params: Promise<{ id: string }>;
+}) {
+  const params = await props.params;
   const product = await getData(params);
   return {
     title: ` ${product.title} - کیوی پارت`,
   };
 }
 
-export default async function Page({ params }: { params: { id: string } }) {
-  const token = cookies().get("authToken")?.value;
+export default async function Page(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
+  const token = (await cookies()).get("authToken")?.value;
   const data = await getData(params);
   return (
     <main style={{ flex: "1" }}>

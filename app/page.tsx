@@ -11,8 +11,11 @@ import { Metadata, Viewport } from "next";
 import SuggestSection from "./_components/suggestSection/SuggestSection";
 import AdsSection from "./_components/adsSection/AdsSection";
 import { cookies } from "next/headers";
-import { Container, Group } from "@mantine/core";
+import { Button, Container, Group, Text } from "@mantine/core";
+import { IconArrowLeft } from "@tabler/icons-react";
 import PageClient from "./(routes)/choose-part/page.client";
+import BuildAssistantIntro from "@/_components/chooseParts/BuildAssistantIntro";
+import classes from "./page.module.css";
 
 export const viewport: Viewport = {
   themeColor: "#87A10C",
@@ -61,12 +64,35 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const page = () => {
-  const token = cookies().get("authToken")?.value;
+const page = async () => {
+  const token = (await cookies()).get("authToken")?.value;
 
   return (
     <div>
-      <PageClient />
+      <BuildAssistantIntro />
+      <div className={classes.builderPreview}>
+        <div className={classes.builderContent}>
+          <PageClient />
+        </div>
+        <div className={classes.builderAction}>
+          <div className={classes.builderActionPanel}>
+            <Text className={classes.builderActionText} fw={600} size="sm">
+              قطعات سازگار را کنار هم بچین و سیستم ایده‌آلت را بساز
+            </Text>
+            <Button
+              className={classes.builderButton}
+              color="lime"
+              component="a"
+              href="/choose-part"
+              radius="xl"
+              rightSection={<IconArrowLeft size={18} stroke={2} />}
+              size="md"
+            >
+              سیستم خودت را بساز
+            </Button>
+          </div>
+        </div>
+      </div>
       <SuggestSection />
 
       <AdsSection token={token} />

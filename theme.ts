@@ -1,17 +1,17 @@
 "use client";
 
 import { MantineColorsTuple, createTheme } from "@mantine/core";
-const kiwi: MantineColorsTuple = [
-  "#fbfeec",
-  "#f6fbd8",
-  "#7ea300",
-  "#dff379",
-  "#d5f053",
-  "#cfee3c",
-  "#cbed31",
-  "#b3d226",
-  "#9ebb1d",
-  "#87a10c",
+const rigora: MantineColorsTuple = [
+  "#ECFDF5",
+  "#D1FAE5",
+  "#A7F3D0",
+  "#6EE7B7",
+  "#34D399",
+  "#10B981",
+  "#059669",
+  "#047857",
+  "#065F46",
+  "#064E3B",
 ];
 
 const green: MantineColorsTuple = [
@@ -28,7 +28,7 @@ const green: MantineColorsTuple = [
 ];
 export const theme = createTheme({
   colors: {
-    kiwi,
+    rigora,
   },
   primaryColor: "green",
 });
