@@ -16,6 +16,9 @@ import {
   ThemeIcon,
   Flex,
   Modal,
+  Avatar,
+  Menu,
+  Button,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import classes from "./Header.module.css";
@@ -26,6 +29,9 @@ import {
   IconChartPie3,
   IconUserCircle,
   IconBrandLine,
+  IconHome2,
+  IconLogin,
+  IconLogout,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import UseLoading from "@/_utils/customHook/useLoading";
@@ -34,8 +40,14 @@ import DrawerHeader from "./Drawer";
 import LoginModal from "../loginModal/LoginModal";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { createClient } from "../../_lib/supabase/client";
 
-export function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
+interface HeaderProps {
+  isAuthenticated: boolean;
+  userLabel?: string;
+}
+
+export function Header({ isAuthenticated, userLabel }: HeaderProps) {
   const [opened, { open, close }] = useDisclosure(false);
   const [openedModal, { open: openModal, close: closeModal }] =
     useDisclosure(false);
@@ -54,12 +66,17 @@ export function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
     router.prefetch("/profile");
   }, [router]);
 
-  const handleAddAdsPage = () => {
+  const handleAccountPage = () => {
     if (isAuthenticated) {
       router.push("/profile", { scroll: true });
     } else {
       router.push("/login", { scroll: true });
     }
+  };
+
+  const handleLogout = async () => {
+    await createClient().auth.signOut();
+    window.location.href = "/";
   };
 
   const handleToChatPage = () => {
@@ -271,46 +288,95 @@ export function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
           </Group>
         </Flex>
 
-        <Group gap={5}>
+        <Group gap="md" wrap="nowrap">
           <ActionIcon
             onClick={handleToChatPage}
             size={"lg"}
             radius={"lg"}
             variant="transparent"
-            ml={"md"}
+            aria-label="گفتگوها"
           >
             <IconBrandLine size={24} />
           </ActionIcon>
 
-          <Group w={"27px"} justify="center">
-            {isLoading ? (
-              <ActionIcon
-                onClick={() =>
-                  setColorScheme(
-                    computedColorScheme === "light" ? "dark" : "light",
-                  )
-                }
-                variant="subtle"
-                size="xl"
-                aria-label="Toggle color scheme"
-                color={"#7ea300"}
-              >
-                {computedColorScheme === "light" ? <IconMoon /> : <IconSun />}
-              </ActionIcon>
-            ) : (
-              ""
-            )}
-          </Group>
+          {isLoading && (
+            <ActionIcon
+              onClick={() =>
+                setColorScheme(
+                  computedColorScheme === "light" ? "dark" : "light",
+                )
+              }
+              variant="subtle"
+              size="lg"
+              radius="lg"
+              aria-label="تغییر حالت رنگ"
+              color={"#7ea300"}
+            >
+              {computedColorScheme === "light" ? <IconMoon /> : <IconSun />}
+            </ActionIcon>
+          )}
 
-          <ActionIcon
-            onClick={handleAddAdsPage}
-            size={"lg"}
-            radius={"lg"}
-            variant="light"
-            mr={"lg"}
-          >
-            <IconUserCircle size={24} />
-          </ActionIcon>
+          {isAuthenticated ? (
+            <Menu position="bottom-end" shadow="md" width={210}>
+              <Menu.Target>
+                <UnstyledButton
+                  aria-label="منوی حساب کاربری"
+                  className={classes.accountButton}
+                >
+                  <Avatar color="green" radius="xl" size={34}>
+                    {(userLabel || "ک").trim().charAt(0).toUpperCase()}
+                  </Avatar>
+                  <Text
+                    className={classes.accountName}
+                    fz="sm"
+                    fw={600}
+                    visibleFrom="sm"
+                  >
+                    {userLabel || "کاربر ریگورا"}
+                  </Text>
+                </UnstyledButton>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Label>حساب کاربری</Menu.Label>
+                <Menu.Item
+                  leftSection={<IconUserCircle size={17} />}
+                  onClick={() => router.push("/profile")}
+                >
+                  پروفایل من
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<IconHome2 size={17} />}
+                  onClick={() => router.push("/profile/ads")}
+                >
+                  آگهی‌های من
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Item
+                  color="red"
+                  leftSection={<IconLogout size={17} />}
+                  onClick={handleLogout}
+                >
+                  خروج از حساب
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          ) : (
+            <Button
+              aria-label="ورود یا ثبت نام"
+              leftSection={<IconLogin size={18} />}
+              onClick={handleAccountPage}
+              radius="xl"
+              size="xs"
+              variant="light"
+            >
+              <Text visibleFrom="sm" inherit>
+                ورود / ثبت نام
+              </Text>
+              <Text hiddenFrom="sm" inherit>
+                ورود
+              </Text>
+            </Button>
+          )}
         </Group>
       </Container>
       <DrawerHeader opened={opened} close={close} />

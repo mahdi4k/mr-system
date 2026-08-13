@@ -44,6 +44,7 @@ export interface AdsFilters {
   sort?: string;
   page?: string | number;
   ostan?: string;
+  status?: AdStatus;
 }
 
 export interface CreateAdInput {
@@ -54,6 +55,12 @@ export interface CreateAdInput {
   price: number | null;
   provinceId: number;
   title: string;
+}
+
+export interface AdCreationProgress {
+  completed: number;
+  stage: "creating" | "uploading" | "saving";
+  total: number;
 }
 
 export interface UpdateAdInput {

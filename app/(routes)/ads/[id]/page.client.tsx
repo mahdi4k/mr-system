@@ -138,7 +138,8 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
       return <></>;
     }
   };
-  const { createConversation } = useChat(currentUserId);
+  const { createConversation, creatingConversation } = useChat();
+  const isOwnAd = currentUserId === product.user_id;
 
   const handleStartChat = () => {
     if (currentUserId) {
@@ -273,13 +274,19 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
               </Button>
             </Flex>
             <Button
+              disabled={isOwnAd}
+              loading={creatingConversation}
               radius={"lg"}
               variant="outline"
               leftSection={<IconMessages />}
               onClick={handleStartChat}
               mt="md"
             >
-              <Text>چت با {product.user.name}</Text>
+              <Text>
+                {isOwnAd
+                  ? "این آگهی متعلق به شماست"
+                  : `چت با ${product.user.name}`}
+              </Text>
             </Button>
           </Card>
         </Grid.Col>

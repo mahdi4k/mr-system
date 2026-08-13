@@ -25,11 +25,19 @@ export type ApiResponse = AdsResponse;
 export const AdsApi = api.injectEndpoints({
   overrideExisting: process.env.NODE_ENV === "development",
   endpoints: (builder) => ({
-    getAdsList: builder.query<ApiResponse, { page?: number }>({
-      queryFn: async ({ page }) => {
+    getAdsList: builder.query<
+      ApiResponse,
+      { page?: number; search?: string; status?: AdsFilters["status"] }
+    >({
+      queryFn: async ({ page, search, status }) => {
         try {
           return {
-            data: await getAds({ page }, createClient(), undefined, true),
+            data: await getAds(
+              { page, search, status },
+              createClient(),
+              undefined,
+              true,
+            ),
           };
         } catch (error) {
           return {
@@ -142,6 +150,7 @@ export const AdsApi = api.injectEndpoints({
 
 export const {
   useGetAdsListQuery,
+  useGetAdsListCategoryQuery,
   useLazyGetAdsListCategoryQuery,
   useGetAdsQuery,
   useApproveAdsItemMutation: useApproveAdsItem,

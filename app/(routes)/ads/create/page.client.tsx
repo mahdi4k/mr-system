@@ -14,6 +14,8 @@ import {
   SimpleGrid,
   Select,
   Textarea,
+  Alert,
+  Progress,
 } from "@mantine/core";
 import classes from "./ActionGrid.module.css";
 import { isNotEmpty, useForm } from "@mantine/form";
@@ -33,6 +35,7 @@ import { createAd } from "../../../_features/ads/data";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../../_redux/store";
 import { api } from "../../../_redux/services/api";
+import type { AdCreationProgress } from "../../../_features/ads/types";
 
 export default function PageClient() {
   const [provinces, setProvinces] = useState<Province[]>([]);
@@ -45,6 +48,9 @@ export default function PageClient() {
   const [showErrorCategory, setShowErrorCategory] = useState(false);
   const [priceInWords, setPriceInWords] = useState("");
   const [loading, setLoading] = useState(false);
+  const [processingImages, setProcessingImages] = useState(false);
+  const [creationProgress, setCreationProgress] =
+    useState<AdCreationProgress | null>(null);
   const { items, activeCategory } = UseAdsCategory();
   const dispatch: AppDispatch = useDispatch();
 
@@ -100,22 +106,38 @@ export default function PageClient() {
   }, []);
 
   const handleSubmit = async (values: typeof form.values) => {
-    setLoading(true);
-    try {
-      if (!activeCategory || !selectedProvince || !values.city) {
-        validateOtherField();
-        return;
-      }
-      const rawPrice = values.price.replace(/,/g, "");
-      await createAd({
-        title: values.title,
-        description: values.description,
-        categoryId: activeCategory,
-        provinceId: selectedProvince,
-        cityId: Number(values.city),
-        price: rawPrice ? Number(rawPrice) : null,
-        images,
+    if (!activeCategory || !selectedProvince || !values.city) {
+      validateOtherField();
+      return;
+    }
+    if (processingImages) {
+      notifications.show({
+        color: "orange",
+        message: "لطفاً تا پایان آماده‌سازی تصاویر صبر کنید.",
       });
+      return;
+    }
+
+    setLoading(true);
+    setCreationProgress({
+      stage: "creating",
+      completed: 0,
+      total: images.length,
+    });
+    try {
+      const rawPrice = values.price.replace(/,/g, "");
+      await createAd(
+        {
+          title: values.title,
+          description: values.description,
+          categoryId: activeCategory,
+          provinceId: selectedProvince,
+          cityId: Number(values.city),
+          price: rawPrice ? Number(rawPrice) : null,
+          images,
+        },
+        setCreationProgress,
+      );
       dispatch(api.util.invalidateTags(["ads"]));
       open();
       setImages([]);
@@ -135,6 +157,7 @@ export default function PageClient() {
       });
     } finally {
       setLoading(false);
+      setCreationProgress(null);
     }
   };
 
@@ -185,7 +208,11 @@ export default function PageClient() {
               mb="md"
             />
 
-            <AdsImageForm images={images} setImages={setImages} />
+            <AdsImageForm
+              images={images}
+              onProcessingChange={setProcessingImages}
+              setImages={setImages}
+            />
 
             <Card withBorder radius="md" className={classes.card}>
               <Group justify="space-between">
@@ -261,7 +288,34 @@ export default function PageClient() {
               label={"توضیحات"}
             ></Textarea>
             <Group w={"100%"} justify="flex-end" mt={"lg"}>
+              {creationProgress && (
+                <Alert color="green" variant="light" w="100%">
+                  <Text fz="sm" fw={600} mb="xs">
+                    {creationProgress.stage === "creating"
+                      ? "در حال ثبت اطلاعات آگهی..."
+                      : creationProgress.stage === "uploading"
+                        ? `در حال بارگذاری تصاویر (${creationProgress.completed} از ${creationProgress.total})`
+                        : "در حال نهایی‌سازی آگهی..."}
+                  </Text>
+                  <Progress
+                    animated
+                    value={
+                      creationProgress.stage === "creating"
+                        ? 10
+                        : creationProgress.stage === "saving"
+                          ? 95
+                          : creationProgress.total
+                            ? 15 +
+                              (creationProgress.completed /
+                                creationProgress.total) *
+                                75
+                            : 85
+                    }
+                  />
+                </Alert>
+              )}
               <Button
+                disabled={processingImages}
                 loading={loading}
                 size="md"
                 w={"100%"}
@@ -269,7 +323,7 @@ export default function PageClient() {
                 px={"xl"}
                 type="submit"
               >
-                ثبت
+                {processingImages ? "در حال آماده‌سازی تصاویر" : "ثبت آگهی"}
               </Button>
             </Group>
           </form>

@@ -1,308 +1,263 @@
 "use client";
 
+import type { AdsCategory } from "../../(routes)/ads/page";
 import {
-  Box,
   Accordion,
+  ActionIcon,
+  Box,
+  Button,
+  Divider,
+  Group,
+  MultiSelect,
   NavLink,
   Stack,
-  Skeleton,
-  TextInput,
-  ActionIcon,
   Text,
-  ScrollArea,
-  Button,
-  Flex,
-  Group,
-  Divider,
-  Select,
-  MultiSelect,
+  TextInput,
 } from "@mantine/core";
-import { IconSearch } from "@tabler/icons-react";
-import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { IconSearch, IconX } from "@tabler/icons-react";
 import Image from "next/image";
-import { Category } from "@/_redux/services/adsApi";
+import { useEffect, useState } from "react";
 import {
   convertToEnglishNumber,
-  currentUrlCategory,
   formatNumberWithCommas,
-} from "@/_utils/utils";
-import classes from "./scroll.module.css";
-import { Province } from "(routes)/ads/create/page";
-import { CategoryProdcut } from "(routes)/ads/page";
+} from "../../_utils/utils";
 
-const AdsFilter = ({
-  isTablet,
-  setPage,
-  provinces,
+export interface AdsFilterUpdate {
+  category?: string | null;
+  ostan?: string[] | null;
+  price_from?: string | null;
+  price_to?: string | null;
+  search?: string | null;
+}
+
+interface AdsFilterProps {
+  categories: AdsCategory[];
+  currentCategory: string | null;
+  currentProvinces: string[];
+  currentSearch: string;
+  currentPriceFrom: string;
+  currentPriceTo: string;
+  onApply: (update: AdsFilterUpdate) => void;
+  onApplied?: () => void;
+  provinces: Array<{ id: number; name: string }>;
+}
+
+function formatPriceInput(value: string): string {
+  const digits = convertToEnglishNumber(value).replace(/\D/g, "");
+  return digits ? formatNumberWithCommas(digits) : "";
+}
+
+export default function AdsFilter({
   categories,
-}: {
-  isTablet: boolean;
-  categories: CategoryProdcut[];
-  provinces: Province[];
-  setPage: React.Dispatch<React.SetStateAction<number>>;
-}) => {
-  const searchParams = useSearchParams();
-  const [value, setValue] = useState("");
-  const [price_from, setPriceFrom] = useState("");
-  const [price_to, setPriceTo] = useState("");
-  const router = useRouter();
-  const [selectedProvince, setSelectedProvince] = useState<string[] | null>([]);
+  currentCategory,
+  currentPriceFrom,
+  currentPriceTo,
+  currentProvinces,
+  currentSearch,
+  onApply,
+  onApplied,
+  provinces,
+}: AdsFilterProps) {
+  const [search, setSearch] = useState(currentSearch);
+  const [priceFrom, setPriceFrom] = useState(
+    currentPriceFrom ? formatNumberWithCommas(currentPriceFrom) : "",
+  );
+  const [priceTo, setPriceTo] = useState(
+    currentPriceTo ? formatNumberWithCommas(currentPriceTo) : "",
+  );
+  const [selectedProvinces, setSelectedProvinces] =
+    useState<string[]>(currentProvinces);
 
-  const handleSearch = () => {
-    setPage(1);
-    const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set("search", value); // Set or update the 'search' query param
-    const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
+  useEffect(() => setSearch(currentSearch), [currentSearch]);
+  useEffect(
+    () =>
+      setPriceFrom(
+        currentPriceFrom ? formatNumberWithCommas(currentPriceFrom) : "",
+      ),
+    [currentPriceFrom],
+  );
+  useEffect(
+    () =>
+      setPriceTo(currentPriceTo ? formatNumberWithCommas(currentPriceTo) : ""),
+    [currentPriceTo],
+  );
+  useEffect(
+    () => setSelectedProvinces(currentProvinces),
+    [currentProvinces.join(",")],
+  );
 
-    // Update the browser's URL without reloading the page
-    window.history.pushState({}, "", newUrl);
+  const apply = (update: AdsFilterUpdate) => {
+    onApply(update);
+    onApplied?.();
   };
-
-  const handlePrice = () => {
-    const searchParams = new URLSearchParams(window.location.search);
-    setPage(1);
-    if (price_from)
-      searchParams.set("price_from", price_from.replace(/,/g, ""));
-    if (price_to) searchParams.set("price_to", price_to.replace(/,/g, ""));
-    const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
-
-    // Update the browser's URL without reloading the page
-    window.history.pushState({}, "", newUrl);
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      handleSearch();
-    }
-  };
-
-  const handleOstanFilter = () => {
-    const searchParams = new URLSearchParams(window.location.search);
-    // Remove the existing 'ostan' parameter
-    searchParams.delete("ostan");
-
-    // Add each selected province as a separate 'ostan' parameter
-    if (selectedProvince && selectedProvince.length > 0) {
-      setPage(1);
-
-      selectedProvince.forEach((province) => {
-        searchParams.append("ostan", province);
-      });
-    }
-
-    const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
-
-    // Update the browser's URL without reloading the page
-    window.history.pushState({}, "", newUrl);
-  };
-
-  const handleNumberChange = (
-    value: string,
-    setValue: React.Dispatch<React.SetStateAction<string>>,
-  ) => {
-    // Convert Persian/Arabic digits to English digits
-    let inputValue = convertToEnglishNumber(value);
-    // Remove non-numeric characters (except commas for formatted values)
-    inputValue = inputValue.replace(/\D/g, "");
-    // Format number with commas as thousand separators
-    const formattedValue = formatNumberWithCommas(inputValue);
-    // Update the state
-    setValue(formattedValue);
-  };
-
-  const handleRemoveParam = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // Create a new search parameter object without the removed key
-    const newParams = new URLSearchParams(searchParams.toString());
-    newParams.delete("price_from");
-    newParams.delete("price_to");
-    setPriceTo("");
-    setPriceFrom("");
-    // Update the URL by pushing new search parameters
-    router.push(`?${newParams.toString()}`);
-  };
-
-  const handleProvinceChange = (provinceId: string[] | null) => {
-    if (provinceId) {
-      setSelectedProvince(provinceId);
-    }
-  };
-
-  useEffect(() => {
-    const searchValue = searchParams.get("search");
-    if (searchValue) {
-      setValue(searchValue);
-    }
-
-    const priceFromValue = searchParams.get("price_from");
-    if (priceFromValue) {
-      setPriceFrom(priceFromValue);
-    }
-
-    const priceToValue = searchParams.get("price_to");
-    if (priceToValue) {
-      setPriceTo(priceToValue);
-    }
-
-    const ostanValues = searchParams.getAll("ostan");
-    if (ostanValues.length) {
-      setSelectedProvince(ostanValues); // Update the MultiSelect state
-    }
-  }, [searchParams]);
 
   return (
-    <ScrollArea
-      classNames={classes}
-      scrollbars="y"
-      pl={"xs"}
-      offsetScrollbars
-      type="always"
-      scrollbarSize={3}
-      h={isTablet ? 310 : 560}
-    >
-      <Accordion
-        styles={{ content: { padding: "0" } }}
-        defaultValue="categories"
-      >
-        <Accordion.Item value={"categories"}>
+    <Stack gap="lg">
+      <Accordion defaultValue="categories" variant="separated">
+        <Accordion.Item value="categories">
           <Accordion.Control>
-            <Text fw={"bold"} fz={"md"}>
-              دسته‌بندی‌ ها
-            </Text>
+            <Text fw={700}>دسته‌بندی</Text>
           </Accordion.Control>
           <Accordion.Panel>
-            {categories.length ? (
-              categories.map((item) => (
-                <Link key={item.id} href={currentUrlCategory(item.value)}>
-                  <NavLink
-                    onClick={() => {
-                      setPage(1);
-                    }}
-                    component="div"
-                    active={searchParams.get("category") === item.value}
-                    label={item.name}
-                    leftSection={
-                      <Image
-                        width={13}
-                        height={13}
-                        src={`/svg/${item.value}.svg`}
-                        alt={item.name}
-                      />
-                    }
-                  />
-                </Link>
-              ))
-            ) : (
-              <Stack mt={"md"}>
-                {Array.from({ length: 8 }).map((_, index) => (
-                  <Skeleton key={index} height="20px" />
-                ))}
-              </Stack>
-            )}
+            <Stack gap={2}>
+              <NavLink
+                active={!currentCategory}
+                label="همه قطعات"
+                onClick={() => apply({ category: null })}
+              />
+              {categories.map((category) => (
+                <NavLink
+                  active={currentCategory === category.value}
+                  key={category.id}
+                  label={category.name}
+                  leftSection={
+                    <Image alt="" height={18} src={category.icon} width={18} />
+                  }
+                  onClick={() => apply({ category: category.value })}
+                />
+              ))}
+            </Stack>
           </Accordion.Panel>
         </Accordion.Item>
       </Accordion>
-      <Box mt={"xl"}>
+
+      <Box>
         <MultiSelect
-          searchable
-          label="استان"
-          value={selectedProvince ? selectedProvince : []}
-          onChange={handleProvinceChange}
+          clearable
           data={provinces.map((province) => ({
             value: province.id.toString(),
             label: province.name,
           }))}
+          label="استان"
+          nothingFoundMessage="استانی یافت نشد"
+          onChange={setSelectedProvinces}
+          placeholder="انتخاب استان"
+          searchable
+          value={selectedProvinces}
         />
-        <Group mt={"md"} justify="flex-end" wrap="nowrap">
-          <Button size="xs" onClick={handleOstanFilter}>
-            <Text fz={"xs"}>اعمال فیلتر استان</Text>
-          </Button>
+        <Group gap="xs" justify="flex-end" mt="sm">
           <Button
+            disabled={
+              selectedProvinces.join(",") === currentProvinces.join(",")
+            }
+            onClick={() => apply({ ostan: selectedProvinces })}
             size="xs"
-            onClick={(e) => handleRemoveParam(e)}
-            variant="outline"
           >
-            <Text fz={"xs"}>حذف</Text>
+            اعمال
           </Button>
+          {currentProvinces.length > 0 && (
+            <Button
+              color="gray"
+              onClick={() => {
+                setSelectedProvinces([]);
+                apply({ ostan: null });
+              }}
+              size="xs"
+              variant="subtle"
+            >
+              حذف
+            </Button>
+          )}
         </Group>
       </Box>
 
-      <Text mt={"xl"} fw={"bold"} fz={"sm"}>
-        {" "}
-        جستجو در نتایج
-      </Text>
-      <TextInput
-        mt="xs"
-        onKeyDown={handleKeyDown}
-        value={value}
-        onChange={(event) => setValue(event.currentTarget.value)}
-        rightSection={
-          <ActionIcon onClick={handleSearch} variant="light">
-            <IconSearch size={13} />
-          </ActionIcon>
-        }
-      />
-      <Divider mt={"xl"} />
-      <Text mt={"lg"} fw={"bold"} fz={"sm"}>
-        {" "}
-        قیمت
-      </Text>
+      <Divider />
 
-      {/* price filter */}
-      <TextInput
-        mt="xs"
-        styles={{ input: { textAlign: "left", direction: "ltr" } }}
-        onKeyDown={handleKeyDown}
-        leftSection={<Text fz={"xs"}>از</Text>}
-        value={price_from}
-        onChange={(event) =>
-          handleNumberChange(event.currentTarget.value, setPriceFrom)
-        }
-        rightSection={
-          <Image
-            src={"/svg/toman.svg"}
-            alt="kiwi part price from"
-            width={18}
-            height={18}
-          />
-        }
-      />
-
-      <TextInput
-        mt="xs"
-        styles={{ input: { textAlign: "left", direction: "ltr" } }}
-        onKeyDown={handleKeyDown}
-        leftSection={<Text fz={"xs"}>تا</Text>}
-        value={price_to}
-        onChange={(event) =>
-          handleNumberChange(event.currentTarget.value, setPriceTo)
-        }
-        rightSection={
-          <Image
-            src={"/svg/toman.svg"}
-            alt="kiwi part price to"
-            width={18}
-            height={18}
-          />
-        }
-      />
-
-      <Group mt={"md"} justify="flex-end" wrap="nowrap">
-        <Button size="xs" onClick={handlePrice}>
-          <Text fz={"xs"}>اعمال فیلتر قیمت</Text>
-        </Button>
+      <Box>
+        <Text fw={700} fz="sm" mb="xs">
+          جستجو در آگهی‌ها
+        </Text>
+        <TextInput
+          leftSection={<IconSearch size={16} />}
+          onChange={(event) => setSearch(event.currentTarget.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              apply({ search: search.trim() || null });
+            }
+          }}
+          placeholder="مثلاً RTX 4070"
+          rightSection={
+            search ? (
+              <ActionIcon
+                aria-label="پاک کردن جستجو"
+                onClick={() => {
+                  setSearch("");
+                  apply({ search: null });
+                }}
+                variant="subtle"
+              >
+                <IconX size={15} />
+              </ActionIcon>
+            ) : undefined
+          }
+          value={search}
+        />
         <Button
+          fullWidth
+          mt="sm"
+          onClick={() => apply({ search: search.trim() || null })}
           size="xs"
-          onClick={(e) => handleRemoveParam(e)}
-          variant="outline"
+          variant="light"
         >
-          <Text fz={"xs"}>حذف</Text>
+          جستجو
         </Button>
-      </Group>
-    </ScrollArea>
-  );
-};
+      </Box>
 
-export default AdsFilter;
+      <Divider />
+
+      <Box>
+        <Text fw={700} fz="sm" mb="xs">
+          محدوده قیمت
+        </Text>
+        <TextInput
+          inputMode="numeric"
+          label="از قیمت"
+          onChange={(event) =>
+            setPriceFrom(formatPriceInput(event.currentTarget.value))
+          }
+          placeholder="تومان"
+          styles={{ input: { direction: "ltr", textAlign: "left" } }}
+          value={priceFrom}
+        />
+        <TextInput
+          inputMode="numeric"
+          label="تا قیمت"
+          mt="xs"
+          onChange={(event) =>
+            setPriceTo(formatPriceInput(event.currentTarget.value))
+          }
+          placeholder="تومان"
+          styles={{ input: { direction: "ltr", textAlign: "left" } }}
+          value={priceTo}
+        />
+        <Group gap="xs" justify="flex-end" mt="sm">
+          <Button
+            onClick={() =>
+              apply({
+                price_from: priceFrom.replace(/,/g, "") || null,
+                price_to: priceTo.replace(/,/g, "") || null,
+              })
+            }
+            size="xs"
+          >
+            اعمال قیمت
+          </Button>
+          {(currentPriceFrom || currentPriceTo) && (
+            <Button
+              color="gray"
+              onClick={() => {
+                setPriceFrom("");
+                setPriceTo("");
+                apply({ price_from: null, price_to: null });
+              }}
+              size="xs"
+              variant="subtle"
+            >
+              حذف
+            </Button>
+          )}
+        </Group>
+      </Box>
+    </Stack>
+  );
+}

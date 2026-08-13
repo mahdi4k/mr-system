@@ -39,15 +39,18 @@ const ClientPage = ({ post }: { post: postsMO[] }) => {
         className="contentPost"
         dangerouslySetInnerHTML={{ __html: post[0].content.rendered }}
       />
-      <Divider
-        mt={"50px"}
-        mb={"xl"}
-        size={"md"}
-        label={<Text fz={"lg"}>نظرات</Text>}
-      />
-
-      <CommentPost postID={post[0].id} />
-      <CommentList postID={post[0].id} />
+      {process.env.NEXT_PUBLIC_WORDPRESS_API && (
+        <>
+          <Divider
+            mt={"50px"}
+            mb={"xl"}
+            size={"md"}
+            label={<Text fz={"lg"}>نظرات</Text>}
+          />
+          <CommentPost postID={post[0].id} />
+          <CommentList postID={post[0].id} />
+        </>
+      )}
     </Container>
   );
 };

@@ -1,467 +1,434 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import type {
+  ChatMessage,
+  Conversation,
+  ConversationsResponse,
+} from "../../_features/chat/types";
+import { createClient } from "../../_lib/supabase/client";
+import { formatJalaliTimeAgo } from "../../_utils/utils";
 import {
-  ScrollArea,
+  ActionIcon,
+  Alert,
+  Avatar,
+  Box,
+  Button,
   Card,
+  Container,
+  Divider,
+  Flex,
+  Group,
+  Loader,
+  Paper,
+  ScrollArea,
+  Skeleton,
+  Stack,
   Text,
   TextInput,
-  Stack,
-  Divider,
-  Box,
-  Flex,
-  Container,
-  Paper,
-  Alert,
-  LoadingOverlay,
-  ActionIcon,
+  Title,
 } from "@mantine/core";
-import { Apiconversation, Transaction } from "api/conversations/route";
-import { UserResponse } from "@/_components/profile/UserDetail";
-import { useSearchParams } from "next/navigation";
-import { formatJalaliTimeAgo } from "@/_utils/utils";
-import { IconArrowRight, IconCircleArrowUpFilled } from "@tabler/icons-react";
+import { notifications } from "@mantine/notifications";
+import {
+  IconArrowRight,
+  IconCircleArrowUpFilled,
+  IconMessageCircle,
+  IconRefresh,
+} from "@tabler/icons-react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import NoMessageSvg from "../../../public/svg/no-message.svg";
 import styles from "./Chat.module.css";
-import ImgNoProduct from "../../../public/no-product.png";
 
-interface Message {
-  id: number;
-  content: string;
-  user_id: number;
-  created_at: string;
+function ConversationImage({ conversation }: { conversation: Conversation }) {
+  return conversation.ad.imageUrl ? (
+    <Image
+      alt={conversation.ad.title}
+      className={styles.productImage}
+      height={44}
+      src={conversation.ad.imageUrl}
+      width={44}
+    />
+  ) : (
+    <Avatar color="gray" radius="md" size={44}>
+      <IconMessageCircle size={20} />
+    </Avatar>
+  );
 }
 
-const ChatPage = () => {
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [conversations, setConversations] = useState<Apiconversation>();
-  const [selectedConversation, setSelectedConversation] = useState<
-    Transaction | undefined
-  >();
-  const [messages, setMessages] = useState<Message[]>([]);
+export default function ChatPage() {
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [selectedConversation, setSelectedConversation] =
+    useState<Conversation>();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [userData, setUserData] = useState<UserResponse>();
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string>();
+  const [loading, setLoading] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
-  const conversationId = searchParams.get("conversationId");
+  const requestedConversationId = searchParams.get("conversationId");
   const viewport = useRef<HTMLDivElement | null>(null);
 
-  // Connect to Socket.IO server
-  useEffect(() => {
-    const newSocket = io("wss://kiwipart-socket.darkube.app", {
-      path: "/socket.io/", // Ensure correct WebSocket path
-      transports: ["websocket", "polling"],
-      secure: true,
-      reconnection: true,
-    });
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+    window.setTimeout(() => {
+      viewport.current?.scrollTo({
+        top: viewport.current.scrollHeight,
+        behavior,
+      });
+    }, 50);
+  };
 
-    newSocket.on("connect", () => {
-      console.log("✅ Connected to Socket.IO:", newSocket.id);
-    });
-
-    newSocket.on("connect_error", (err) => {
-      console.error("❌ Connection error:", err);
-    });
-
-    setSocket(newSocket);
-
-    return () => {
-      newSocket.disconnect();
-    };
-  }, []);
-
-  // Fetch conversations on page load
-  useEffect(() => {
-    const fetchConversations = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch("/api/conversations");
-        const data: Apiconversation = await response.json();
-        setLoading(false);
-        setConversations(data);
-        if (conversationId && data.data.length > 0) {
-          console.log(conversationId);
-          setSelectedConversation(
-            data.data.find((item) => item.id === Number(conversationId)),
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching conversations:", error);
-        setLoading(false);
+  const fetchConversations = async (): Promise<void> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/conversations");
+      const data = (await response.json()) as ConversationsResponse & {
+        message?: string;
+      };
+      if (!response.ok) {
+        throw new Error(data.message || "دریافت گفت‌وگوها ناموفق بود.");
       }
-    };
-
-    fetchConversations();
-  }, []);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch("/api/user-profile", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        // Check if the request was successful
-        if (response.ok) {
-          const data = await response.json();
-          console.log("🚀 ~ fetchUserData ~ data:", data);
-          setUserData(data); // Assuming userData is in the response
-        } else {
-          const errorData = await response.json();
-          setError(errorData.message || "Something went wrong");
+      setConversations(data.data);
+      setSelectedConversation((current) => {
+        if (current) {
+          return data.data.find(({ id }) => id === current.id);
         }
-      } catch (error) {
-        // setError(error.message || 'An error occurred');
-      }
-    };
-    fetchUserData();
+        if (requestedConversationId) {
+          return data.data.find(({ id }) => id === requestedConversationId);
+        }
+        return undefined;
+      });
+    } catch (fetchError) {
+      setError(
+        fetchError instanceof Error
+          ? fetchError.message
+          : "دریافت گفت‌وگوها ناموفق بود.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void createClient()
+      .auth.getUser()
+      .then(({ data }) => setCurrentUserId(data.user?.id));
+    void fetchConversations();
   }, []);
 
-  // Fetch messages for the selected conversation
   useEffect(() => {
-    if (!selectedConversation) return;
-    setLoadingMessage(true);
+    if (!selectedConversation) {
+      setMessages([]);
+      return;
+    }
+
+    let active = true;
     const fetchMessages = async () => {
+      setLoadingMessages(true);
       try {
         const response = await fetch(
           `/api/conversations/${selectedConversation.id}/messages`,
         );
-        const data = await response.json();
-        setTimeout(scrollToBottom, 100);
-        setMessages(data ? data : []);
-        setLoadingMessage(false);
-      } catch (error) {
-        setLoadingMessage(false);
-        console.error("Error fetching messages:", error);
+        const data = (await response.json()) as
+          | ChatMessage[]
+          | { message: string };
+        if (!response.ok || !Array.isArray(data)) {
+          throw new Error(
+            !Array.isArray(data) ? data.message : "دریافت پیام‌ها ناموفق بود.",
+          );
+        }
+        if (active) {
+          setMessages(data);
+          scrollToBottom("auto");
+        }
+      } catch (fetchError) {
+        if (active) {
+          notifications.show({
+            color: "red",
+            message:
+              fetchError instanceof Error
+                ? fetchError.message
+                : "دریافت پیام‌ها ناموفق بود.",
+          });
+        }
+      } finally {
+        if (active) setLoadingMessages(false);
       }
     };
+    void fetchMessages();
 
-    fetchMessages();
-  }, [selectedConversation]);
-
-  // Listen for real-time messages
-  useEffect(() => {
-    if (!socket || !selectedConversation) return;
-    console.log(`Joining conversation: ${selectedConversation.id}`);
-    if (!selectedConversation) {
-      console.warn("⚠️ selectedConversation is undefined!");
-      return;
-    }
-    socket.emit("joinConversation", {
-      conversationId: selectedConversation.id,
-    });
-
-    socket.on("newMessage", (message) => {
-      console.log("📥📩📩 New message received:", message);
-      setMessages((prev) => [...prev, message]); // Update messages state
-      setTimeout(scrollToBottom, 100);
-    });
-    // Scroll to the bottom when a new message is added
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`conversation:${selectedConversation.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${selectedConversation.id}`,
+        },
+        ({ new: insertedMessage }) => {
+          const message = insertedMessage as ChatMessage;
+          setMessages((current) =>
+            current.some(({ id }) => id === message.id)
+              ? current
+              : [...current, message],
+          );
+          scrollToBottom();
+        },
+      )
+      .subscribe();
 
     return () => {
-      socket.emit("leaveConversation", selectedConversation.id);
-      socket.off("newMessage");
+      active = false;
+      void supabase.removeChannel(channel);
     };
-  }, [socket, selectedConversation]);
+  }, [selectedConversation?.id]);
 
-  const scrollToBottom = () =>
-    viewport.current!.scrollTo({
-      top: viewport.current!.scrollHeight,
-      behavior: "smooth",
-    });
+  const handleSendMessage = async (): Promise<void> => {
+    const content = newMessage.trim();
+    if (!selectedConversation || !content || sending) return;
 
-  // Send a new message
-  const handleSendMessage = async () => {
-    if (!selectedConversation || !newMessage.trim()) return;
-
+    setSending(true);
     try {
       const response = await fetch(
         `/api/conversations/${selectedConversation.id}/messages`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: newMessage }),
+          body: JSON.stringify({ message: content }),
         },
       );
-
+      const data = (await response.json()) as ChatMessage & {
+        message?: string;
+      };
       if (!response.ok) {
-        throw new Error("Failed to send message");
+        throw new Error(data.message || "ارسال پیام ناموفق بود.");
       }
-
-      const message = await response.json();
-      console.log("🚀 ~ handleSendMessage ~ message:", message);
-      // Scroll to the bottom when a new message is added
-      setTimeout(scrollToBottom, 100);
-
-      // Emit the new message via Socket.IO
-      socket?.emit("sendMessage", {
-        conversationId: selectedConversation.id,
-        message,
-      });
-
-      // Update the message list
-      // setMessages((prev) => [...prev, message]);
+      setMessages((current) =>
+        current.some(({ id }) => id === data.id) ? current : [...current, data],
+      );
       setNewMessage("");
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
-  };
-
-  const handleImageAds = (image: string, title: string) => {
-    const images: string[] = JSON.parse(image);
-    if (images.length > 0) {
-      return (
-        <Image
-          alt={title}
-          style={{ borderRadius: "7px" }}
-          width={40}
-          height={40}
-          src={`${images[0]}`}
-        />
-      );
-    } else {
-      return (
-        <Image
-          style={{ objectFit: "contain" }}
-          width={40}
-          height={40}
-          alt="no img"
-          src={ImgNoProduct}
-        />
-      );
+      scrollToBottom();
+      void fetchConversations();
+    } catch (sendError) {
+      notifications.show({
+        color: "red",
+        message:
+          sendError instanceof Error
+            ? sendError.message
+            : "ارسال پیام ناموفق بود.",
+      });
+    } finally {
+      setSending(false);
     }
   };
 
   return (
-    <Container
-      pos="relative"
-      my={"lg"}
-      styles={{ root: { flex: "1 0 auto", width: "100%" } }}
-      size={"lg"}
-    >
-      <LoadingOverlay
-        visible={loading}
-        zIndex={1000}
-        overlayProps={{ radius: "sm", blur: 2 }}
-      />
-      {conversations?.data && conversations?.data.length > 0 ? (
-        <Text fz={"h1"} mt={"xs"} mb={"md"}>
-          پیام‌ها
-        </Text>
-      ) : (
-        ""
+    <Container className={styles.container} my="lg" size="lg">
+      <Group justify="space-between" mb="md">
+        <Title order={2}>پیام‌ها</Title>
+        <ActionIcon
+          aria-label="به‌روزرسانی گفت‌وگوها"
+          loading={loading}
+          onClick={fetchConversations}
+          variant="subtle"
+        >
+          <IconRefresh size={19} />
+        </ActionIcon>
+      </Group>
+
+      {error && (
+        <Alert color="red" mb="md" title="بارگذاری گفت‌وگوها ناموفق بود">
+          <Text fz="sm" mb="sm">
+            {error}
+          </Text>
+          <Button color="red" onClick={fetchConversations} variant="light">
+            تلاش دوباره
+          </Button>
+        </Alert>
       )}
-      <Paper withBorder>
-        {conversations?.data && conversations?.data.length > 0 ? (
-          <Flex style={{ height: "80vh" }}>
-            {/* Sidebar */}
-            <Box
-              p={{ base: selectedConversation ? "0" : "16px", lg: "16px" }}
-              w={{ base: selectedConversation ? "0" : "100%", lg: "25%" }}
-              style={{
-                backgroundColor:
-                  "light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-7))", // Matches bg-gray-100
-                borderLeft:
-                  "1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))", // Matches border-r
-                overflow: "auto",
-              }}
-            >
-              <Flex direction={"column-reverse"}>
-                {conversations?.data.map((conversation) => (
-                  <Card
-                    w={"100%"}
-                    key={conversation.id}
-                    shadow="sm"
-                    padding="md"
-                    radius="md"
-                    onClick={() => setSelectedConversation(conversation)}
-                    style={{
-                      marginBottom: "8px", // Matches mb-2
-                      cursor: "pointer",
-                      backgroundColor:
-                        selectedConversation?.id === conversation.id
-                          ? "light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-9))"
-                          : "var(--mantine-color-body)", // Matches bg-blue-50
-                    }}
-                  >
-                    <Text fz={"sm"} fw={"bold"} mb={"5px"}>
-                      {conversation.seller.name}
-                    </Text>
-                    <Flex align={"center"}>
-                      {handleImageAds(
-                        conversation.product.image as string,
-                        conversation.product.title,
-                      )}
-                      <Box mr={"xs"}>
-                        <Text fz={"sm"}>{conversation.product.title}</Text>
-                      </Box>
-                    </Flex>
-                    <Text fz={"xs"} c={"dimmed"} mt={"xs"}>
-                      {formatJalaliTimeAgo(conversation.created_at)}
-                    </Text>
-                  </Card>
-                ))}
-              </Flex>
-            </Box>
 
-            {/* Main Chat Area */}
-            <Box
-              w={{ base: selectedConversation ? "100%" : "0", lg: "75%" }}
-              style={{ display: "flex", flexDirection: "column" }}
-            >
-              {selectedConversation ? (
-                <>
-                  <Flex
-                    pt={{ base: "20px", lg: "0" }}
-                    py={"xs"}
-                    pr={"lg"}
-                    bg={
-                      "light-dark(var(--mantine-color-green-0), var(--mantine-color-dark-8))"
-                    }
-                  >
-                    <Box
-                      onClick={() => setSelectedConversation(undefined)}
-                      ml={"4px"}
-                      display={{ base: "flex", lg: "none" }}
-                    >
-                      <IconArrowRight size={20} />
-                    </Box>
-                    <Text fz={"13px"}>{selectedConversation.seller.name}</Text>
-                  </Flex>
-
-                  <Flex p={{ base: "10px" }} align={"center"}>
-                    {handleImageAds(
-                      selectedConversation.product.image as string,
-                      selectedConversation.product.title,
-                    )}
-                    <Text pr={"xs"} size="md" fw={700}>
-                      {selectedConversation.product.title}
-                    </Text>
-                  </Flex>
-                  <Divider />
-                  <ScrollArea
-                    p={"md"}
-                    pb={"0"}
-                    pl={{ base: "0", lg: "sm" }}
-                    offsetScrollbars={true}
-                    viewportRef={viewport}
-                    pos={"relative"}
-                    style={{ flex: 1, marginBottom: "16px" }}
-                  >
-                    <LoadingOverlay
-                      visible={loadingMessage}
-                      zIndex={1000}
-                      overlayProps={{ radius: "sm", blur: 2 }}
-                    />
-                    <Stack>
-                      {messages.map((message) => (
-                        <Flex
-                          key={message.id}
-                          justify={
-                            String(message.user_id) === userData?.userData.id
-                              ? "flex-start"
-                              : "flex-end"
-                          }
-                        >
-                          <Card
-                            shadow="sm"
-                            padding="md"
-                            radius="md"
-                            style={{
-                              backgroundColor:
-                                String(message.user_id) ===
-                                userData?.userData.id
-                                  ? "light-dark(#E3F2FD,  #041622)"
-                                  : "light-dark(#F5F5F5,  #053555)",
-                              maxWidth: "60%",
-                              textAlign: "right",
-                            }}
-                          >
-                            <Text>{message.content}</Text>
-                            <Text size="11px" mt={"3px"} c="dimmed">
-                              {formatJalaliTimeAgo(message.created_at)}
-                            </Text>
-                          </Card>
-                        </Flex>
-                      ))}
-                    </Stack>
-                  </ScrollArea>
-
-                  {/* Send Message Input */}
-                  <Box
-                    style={{
-                      display: "flex",
-                      gap: "8px",
-                      borderTop:
-                        "1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))",
-                    }}
-                  >
-                    <TextInput
-                      styles={{ input: { border: "unset" } }}
-                      rightSection={
-                        <ActionIcon
-                          variant="transparent"
-                          size="compact-lg"
-                          onClick={handleSendMessage}
-                        >
-                          <IconCircleArrowUpFilled size={22} />
-                        </ActionIcon>
-                      }
-                      size="lg"
-                      placeholder="متن خود را وارد کنید"
-                      value={newMessage}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          handleSendMessage();
-                        }
-                      }}
-                      onChange={(e) => setNewMessage(e.currentTarget.value)}
-                      style={{ flex: 1 }}
-                    />
-                  </Box>
-                </>
-              ) : (
-                <Alert display={{ base: "none", lg: "flex" }}>
-                  لطفا یک گفت‌و‌گو انتخاب کنید
-                </Alert>
-              )}
-            </Box>
-          </Flex>
-        ) : (
-          <Flex
-            py={"xl"}
-            direction={"column"}
-            justify={"center"}
-            align={"center"}
+      {loading && conversations.length === 0 ? (
+        <Paper p="md" withBorder>
+          <Stack>
+            {[0, 1, 2].map((item) => (
+              <Skeleton height={74} key={item} radius="md" />
+            ))}
+          </Stack>
+        </Paper>
+      ) : conversations.length > 0 ? (
+        <Paper className={styles.chatShell} withBorder>
+          <Box
+            className={styles.sidebar}
+            data-hidden={Boolean(selectedConversation) || undefined}
           >
+            <Stack gap="xs">
+              {conversations.map((conversation) => (
+                <Card
+                  className={styles.conversationCard}
+                  data-active={
+                    selectedConversation?.id === conversation.id || undefined
+                  }
+                  key={conversation.id}
+                  onClick={() => setSelectedConversation(conversation)}
+                  padding="sm"
+                  radius="md"
+                  withBorder
+                >
+                  <Group wrap="nowrap">
+                    <ConversationImage conversation={conversation} />
+                    <Box flex={1} miw={0}>
+                      <Text fw={600} fz="sm" truncate>
+                        {conversation.otherParticipant.name}
+                      </Text>
+                      <Text c="dimmed" fz="xs" truncate>
+                        {conversation.ad.title}
+                      </Text>
+                    </Box>
+                    <Text c="dimmed" fz={10}>
+                      {formatJalaliTimeAgo(conversation.updatedAt)}
+                    </Text>
+                  </Group>
+                </Card>
+              ))}
+            </Stack>
+          </Box>
+
+          <Box
+            className={styles.messagePanel}
+            data-visible={Boolean(selectedConversation) || undefined}
+          >
+            {selectedConversation ? (
+              <>
+                <Group className={styles.chatHeader} wrap="nowrap">
+                  <ActionIcon
+                    aria-label="بازگشت به گفت‌وگوها"
+                    className={styles.backButton}
+                    onClick={() => setSelectedConversation(undefined)}
+                    variant="subtle"
+                  >
+                    <IconArrowRight size={19} />
+                  </ActionIcon>
+                  <ConversationImage conversation={selectedConversation} />
+                  <Box miw={0}>
+                    <Text fw={700} fz="sm" truncate>
+                      {selectedConversation.otherParticipant.name}
+                    </Text>
+                    <Text c="dimmed" fz="xs" truncate>
+                      {selectedConversation.ad.title}
+                    </Text>
+                  </Box>
+                </Group>
+                <Divider />
+
+                <ScrollArea
+                  className={styles.messages}
+                  offsetScrollbars
+                  viewportRef={viewport}
+                >
+                  {loadingMessages ? (
+                    <Flex h="100%" align="center" justify="center">
+                      <Loader size="sm" />
+                    </Flex>
+                  ) : messages.length ? (
+                    <Stack gap="sm">
+                      {messages.map((message) => {
+                        const ownMessage = message.sender_id === currentUserId;
+                        return (
+                          <Flex
+                            justify={ownMessage ? "flex-start" : "flex-end"}
+                            key={message.id}
+                          >
+                            <Card
+                              className={styles.messageBubble}
+                              data-own={ownMessage || undefined}
+                              padding="sm"
+                              radius="lg"
+                            >
+                              <Text className={styles.messageContent} fz="sm">
+                                {message.content}
+                              </Text>
+                              <Text c="dimmed" fz={10} mt={4}>
+                                {formatJalaliTimeAgo(message.created_at)}
+                              </Text>
+                            </Card>
+                          </Flex>
+                        );
+                      })}
+                    </Stack>
+                  ) : (
+                    <Flex h="100%" align="center" justify="center">
+                      <Text c="dimmed" fz="sm">
+                        اولین پیام این گفت‌وگو را ارسال کنید.
+                      </Text>
+                    </Flex>
+                  )}
+                </ScrollArea>
+
+                <Box className={styles.composer}>
+                  <TextInput
+                    disabled={sending}
+                    maxLength={2000}
+                    onChange={(event) =>
+                      setNewMessage(event.currentTarget.value)
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" && !event.shiftKey) {
+                        event.preventDefault();
+                        void handleSendMessage();
+                      }
+                    }}
+                    placeholder="پیام خود را بنویسید..."
+                    rightSection={
+                      <ActionIcon
+                        aria-label="ارسال پیام"
+                        disabled={!newMessage.trim()}
+                        loading={sending}
+                        onClick={handleSendMessage}
+                        variant="transparent"
+                      >
+                        <IconCircleArrowUpFilled size={24} />
+                      </ActionIcon>
+                    }
+                    size="lg"
+                    value={newMessage}
+                  />
+                </Box>
+              </>
+            ) : (
+              <Flex
+                className={styles.selectPrompt}
+                align="center"
+                justify="center"
+              >
+                <Text c="dimmed">یک گفت‌وگو را انتخاب کنید.</Text>
+              </Flex>
+            )}
+          </Box>
+        </Paper>
+      ) : (
+        <Paper p="xl" withBorder>
+          <Flex direction="column" align="center" ta="center">
             <Image
-              alt="kiwipart no message"
-              sizes="100vw"
+              alt="گفت‌وگویی وجود ندارد"
               className={styles.imgNoDescription}
-              style={{
-                height: "auto",
-              }}
               src={NoMessageSvg}
             />
-            <Text fw={"bold"} fz={"lg"} pt={"xl"}>
-              چتی یافت نشد ...!!
-            </Text>
-            <Text px={"md"} pt={"xs"} fz={"sm"} c={"dimmend"}>
-              با کلیک بروی دکمه «چت» در صفحه آگهی می‌توانید با دیگران گفت‌و‌گو
-              کنید.
+            <Title order={3} mt="lg">
+              هنوز گفت‌وگویی ندارید
+            </Title>
+            <Text c="dimmed" fz="sm" mt="xs" maw={460}>
+              از صفحه یک آگهی، دکمه گفت‌وگو را انتخاب کنید تا با فروشنده در
+              ارتباط باشید.
             </Text>
           </Flex>
-        )}
-      </Paper>
+        </Paper>
+      )}
     </Container>
   );
-};
-
-export default ChatPage;
+}

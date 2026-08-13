@@ -1,75 +1,33 @@
-"use client";
-import {
-  ActionIcon,
-  AppShell,
-  Burger,
-  Container,
-  Group,
-  Paper,
-  Text,
-} from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import Navbar from "./(navbar)/Navbar";
-import { IconLogout2 } from "@tabler/icons-react";
-import { createClient } from "../../_lib/supabase/client";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "../../_lib/supabase/auth";
+import DashboardShell from "./DashboardShell";
 
-interface Props {
+interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-export default function DashboardLayout({ children }: Props) {
-  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
-  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
-  const logout = async () => {
-    await createClient().auth.signOut();
-    window.location.href = "/";
+export default async function DashboardLayout({
+  children,
+}: DashboardLayoutProps) {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login?next=/dashboard");
+  if (user.app_metadata.role !== "admin") redirect("/");
+
+  const metadata = user.user_metadata as {
+    display_name?: string;
+    full_name?: string;
+    name?: string;
   };
+  const label =
+    metadata.display_name ||
+    metadata.full_name ||
+    metadata.name ||
+    user.email?.split("@")[0] ||
+    "مدیر ریگورا";
 
   return (
-    <AppShell
-      header={{ height: 60 }}
-      navbar={{
-        width: 300,
-        breakpoint: "sm",
-        collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
-      }}
-      padding="md"
-    >
-      <AppShell.Header>
-        <Group align="center" h="100%" px="md">
-          <Burger
-            opened={mobileOpened}
-            onClick={toggleMobile}
-            hiddenFrom="sm"
-            size="sm"
-          />
-          <Burger
-            opened={desktopOpened}
-            onClick={toggleDesktop}
-            visibleFrom="sm"
-            size="sm"
-          />
-          <Text fw={"bolder"} mt={"4px"}>
-            {" "}
-            پنل مدیریت
-          </Text>
-          <ActionIcon onClick={logout} mr={"auto"} variant="default">
-            <IconLogout2 />
-          </ActionIcon>
-        </Group>
-      </AppShell.Header>
-      <AppShell.Navbar>
-        <Navbar />
-      </AppShell.Navbar>
-      <AppShell.Main>
-        <Paper>
-          <Container size={"xl"}>
-            <Paper my={"lg"} shadow={"md"} p={"lg"}>
-              {children}
-            </Paper>
-          </Container>
-        </Paper>
-      </AppShell.Main>
-    </AppShell>
+    <DashboardShell email={user.email ?? ""} label={label}>
+      {children}
+    </DashboardShell>
   );
 }

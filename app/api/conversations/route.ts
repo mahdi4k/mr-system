@@ -1,97 +1,57 @@
 import { NextResponse } from "next/server";
-
+import type {
+  Conversation,
+  ConversationsResponse,
+} from "../../_features/chat/types";
 import { createClient } from "../../_lib/supabase/server";
-import { getAdById } from "../../_features/ads/data";
 
-export interface Apiconversation {
-  data: Transaction[];
-  meta: {
-    count: number;
+interface ConversationRow {
+  ad: {
+    id: string;
+    images: Array<{ sort_order: number; url: string }>;
+    title: string;
+  };
+  buyer: {
+    avatar_url: string | null;
+    display_name: string | null;
+    id: string;
+  };
+  buyer_id: string;
+  created_at: string;
+  id: string;
+  seller: {
+    avatar_url: string | null;
+    display_name: string | null;
+    id: string;
+  };
+  seller_id: string;
+  updated_at: string;
+}
+
+function toConversation(row: ConversationRow, userId: string): Conversation {
+  const other = row.buyer_id === userId ? row.seller : row.buyer;
+  const firstImage = [...(row.ad.images ?? [])].sort(
+    (a, b) => a.sort_order - b.sort_order,
+  )[0];
+
+  return {
+    id: row.id,
+    buyerId: row.buyer_id,
+    sellerId: row.seller_id,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    ad: {
+      id: row.ad.id,
+      title: row.ad.title,
+      imageUrl: firstImage?.url ?? null,
+    },
+    otherParticipant: {
+      id: other.id,
+      name: other.display_name || "کاربر ریگورا",
+      avatarUrl: other.avatar_url,
+    },
   };
 }
-
-export interface Transaction {
-  id: number;
-  product_id: number;
-  user_id: number;
-  seller_id: number;
-  created_at: string;
-  updated_at: string;
-  product: Product;
-  buyer: User;
-  seller: User;
-}
-
-interface Product {
-  id: number;
-  user_id: number;
-  category_id: number;
-  title: string;
-  image: string;
-  city: string;
-  ostan: string;
-  price: number | null;
-  description: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface User {
-  id: number;
-  name: string;
-  username: string;
-  phone: string;
-  email: string;
-  email_verified_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-const mockTransactions: Transaction[] = [
-  {
-    id: 1,
-    product_id: 1,
-    user_id: 1,
-    seller_id: 2,
-    created_at: "2024-01-15T10:30:00Z",
-    updated_at: "2024-01-15T10:30:00Z",
-    product: {
-      id: 1,
-      user_id: 2,
-      category_id: 1,
-      title: "کامپیوتر گیمینگ",
-      image: '["https://via.placeholder.com/400x300"]',
-      city: "تهران",
-      ostan: "1",
-      price: 45000000,
-      description: "سیستم گیمینگ حرفه‌ای",
-      status: "active",
-      created_at: "2024-01-14T09:00:00Z",
-      updated_at: "2024-01-14T09:00:00Z",
-    },
-    buyer: {
-      id: 1,
-      name: "کاربر خریدار",
-      username: "buyer_user",
-      phone: "09123456789",
-      email: "buyer@test.com",
-      email_verified_at: null,
-      created_at: "2024-01-01T00:00:00Z",
-      updated_at: "2024-01-01T00:00:00Z",
-    },
-    seller: {
-      id: 2,
-      name: "فروشنده",
-      username: "seller_user",
-      phone: "09123456790",
-      email: "seller@test.com",
-      email_verified_at: null,
-      created_at: "2024-01-01T00:00:00Z",
-      updated_at: "2024-01-01T00:00:00Z",
-    },
-  },
-];
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -102,50 +62,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  try {
-    const { adId } = await request.json();
-
-    if (!adId) {
-      return NextResponse.json(
-        { error: "Missing adId in request body" },
-        { status: 400 },
-      );
-    }
-    const ad = await getAdById(String(adId), supabase);
-    if (!ad) {
-      return NextResponse.json(
-        { error: "Advertisement not found" },
-        { status: 404 },
-      );
-    }
-    if (ad.user_id === user.id) {
-      return NextResponse.json(
-        { error: "You cannot start a conversation for your own advertisement" },
-        { status: 400 },
-      );
-    }
-
-    const mockResponse = {
-      id: 1,
-      product_id: adId,
-      user_id: user.id,
-      seller_id: ad.user_id,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    return NextResponse.json(mockResponse);
-  } catch (error) {
-    console.error("Error in POST /api/conversations:", error);
-
+  const body = (await request.json()) as { adId?: string };
+  if (!body.adId) {
     return NextResponse.json(
-      {
-        error: "Internal server error",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 },
+      { message: "شناسه آگهی الزامی است." },
+      { status: 400 },
     );
   }
+
+  const { data, error } = await supabase.rpc("get_or_create_conversation", {
+    ad_uuid: body.adId,
+  });
+  if (error) {
+    return NextResponse.json(
+      { message: "ایجاد گفت‌وگو ممکن نیست." },
+      { status: 400 },
+    );
+  }
+
+  return NextResponse.json({ id: data });
 }
 
 export async function GET() {
@@ -157,10 +92,35 @@ export async function GET() {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  return NextResponse.json({
-    data: mockTransactions,
-    meta: {
-      count: mockTransactions.length,
-    },
-  });
+  const { data, error, count } = await supabase
+    .from("conversations")
+    .select(
+      `
+        id,
+        buyer_id,
+        seller_id,
+        created_at,
+        updated_at,
+        ad:ads!conversations_ad_id_fkey(id, title, images:ad_images(url, sort_order)),
+        buyer:profiles!conversations_buyer_id_fkey(id, display_name, avatar_url),
+        seller:profiles!conversations_seller_id_fkey(id, display_name, avatar_url)
+      `,
+      { count: "exact" },
+    )
+    .order("updated_at", { ascending: false });
+
+  if (error) {
+    return NextResponse.json(
+      { message: "دریافت گفت‌وگوها ناموفق بود." },
+      { status: 500 },
+    );
+  }
+
+  const response: ConversationsResponse = {
+    data: ((data ?? []) as unknown as ConversationRow[]).map((row) =>
+      toConversation(row, user.id),
+    ),
+    meta: { count: count ?? 0 },
+  };
+  return NextResponse.json(response);
 }

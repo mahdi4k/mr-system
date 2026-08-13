@@ -1,5 +1,6 @@
 import ArticleSectionClient from "./ArticleSection.client";
-import { headers } from "next/headers";
+import { getPublishedArticles } from "../../_features/articles/data";
+import { createClient } from "../../_lib/supabase/server";
 
 type featuredmedia = {
   id: number;
@@ -18,13 +19,7 @@ export type postsMO = {
 };
 
 async function getData() {
-  const host = (await headers()).get("host"); // Get current domain
-  const protocol = process.env.NODE_ENV === "production" ? "http" : "http";
-  const url = `${protocol}://${host}/api/articles`; // Construct absolute URL
-
-  const res = await fetch(url, { cache: "force-cache" });
-  if (!res.ok) throw new Error("Failed to fetch data");
-  return res.json();
+  return getPublishedArticles(await createClient(), { limit: 8 });
 }
 
 const ArticleSection = async () => {

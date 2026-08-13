@@ -1,7 +1,58 @@
-.dashboradCard {
-    cursor: pointer;
-    transition: all .3s;
-    @mixin hover {
-      box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
-    }
+.recentPanel {
+  grid-column: span 2;
+  min-width: 0;
+}
+
+.tableScroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.primaryAction,
+.subtleAction,
+.lightAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: rem(8px);
+  border-radius: var(--mantine-radius-sm);
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.primaryAction {
+  min-height: rem(36px);
+  padding-inline: var(--mantine-spacing-md);
+  color: var(--mantine-color-white);
+  background-color: var(--mantine-primary-color-filled);
+}
+
+.subtleAction {
+  padding: rem(5px) rem(8px);
+  color: var(--mantine-primary-color-filled);
+}
+
+.lightAction {
+  align-self: flex-start;
+  min-height: rem(36px);
+  margin-top: var(--mantine-spacing-lg);
+  padding-inline: var(--mantine-spacing-md);
+  color: var(--mantine-primary-color-light-color);
+  background-color: var(--mantine-primary-color-light);
+}
+
+.primaryAction:hover {
+  background-color: var(--mantine-primary-color-filled-hover);
+}
+
+.subtleAction:hover,
+.lightAction:hover {
+  background-color: var(--mantine-primary-color-light-hover);
+}
+
+@media (max-width: $mantine-breakpoint-lg) {
+  .recentPanel {
+    grid-column: auto;
+  }
 }

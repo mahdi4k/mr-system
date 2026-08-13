@@ -1,12 +1,139 @@
+.container {
+  flex: 1 0 auto;
+  width: 100%;
+}
+
+.chatShell {
+  display: flex;
+  height: min(75vh, rem(720px));
+  min-height: rem(520px);
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 32%;
+  padding: var(--mantine-spacing-sm);
+  overflow-y: auto;
+  border-left: rem(1px) solid light-dark(
+    var(--mantine-color-gray-3),
+    var(--mantine-color-dark-4)
+  );
+  background-color: light-dark(
+    var(--mantine-color-gray-0),
+    var(--mantine-color-dark-7)
+  );
+}
+
+.conversationCard {
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.conversationCard[data-active] {
+  border-color: var(--mantine-primary-color-filled);
+  background-color: var(--mantine-primary-color-light);
+}
+
+.productImage {
+  flex-shrink: 0;
+  border-radius: var(--mantine-radius-md);
+  object-fit: cover;
+}
+
+.messagePanel {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.chatHeader {
+  min-height: rem(68px);
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+}
+
+.backButton {
+  display: none;
+}
+
+.messages {
+  flex: 1;
+  min-height: 0;
+  padding: var(--mantine-spacing-md);
+  background-color: light-dark(
+    rgba(248, 249, 250, 0.7),
+    rgba(20, 21, 23, 0.45)
+  );
+}
+
+.messageBubble {
+  max-width: min(75%, rem(520px));
+  background-color: light-dark(
+    var(--mantine-color-gray-1),
+    var(--mantine-color-dark-5)
+  );
+}
+
+.messageBubble[data-own] {
+  background-color: var(--mantine-primary-color-light);
+}
+
+.messageContent {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.composer {
+  padding: var(--mantine-spacing-sm);
+  border-top: rem(1px) solid light-dark(
+    var(--mantine-color-gray-3),
+    var(--mantine-color-dark-4)
+  );
+}
+
+.selectPrompt {
+  flex: 1;
+}
+
 .imgNoDescription {
-    width: 50%;
+  width: min(50%, rem(420px));
+  height: auto;
+}
+
+@media (max-width: $mantine-breakpoint-sm) {
+  .chatShell {
+    height: calc(100dvh - rem(150px));
+    min-height: rem(480px);
   }
-   
-  @media (max-width: $mantine-breakpoint-md) {
-    
-    .imgNoDescription {
-        width: 100%;
-        padding: 20px;
-    }
+
+  .sidebar {
+    width: 100%;
+    border-left: 0;
   }
-  
+
+  .sidebar[data-hidden] {
+    display: none;
+  }
+
+  .messagePanel {
+    display: none;
+  }
+
+  .messagePanel[data-visible] {
+    display: flex;
+    width: 100%;
+  }
+
+  .backButton {
+    display: inline-flex;
+  }
+
+  .messageBubble {
+    max-width: 86%;
+  }
+
+  .imgNoDescription {
+    width: 100%;
+    max-width: rem(360px);
+  }
+}

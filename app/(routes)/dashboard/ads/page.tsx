@@ -1,18 +1,11 @@
-import React from "react";
 import type { Metadata } from "next";
 import ClientAds from "./clientAds";
 
 export const metadata: Metadata = {
-  title: "لیست آگهی",
-  description: "",
+  title: "مدیریت آگهی‌ها | ریگورا",
+  description: "صف بررسی و مدیریت آگهی‌های ریگورا",
 };
 
-const Page = () => {
-  return (
-    <>
-      <ClientAds />
-    </>
-  );
-};
-
-export default Page;
+export default function Page() {
+  return <ClientAds />;
+}

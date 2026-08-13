@@ -1,241 +1,438 @@
 "use client";
+
+import type { Product } from "../../../_features/ads/types";
+import type { AdStatus } from "../../../types/database.types";
 import {
   useApproveAdsItem,
   useGetAdsListQuery,
   useRejectAdsItem,
   useRemoveAds,
-} from "@/_redux/services/adsApi";
+} from "../../../_redux/services/adsApi";
 import {
   ActionIcon,
+  Alert,
+  Badge,
+  Box,
   Button,
+  Card,
   Flex,
-  Loader,
+  Group,
+  Image,
+  Menu,
   Modal,
   Pagination,
-  Popover,
-  Table,
+  Paper,
+  SegmentedControl,
+  SimpleGrid,
+  Skeleton,
+  Stack,
   Text,
+  TextInput,
+  Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { IconCheck, IconTrash, IconXboxX } from "@tabler/icons-react";
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import ConfirmDeletePopover from "@/_components/adsSection/ConfirmDeletePopover";
+import {
+  IconAlertCircle,
+  IconCheck,
+  IconDotsVertical,
+  IconEye,
+  IconPhoto,
+  IconRefresh,
+  IconSearch,
+  IconTrash,
+  IconX,
+} from "@tabler/icons-react";
+import Link from "next/link";
+import { useDeferredValue, useEffect, useState } from "react";
+import classes from "./moderation.module.css";
 
-const ClientAds = () => {
-  const [currentPage, setCurrentPage] = useState(1); // Track current page
-  const [openedDescription, { open, close }] = useDisclosure(false);
-  const [descriptionTitle, setDescriptionTitle] = useState("");
-  const { data, isLoading, isSuccess } = useGetAdsListQuery({
-    page: currentPage,
+const STATUS_OPTIONS: Array<{
+  color: string;
+  label: string;
+  value: AdStatus | "all";
+}> = [
+  { color: "gray", label: "همه", value: "all" },
+  { color: "orange", label: "در انتظار", value: "pending" },
+  { color: "green", label: "منتشرشده", value: "published" },
+  { color: "red", label: "ردشده", value: "rejected" },
+  { color: "blue", label: "فروخته‌شده", value: "sold" },
+  { color: "gray", label: "بایگانی", value: "archived" },
+];
+
+function parseImages(image?: string): string[] {
+  if (!image) return [];
+  try {
+    const parsed = JSON.parse(image) as unknown;
+    return Array.isArray(parsed)
+      ? parsed.filter((item): item is string => typeof item === "string")
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function errorMessage(error: unknown): string {
+  if (typeof error === "object" && error && "error" in error) {
+    const message = (error as { error?: unknown }).error;
+    if (typeof message === "string") return message;
+  }
+  return "عملیات ناموفق بود. دوباره تلاش کنید.";
+}
+
+export default function ClientAds() {
+  const [page, setPage] = useState(1);
+  const [status, setStatus] = useState<AdStatus | "all">("pending");
+  const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search.trim());
+  const [selectedAd, setSelectedAd] = useState<Product>();
+  const [deleteTarget, setDeleteTarget] = useState<Product>();
+  const [detailsOpened, details] = useDisclosure(false);
+
+  const query = useGetAdsListQuery({
+    page,
+    search: deferredSearch || undefined,
+    status: status === "all" ? undefined : status,
   });
-  const [opened, setOpened] = useState<{ [key: string]: boolean }>({});
-  const [openedImageModal, setOpenedImageModal] = useState(false);
+  const [approve, approveState] = useApproveAdsItem();
+  const [reject, rejectState] = useRejectAdsItem();
+  const [remove, removeState] = useRemoveAds();
+  const actionLoading =
+    approveState.isLoading || rejectState.isLoading || removeState.isLoading;
 
-  const [approve, { isSuccess: isSuccessApprove }] = useApproveAdsItem();
-  const [reject, { isSuccess: isSuccessReject }] = useRejectAdsItem();
-  const [remove, { isSuccess: isSuccessRemove }] = useRemoveAds();
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  useEffect(() => setPage(1), [deferredSearch, status]);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const acceptAds = (id: string) => {
-    if (id) {
-      approve({ id });
-    }
-  };
-
-  const rejectAds = (id: string) => {
-    if (id) {
-      reject({ id });
-    }
-  };
-  const removeAds = (id: string) => {
-    if (id) {
-      remove(id);
-    }
-  };
-
-  useEffect(() => {
-    if (isSuccessApprove) {
+  const runAction = async (
+    action: "approve" | "reject" | "delete",
+    ad: Product,
+  ) => {
+    try {
+      if (action === "approve") await approve({ id: ad.id }).unwrap();
+      if (action === "reject") await reject({ id: ad.id }).unwrap();
+      if (action === "delete") await remove(ad.id).unwrap();
       notifications.show({
         color: "green",
-        title: "با موفقیت تایید شد",
-        message: "",
+        message:
+          action === "approve"
+            ? "آگهی منتشر شد."
+            : action === "reject"
+              ? "آگهی رد شد."
+              : "آگهی حذف شد.",
       });
-    }
-  }, [isSuccessApprove]);
-
-  useEffect(() => {
-    if (isSuccessReject) {
-      notifications.show({
-        color: "green",
-        title: "با موفقیت رد شد",
-        message: "",
-      });
-    }
-  }, [isSuccessReject]);
-
-  useEffect(() => {
-    if (isSuccessRemove) {
-      notifications.show({
-        color: "green",
-        title: "با موفقیت حذف شد",
-        message: "",
-      });
-    }
-  }, [isSuccessRemove]);
-
-  const handleOpen = (id: string) => {
-    setOpened((prevState) => ({ ...prevState, [id]: true }));
-  };
-
-  const handleClose = (id: string) => {
-    setOpened((prevState) => ({ ...prevState, [id]: false }));
-  };
-
-  const handleImageAds = (image: string | undefined, title: string) => {
-    if (image) {
-      const images: string[] = JSON.parse(image);
-      return (
-        <>
-          {images.map((img, index) => (
-            <Image
-              key={index} // Ensure to add a key when mapping elements
-              alt={title}
-              width={30}
-              onClick={() => openModal(img)} // Opens modal on click
-              height={30}
-              src={img}
-            />
-          ))}
-        </>
-      );
-    } else {
-      return <></>;
+      if (action === "delete") setDeleteTarget(undefined);
+    } catch (actionError) {
+      notifications.show({ color: "red", message: errorMessage(actionError) });
     }
   };
 
-  const openModal = (img: string) => {
-    setSelectedImage(img);
-    setOpenedImageModal(true);
+  const openDetails = (ad: Product) => {
+    setSelectedAd(ad);
+    details.open();
   };
-
-  const rows = data?.data.map((product) => (
-    <Table.Tr key={product.id}>
-      <Table.Td>{product.id}</Table.Td>
-      <Table.Td>{product.title}</Table.Td>
-      <Table.Td>{handleImageAds(product.image, product.title)}</Table.Td>
-      <Table.Td
-        onClick={() => {
-          setDescriptionTitle(product.description);
-          open();
-        }}
-      >
-        <Text fz="sm" lineClamp={1}>
-          {product.description}
-        </Text>
-      </Table.Td>
-      <Table.Td>{product.category.name}</Table.Td>
-      <Table.Td>{product.user.name}</Table.Td>
-      <Table.Td>
-        {new Intl.NumberFormat("fa-IR").format(Number(product.price))}
-      </Table.Td>
-      <Table.Td>
-        {product.status === "published" ? (
-          <Text fz="xs" c="green">
-            Approved
-          </Text>
-        ) : (
-          <Text fz="xs" c="red">
-            Pending
-          </Text>
-        )}
-      </Table.Td>
-      <Table.Td>{product.city}</Table.Td>
-      <Table.Td>
-        <Flex>
-          <ActionIcon
-            onClick={() => acceptAds(product.id)}
-            variant="light"
-            ml={"lg"}
-          >
-            <IconCheck size={17} />
-          </ActionIcon>
-          <ActionIcon
-            onClick={() => rejectAds(product.id)}
-            variant="light"
-            color="orange"
-          >
-            <IconXboxX size={17} />
-          </ActionIcon>
-          <ConfirmDeletePopover productId={product.id} onDelete={removeAds} />
-        </Flex>
-      </Table.Td>
-    </Table.Tr>
-  ));
-
-  const totalPages = data?.last_page || 1;
 
   return (
-    <div>
-      {isLoading ? (
-        <Loader size="lg" /> // Show loading spinner while data is fetching
-      ) : isSuccess && data?.data.length > 0 ? (
-        <>
-          <Table>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>#</Table.Th>
-                <Table.Th>عنوان</Table.Th>
-                <Table.Th>تصاویر</Table.Th>
-                <Table.Th>توضیحات</Table.Th>
-                <Table.Th>دسته بندی</Table.Th>
-                <Table.Th>کاربر</Table.Th>
-                <Table.Th>قیمت</Table.Th>
-                <Table.Th>وضعیت</Table.Th>
-                <Table.Th>شهر</Table.Th>
-                <Table.Th> </Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
+    <Stack gap="lg">
+      <Group align="flex-end" justify="space-between">
+        <div>
+          <Text c="dimmed" fz="sm" fw={600}>
+            بازار
+          </Text>
+          <Title order={1} size="h2">
+            مدیریت آگهی‌ها
+          </Title>
+          <Text c="dimmed" fz="sm" mt={4}>
+            بررسی، انتشار و مدیریت آگهی‌های کاربران
+          </Text>
+        </div>
+        <ActionIcon
+          aria-label="به‌روزرسانی آگهی‌ها"
+          loading={query.isFetching}
+          onClick={query.refetch}
+          size="lg"
+          variant="light"
+        >
+          <IconRefresh size={18} />
+        </ActionIcon>
+      </Group>
 
-          {/* Mantine Pagination */}
-          <Pagination
-            mt="lg"
-            total={totalPages}
-            value={currentPage}
-            onChange={handlePageChange}
+      <Paper p="md" radius="lg" withBorder>
+        <Flex
+          align={{ base: "stretch", md: "center" }}
+          direction={{ base: "column", md: "row" }}
+          gap="md"
+          justify="space-between"
+        >
+          <SegmentedControl
+            className={classes.statusControl}
+            data={STATUS_OPTIONS.map((option) => ({
+              label: option.label,
+              value: option.value,
+            }))}
+            onChange={(value) => setStatus(value as AdStatus | "all")}
+            value={status}
           />
-          <Modal
-            size={"xl"}
-            opened={openedDescription}
-            onClose={close}
-            title=""
-          >
-            <div style={{ whiteSpace: "pre-wrap" }}>{descriptionTitle}</div>
-          </Modal>
+          <TextInput
+            leftSection={<IconSearch size={16} />}
+            onChange={(event) => setSearch(event.currentTarget.value)}
+            placeholder="جستجو در عنوان آگهی"
+            value={search}
+            w={{ base: "100%", md: 280 }}
+          />
+        </Flex>
+      </Paper>
 
-          <Modal
-            opened={openedImageModal}
-            onClose={() => setOpenedImageModal(false)}
-            centered
-            size="auto" // Adjust the size automatically based on content
-          >
-            {selectedImage && (
-              <Image src={selectedImage} alt={""} width={600} height={600} />
-            )}
-          </Modal>
+      {query.isError ? (
+        <Alert
+          color="red"
+          icon={<IconAlertCircle size={20} />}
+          title="دریافت آگهی‌ها ناموفق بود"
+        >
+          <Text fz="sm" mb="md">
+            {errorMessage(query.error)}
+          </Text>
+          <Button onClick={query.refetch} variant="light">
+            تلاش دوباره
+          </Button>
+        </Alert>
+      ) : query.isLoading ? (
+        <SimpleGrid cols={{ base: 1, sm: 2, xl: 3 }}>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Skeleton height={350} key={index} radius="lg" />
+          ))}
+        </SimpleGrid>
+      ) : query.data?.data.length ? (
+        <>
+          <SimpleGrid cols={{ base: 1, sm: 2, xl: 3 }}>
+            {query.data.data.map((ad) => (
+              <ModerationCard
+                actionLoading={actionLoading}
+                ad={ad}
+                key={ad.id}
+                onApprove={() => void runAction("approve", ad)}
+                onDelete={() => setDeleteTarget(ad)}
+                onOpen={() => openDetails(ad)}
+                onReject={() => void runAction("reject", ad)}
+              />
+            ))}
+          </SimpleGrid>
+          {query.data.last_page > 1 && (
+            <Flex justify="center">
+              <Pagination
+                onChange={setPage}
+                total={query.data.last_page}
+                value={page}
+              />
+            </Flex>
+          )}
         </>
       ) : (
-        <Text>No products found.</Text>
+        <Paper className={classes.emptyState} p="xl" radius="lg" withBorder>
+          <IconSearch size={42} stroke={1.4} />
+          <Title order={3} size="h4" mt="md">
+            آگهی‌ای در این صف نیست
+          </Title>
+          <Text c="dimmed" fz="sm" mt="xs" ta="center">
+            وضعیت یا عبارت جستجو را تغییر دهید.
+          </Text>
+        </Paper>
       )}
-    </div>
-  );
-};
 
-export default ClientAds;
+      <Modal
+        centered
+        onClose={details.close}
+        opened={detailsOpened}
+        size="lg"
+        title="جزئیات آگهی"
+      >
+        {selectedAd && <AdDetails ad={selectedAd} />}
+      </Modal>
+
+      <Modal
+        centered
+        onClose={() => setDeleteTarget(undefined)}
+        opened={Boolean(deleteTarget)}
+        title="حذف دائمی آگهی"
+      >
+        <Text fz="sm">
+          آگهی «{deleteTarget?.title}» و تصاویر آن برای همیشه حذف می‌شوند. این
+          عملیات قابل بازگشت نیست.
+        </Text>
+        <Group justify="flex-end" mt="lg">
+          <Button
+            color="gray"
+            onClick={() => setDeleteTarget(undefined)}
+            variant="subtle"
+          >
+            انصراف
+          </Button>
+          <Button
+            color="red"
+            loading={removeState.isLoading}
+            onClick={() =>
+              deleteTarget && void runAction("delete", deleteTarget)
+            }
+          >
+            حذف دائمی
+          </Button>
+        </Group>
+      </Modal>
+    </Stack>
+  );
+}
+
+interface ModerationCardProps {
+  actionLoading: boolean;
+  ad: Product;
+  onApprove: () => void;
+  onDelete: () => void;
+  onOpen: () => void;
+  onReject: () => void;
+}
+
+function ModerationCard({
+  actionLoading,
+  ad,
+  onApprove,
+  onDelete,
+  onOpen,
+  onReject,
+}: ModerationCardProps) {
+  const images = parseImages(ad.image);
+  const status = STATUS_OPTIONS.find(({ value }) => value === ad.status)!;
+  return (
+    <Card className={classes.card} padding="md" radius="lg" withBorder>
+      <Card.Section className={classes.imageSection}>
+        {images[0] ? (
+          <Image alt={ad.title} fit="cover" h="100%" src={images[0]} />
+        ) : (
+          <Flex align="center" c="dimmed" h="100%" justify="center">
+            <IconPhoto size={35} stroke={1.3} />
+          </Flex>
+        )}
+        <Badge
+          className={classes.statusBadge}
+          color={status.color}
+          variant="filled"
+        >
+          {status.label}
+        </Badge>
+      </Card.Section>
+
+      <Group justify="space-between" mt="md" wrap="nowrap">
+        <Box miw={0}>
+          <Text fw={700} lineClamp={1}>
+            {ad.title}
+          </Text>
+          <Text c="dimmed" fz="xs" mt={3}>
+            {ad.category.name} · {ad.user.name}
+          </Text>
+        </Box>
+        <Menu position="bottom-end">
+          <Menu.Target>
+            <ActionIcon aria-label="گزینه‌های آگهی" variant="subtle">
+              <IconDotsVertical size={18} />
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item
+              component={Link}
+              href={`/ads/${ad.id}`}
+              leftSection={<IconEye size={16} />}
+            >
+              مشاهده صفحه عمومی
+            </Menu.Item>
+            <Menu.Item
+              color="red"
+              leftSection={<IconTrash size={16} />}
+              onClick={onDelete}
+            >
+              حذف دائمی
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+      </Group>
+
+      <Text c="dimmed" fz="sm" lineClamp={2} mih={44} mt="md">
+        {ad.description}
+      </Text>
+      <Group justify="space-between" mt="md">
+        <Text fw={700} fz="sm">
+          {ad.price
+            ? `${Number(ad.price).toLocaleString("fa-IR")} تومان`
+            : "قیمت توافقی"}
+        </Text>
+        <Text c="dimmed" fz="xs">
+          {new Intl.DateTimeFormat("fa-IR").format(new Date(ad.created_at))}
+        </Text>
+      </Group>
+
+      <Group grow mt="md">
+        <Button
+          disabled={actionLoading || ad.status === "published"}
+          leftSection={<IconCheck size={17} />}
+          onClick={onApprove}
+          size="xs"
+          variant="light"
+        >
+          انتشار
+        </Button>
+        <Button
+          color="red"
+          disabled={actionLoading || ad.status === "rejected"}
+          leftSection={<IconX size={17} />}
+          onClick={onReject}
+          size="xs"
+          variant="light"
+        >
+          رد کردن
+        </Button>
+        <Button onClick={onOpen} size="xs" variant="default">
+          جزئیات
+        </Button>
+      </Group>
+    </Card>
+  );
+}
+
+function AdDetails({ ad }: { ad: Product }) {
+  const images = parseImages(ad.image);
+  return (
+    <Stack>
+      {images.length > 0 && (
+        <SimpleGrid cols={{ base: 2, sm: 3 }}>
+          {images.map((image) => (
+            <Image alt={ad.title} h={150} key={image} radius="md" src={image} />
+          ))}
+        </SimpleGrid>
+      )}
+      <div>
+        <Text c="dimmed" fz="xs">
+          عنوان
+        </Text>
+        <Text fw={700}>{ad.title}</Text>
+      </div>
+      <div>
+        <Text c="dimmed" fz="xs">
+          توضیحات
+        </Text>
+        <Text fz="sm" style={{ whiteSpace: "pre-wrap" }}>
+          {ad.description}
+        </Text>
+      </div>
+      <Group grow>
+        <div>
+          <Text c="dimmed" fz="xs">
+            فروشنده
+          </Text>
+          <Text fz="sm">{ad.user.name}</Text>
+        </div>
+        <div>
+          <Text c="dimmed" fz="xs">
+            شماره تماس
+          </Text>
+          <Text fz="sm">{ad.user.phone || "ثبت نشده"}</Text>
+        </div>
+      </Group>
+    </Stack>
+  );
+}

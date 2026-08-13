@@ -1,0 +1,52 @@
+.shell {
+  min-height: 100dvh;
+  background-color: light-dark(
+    var(--mantine-color-gray-0),
+    var(--mantine-color-dark-8)
+  );
+}
+
+.header {
+  border-bottom-color: light-dark(
+    var(--mantine-color-gray-2),
+    var(--mantine-color-dark-5)
+  );
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--mantine-spacing-sm);
+  color: inherit;
+  text-decoration: none;
+}
+
+.accountButton {
+  max-width: rem(190px);
+}
+
+.accountLabel {
+  max-width: rem(100px);
+}
+
+.navbar {
+  border-inline-end-color: light-dark(
+    var(--mantine-color-gray-2),
+    var(--mantine-color-dark-5)
+  );
+}
+
+.main {
+  min-width: 0;
+}
+
+@media (max-width: $mantine-breakpoint-xs) {
+  .accountButton {
+    width: rem(40px);
+    padding-inline: rem(5px);
+  }
+
+  .accountLabel {
+    display: none;
+  }
+}

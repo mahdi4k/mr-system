@@ -46,7 +46,7 @@ const PageClient = ({
                 );
 
                 return (
-                  <Grid.Col mt={"xs"} span={{ base: 12 }}>
+                  <Grid.Col key={post.id} mt={"xs"} span={{ base: 12 }}>
                     <Link href={`/blog/${post.slug}`}>
                       <Card
                         withBorder
@@ -105,7 +105,7 @@ const PageClient = ({
               </Text>
               <ul style={{ paddingRight: "5px", marginTop: "30px" }}>
                 {categories.map((category) => (
-                  <li className={classes.categoryList}>
+                  <li key={category.id} className={classes.categoryList}>
                     <Link href={`/blog/category/${category.slug}`}>
                       <Text fz={"sm"}>{category.name}</Text>
                     </Link>

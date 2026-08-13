@@ -1,549 +1,448 @@
 "use client";
 
+import type { AdsCategory } from "./page";
+import type { AdsFilterUpdate } from "../../_components/adsSection/AdsFilter";
+import type { AdsFilters, Product } from "../../_features/ads/types";
+import AdsFilter from "../../_components/adsSection/AdsFilter";
+import CardPartPrice from "../../_components/shared/CardPartPrice";
+import { fetchCity, fetchOstan } from "../../_redux/features/ads";
+import { useGetAdsListCategoryQuery } from "../../_redux/services/adsApi";
+import type { AppDispatch, RootState } from "../../_redux/store";
 import {
-  ActionIcon,
+  cityTitleHandler,
+  formatJalaliTimeAgo,
+  formatNumberWithCommas,
+  provinceTitleHandler,
+} from "../../_utils/utils";
+import {
+  Alert,
   Anchor,
   Badge,
+  Box,
   Breadcrumbs,
   Button,
   Card,
   Container,
   Drawer,
   Flex,
-  Grid,
   Group,
-  Loader,
   Menu,
-  rem,
+  Pagination,
+  Paper,
   SimpleGrid,
   Skeleton,
   Text,
+  Title,
   UnstyledButton,
 } from "@mantine/core";
-import React, { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { useDisclosure } from "@mantine/hooks";
 import {
-  Product,
-  useLazyGetAdsListCategoryQuery,
-} from "@/_redux/services/adsApi";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import CardPartPrice from "@/_components/shared/CardPartPrice";
-import {
-  formatJalaliTimeAgo,
-  provinceTitleHandler,
-  cityTitleHandler,
-  formatNumberWithCommas,
-  debounce,
-} from "@/_utils/utils";
-import {
+  IconAdjustmentsHorizontal,
+  IconAlertCircle,
   IconChevronDown,
-  IconFilter,
   IconFlag3,
+  IconRefresh,
+  IconSearchOff,
   IconX,
 } from "@tabler/icons-react";
-import { AppDispatch, RootState } from "@/_redux/store";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchOstan, fetchCity } from "@/_redux/features/ads";
-import AdsFilter from "@/_components/adsSection/AdsFilter";
-import classes from "./AdsPage.module.css";
 import ImgNoProduct from "../../../public/no-product.png";
-import { useDisclosure, useMediaQuery } from "@mantine/hooks";
-import { Province } from "./create/page";
-import { CategoryProdcut } from "./page";
+import classes from "./AdsPage.module.css";
 
-const data = [
+const SORT_OPTIONS = [
   { label: "جدیدترین", value: "created_at" },
   { label: "ارزان‌ترین", value: "price_asc" },
   { label: "گران‌ترین", value: "price_desc" },
 ];
 
-const PageClient = ({ categories }: { categories: CategoryProdcut[] }) => {
-  const [
-    adsQuery,
-    {
-      data: adsData,
-      isSuccess: isSuccessAds,
-      isLoading,
-      isFetching: isFetchingAds,
-    },
-  ] = useLazyGetAdsListCategoryQuery();
+interface PageClientProps {
+  categories: AdsCategory[];
+}
+
+function getFirstImage(image?: string): string | null {
+  if (!image) return null;
+  try {
+    const images = JSON.parse(image) as unknown;
+    return Array.isArray(images) && typeof images[0] === "string"
+      ? images[0]
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function getErrorMessage(error: unknown): string {
+  if (typeof error === "object" && error && "error" in error) {
+    const message = (error as { error?: unknown }).error;
+    if (typeof message === "string") return message;
+  }
+  return "دریافت آگهی‌ها ناموفق بود. دوباره تلاش کنید.";
+}
+
+export default function PageClient({ categories }: PageClientProps) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
   const { ostan, city, status } = useSelector((state: RootState) => state.ads);
-  const [params, setParams] = useState<{ [key: string]: string }>({});
-  const router = useRouter();
-  const [opened, setOpened] = useState(false);
-  const [selectedSort, setSelectedSort] = useState(data[0]);
-  const [page, setPage] = useState(1);
-  const [products, setProducts] = useState<Product[]>([]);
-  const observerRef = useRef(null); // Ref for the observer target
-  const [provinces, setProvinces] = useState<Province[]>([]);
+  const [filtersOpened, { open: openFilters, close: closeFilters }] =
+    useDisclosure(false);
+
+  const page = Math.max(Number(searchParams.get("page")) || 1, 1);
+  const currentSort = searchParams.get("sort") || SORT_OPTIONS[0].value;
+  const selectedSort =
+    SORT_OPTIONS.find(({ value }) => value === currentSort) ?? SORT_OPTIONS[0];
+  const provinceFilters = searchParams
+    .getAll("ostan")
+    .flatMap((value) => value.split(","))
+    .filter(Boolean);
+
+  const filters: AdsFilters = {
+    page,
+    category: searchParams.get("category") || undefined,
+    search: searchParams.get("search") || undefined,
+    price_from: searchParams.get("price_from") || undefined,
+    price_to: searchParams.get("price_to") || undefined,
+    sort: currentSort,
+    ostan: provinceFilters.length ? provinceFilters.join(",") : undefined,
+  };
+
+  const { data, error, isError, isFetching, isLoading, refetch } =
+    useGetAdsListCategoryQuery(filters);
 
   useEffect(() => {
-    if (!ostan.length) {
-      dispatch(fetchOstan());
-    }
-    if (!city.length) {
-      dispatch(fetchCity());
-    }
-  }, [ostan, city, dispatch]);
+    if (!ostan.length && status !== "loading") void dispatch(fetchOstan());
+    if (!city.length && status !== "loading") void dispatch(fetchCity());
+  }, [city.length, dispatch, ostan.length, status]);
 
-  useEffect(() => {
-    // Convert search params to an object and set it to state
-    const paramObj: { [key: string]: string } = {};
-    searchParams.forEach((value, key) => {
-      paramObj[key] = value;
-    });
+  const navigate = (params: URLSearchParams) => {
+    const query = params.toString();
+    router.push(query ? `/ads?${query}` : "/ads", { scroll: true });
+  };
 
-    setParams(paramObj);
-  }, [searchParams]);
+  const updateFilters = (update: AdsFilterUpdate) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("page");
 
-  // check query params exist
-
-  useEffect(() => {
-    const categoryParam = searchParams.get("category");
-    const searchParam = searchParams.get("search");
-    const priceFrom = searchParams.get("price_from");
-    const priceTo = searchParams.get("price_to");
-    const sort = searchParams.get("sort");
-    const ostanParams = searchParams.getAll("ostan"); // Retrieve all 'ostan' values
-
-    const queryParams: {
-      ostan?: string; // Array for multiple 'ostan' values
-      category?: string;
-      search?: string;
-      price_from?: string;
-      price_to?: string;
-      sort?: string;
-      page?: string;
-    } = {};
-
-    if (ostanParams.length > 0) queryParams.ostan = ostanParams.join(","); // Add 'ostan' array to query
-    if (categoryParam) queryParams.category = categoryParam;
-    if (searchParam) queryParams.search = searchParam;
-    if (priceFrom) queryParams.price_from = priceFrom;
-    if (priceTo) queryParams.price_to = priceTo;
-    if (sort) queryParams.sort = sort;
-    if (page) queryParams.page = `${page}`;
-
-    if (sort) {
-      const sortParam = sort;
-      setSelectedSort(
-        data.find((item) => item.value === sortParam) as {
-          label: string;
-          value: string;
-        },
-      );
-    }
-
-    adsQuery(queryParams); // Call your API with the constructed queryParams
-  }, [searchParams, page]);
-
-  useEffect(() => {
-    // Fetch provinces and cities data from public folder
-    const fetchProvincesAndCities = async () => {
-      const provincesResponse = await fetch("/provinces.json");
-      const provincesData: Province[] = await provincesResponse.json();
-
-      setProvinces(provincesData);
-    };
-
-    fetchProvincesAndCities();
-  }, []);
-
-  // set total page number in query param
-  useEffect(() => {
-    const setSearchParams = new URLSearchParams(window.location.search);
-
-    if (isSuccessAds) {
-      setSearchParams.set("total_page", `${adsData ? adsData.last_page : 0}`);
-      const newUrl = `${window.location.pathname}?${setSearchParams.toString()}`;
-      window.history.pushState({}, "", newUrl);
-    }
-  }, [isSuccessAds, adsData, searchParams]);
-
-  // Clear products
-  useEffect(() => {
-    if (
-      page === 1 &&
-      (searchParams.get("category") || searchParams.get("sort"))
-    ) {
-      setProducts([]);
-    }
-  }, [page, searchParams.get("category"), searchParams.get("sort")]);
-
-  // set product and merge old product with new product and also checked for duplicate products
-  useEffect(() => {
-    if (isSuccessAds && adsData) {
-      const totalPages = adsData.last_page;
-
-      setProducts((prev) => {
-        const existingIds = new Set(prev.map((product) => product.id));
-
-        // Check if we are resetting or appending
-        if (page === 1) {
-          // On search reset, replace products entirely
-          return adsData.data;
-        }
-
-        // For pagination, append only new products
-        const newProducts = adsData.data.filter(
-          (product) => !existingIds.has(product.id),
-        );
-        return [...prev, ...newProducts];
-      });
-    }
-  }, [isSuccessAds, adsData, page, searchParams]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries: IntersectionObserverEntry[]) => {
-        if (entries[0].isIntersecting && !isFetchingAds) {
-          setPage((prev) => {
-            const currentTotalPage = Number(searchParams.get("total_page")); // Get the latest value as number
-
-            if (Number(prev) <= currentTotalPage) {
-              return prev + 1; // Increment page if current page is less than total pages
-            } else {
-              // Disconnect the observer when we reach or exceed the totalPage
-              if (observerRef.current) {
-                observer.disconnect(); // Stop observing when last page is reached
-              }
-            }
-            return prev; // No page increment if we reach totalPage
-          });
-        }
-      },
-      {
-        root: null,
-        rootMargin: "0px",
-        threshold: 1.0,
-      },
-    );
-
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    // Cleanup the observer on component unmount or effect re-run
-    return () => {
-      if (observerRef.current) {
-        observer.disconnect();
+    Object.entries(update).forEach(([key, value]) => {
+      params.delete(key);
+      if (Array.isArray(value)) {
+        value.forEach((entry) => params.append(key, entry));
+      } else if (value) {
+        params.set(key, value);
       }
-    };
-  }, [page, searchParams]);
-
-  const handleImageAds = (image: string, title: string) => {
-    const images: string[] = JSON.parse(image);
-    if (images.length > 0) {
-      return (
-        <Image
-          alt={title}
-          style={{ borderRadius: "7px" }}
-          width={180}
-          height={170}
-          src={`${images[0]}`}
-        />
-      );
-    } else {
-      return (
-        <Image
-          style={{ objectFit: "contain" }}
-          width={180}
-          height={170}
-          alt="no img"
-          src={ImgNoProduct}
-        />
-      );
-    }
+    });
+    navigate(params);
   };
 
-  const handleRemoveParam = (paramKey: string) => {
-    // Create a new search parameter object without the removed key
-    const newParams = new URLSearchParams(searchParams.toString());
-    newParams.delete(paramKey);
-
-    // Clear products before updating the URL
-    setProducts([]);
-    setPage(1);
-
-    // Use a timeout or promise to ensure the state is cleared before routing
-    setTimeout(() => {
-      // Update the URL by pushing new search parameters
-      router.push(`?${newParams.toString()}`);
-    }, 100);
+  const setSort = (sort: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("page");
+    if (sort === SORT_OPTIONS[0].value) params.delete("sort");
+    else params.set("sort", sort);
+    navigate(params);
   };
 
-  const items = data.map((item) => (
-    <Menu.Item
-      onClick={() => {
-        setPage(1);
-        setSelectedSort(item);
-        const searchParams = new URLSearchParams(window.location.search);
-        searchParams.set("sort", item.value.replace(/,/g, ""));
-        const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
-        window.history.pushState({}, "", newUrl);
-      }}
-      key={item.label}
-    >
-      {item.label}
-    </Menu.Item>
-  ));
+  const setPage = (nextPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (nextPage === 1) params.delete("page");
+    else params.set("page", String(nextPage));
+    navigate(params);
+  };
 
-  function AdsFilterWithDrawer({
-    setPage,
-  }: {
-    setPage: React.Dispatch<React.SetStateAction<number>>;
-  }) {
-    // Manage drawer state
-    const [opened, { open, close }] = useDisclosure(false);
+  const clearAllFilters = () => {
+    const params = new URLSearchParams();
+    if (currentSort !== SORT_OPTIONS[0].value) params.set("sort", currentSort);
+    navigate(params);
+  };
 
-    // Detect screen size (returns true if width < 768px)
-    const isTablet = useMediaQuery("(max-width: 1200px)");
+  const activeFilters = [
+    filters.category && {
+      key: "category",
+      label:
+        categories.find(({ value }) => value === filters.category)?.name ||
+        filters.category,
+    },
+    filters.search && { key: "search", label: `جستجو: ${filters.search}` },
+    filters.price_from && {
+      key: "price_from",
+      label: `از ${formatNumberWithCommas(filters.price_from)} تومان`,
+    },
+    filters.price_to && {
+      key: "price_to",
+      label: `تا ${formatNumberWithCommas(filters.price_to)} تومان`,
+    },
+    provinceFilters.length > 0 && {
+      key: "ostan",
+      label:
+        provinceFilters.length === 1
+          ? ostan.find(({ id }) => String(id) === provinceFilters[0])?.name ||
+            "یک استان"
+          : `${provinceFilters.length} استان`,
+    },
+  ].filter(Boolean) as Array<{ key: string; label: string }>;
 
-    return (
-      <>
-        {isTablet ? (
-          <>
-            {/* Button to open the drawer */}
-            <ActionIcon
-              style={{ position: "relative", top: "54px", left: "10px" }}
-              mr={"auto"}
-              size={"xl"}
-              variant="light"
-              onClick={open}
-            >
-              <IconFilter size={22} />
-            </ActionIcon>
-
-            {/* Drawer component */}
-            <Drawer
-              position="bottom"
-              opened={opened}
-              onClose={close}
-              title="فیلترها"
-              padding="md"
-              size="sm"
-            >
-              <AdsFilter
-                isTablet={true}
-                categories={categories}
-                provinces={provinces}
-                setPage={setPage}
-              />
-            </Drawer>
-          </>
-        ) : (
-          // Render the Card with AdsFilter for larger screens
-          <Grid.Col className={classes.sidebar} span={3} pt={"xl"}>
-            <Card withBorder mb={"lg"} mt={"42px"} pl={"xs"}>
-              <AdsFilter
-                isTablet={false}
-                categories={categories}
-                provinces={provinces}
-                setPage={setPage}
-              />
-            </Card>
-          </Grid.Col>
-        )}
-      </>
-    );
-  }
+  const filterPanel = (
+    <AdsFilter
+      categories={categories}
+      currentCategory={filters.category ?? null}
+      currentPriceFrom={filters.price_from ?? ""}
+      currentPriceTo={filters.price_to ?? ""}
+      currentProvinces={provinceFilters}
+      currentSearch={filters.search ?? ""}
+      onApply={updateFilters}
+      onApplied={closeFilters}
+      provinces={ostan}
+    />
+  );
 
   return (
-    <Container
-      styles={{ root: { flex: "1 0 auto", width: "100%" } }}
-      size={"lg"}
-    >
-      <Breadcrumbs mb={"lg"} mt={"lg"}>
-        <Anchor c={"var(--mantine-color-kiwi-2)"} size="sm" href={"/"}>
+    <Container className={classes.page} size="lg">
+      <Breadcrumbs my="lg">
+        <Anchor component={Link} href="/" size="sm">
           خانه
         </Anchor>
-
         <Text c="dimmed" size="xs">
-          آگهی ها
+          آگهی‌ها
         </Text>
       </Breadcrumbs>
-      <Grid gutter={"lg"}>
-        <AdsFilterWithDrawer setPage={setPage} />
-        <Grid.Col span={{ base: 12, lg: 9 }}>
-          <Flex align={"center"} justify={"space-between"}>
-            {/* Render badges for each query parameter */}
-            {Object.entries(params)
-              .filter(([key]) => key !== "sort" && key !== "total_page") // Exclude irrelevant keys
-              .map(([key, value]) => {
-                const category = categories.find(
-                  (item) => item.value === value,
-                )?.name;
 
-                return (
-                  <Badge
-                    ml={"4px"}
-                    color="var(--mantine-color-kiwi-3)"
-                    key={`${key}-${value}`}
-                    rightSection={
-                      <IconX
-                        onClick={() => handleRemoveParam(key)}
-                        color="var(--mantine-color-gray-8)"
-                        style={{
-                          width: rem(12),
-                          height: rem(12),
-                          cursor: "pointer",
-                          marginLeft: "3px",
-                        }}
-                      />
-                    }
-                  >
-                    {key === "search" && (
-                      <Text c="var(--mantine-color-gray-8)" fz="12px">
-                        جستجو: {value}
-                      </Text>
-                    )}
-                    {key === "ostan" && (
-                      <Text c="var(--mantine-color-gray-8)" fz="12px">
-                        استان:
-                      </Text>
-                    )}
-                    {category && key !== "search" && (
-                      <Text c="var(--mantine-color-gray-8)" fz="12px">
-                        {category}
-                      </Text>
-                    )}
-                    {key === "price_from" && (
-                      <Text c="var(--mantine-color-gray-8)" fz="12px">
-                        قیمت از : {formatNumberWithCommas(value)} تومان
-                      </Text>
-                    )}
-                    {key === "price_to" && (
-                      <Text c="var(--mantine-color-gray-8)" fz="12px">
-                        قیمت تا : {formatNumberWithCommas(value)} تومان
-                      </Text>
-                    )}
-                  </Badge>
-                );
-              })}
+      <Flex align="flex-end" justify="space-between" mb="lg" gap="md">
+        <Box>
+          <Title order={1} size="h2">
+            آگهی قطعات کامپیوتر
+          </Title>
+          <Text c="dimmed" fz="sm" mt={4}>
+            {data
+              ? `${data.total.toLocaleString("fa-IR")} آگهی`
+              : "جستجو و مقایسه قطعات"}
+          </Text>
+        </Box>
+        <Button
+          className={classes.mobileFilterButton}
+          leftSection={<IconAdjustmentsHorizontal size={18} />}
+          onClick={openFilters}
+          variant="light"
+        >
+          فیلترها
+          {activeFilters.length > 0 && (
+            <Badge circle mr="xs" size="sm">
+              {activeFilters.length}
+            </Badge>
+          )}
+        </Button>
+      </Flex>
 
-            <Menu
-              onOpen={() => setOpened(true)}
-              onClose={() => setOpened(false)}
-              radius="md"
-              width="target"
-              withinPortal
-            >
-              <Menu.Target>
-                <UnstyledButton
-                  className={classes.control}
-                  data-expanded={opened || undefined}
+      <div className={classes.layout}>
+        <Paper className={classes.sidebar} p="md" radius="lg" withBorder>
+          <Group justify="space-between" mb="md">
+            <Text fw={700}>فیلترها</Text>
+            {activeFilters.length > 0 && (
+              <Button
+                color="gray"
+                onClick={clearAllFilters}
+                size="compact-xs"
+                variant="subtle"
+              >
+                پاک کردن همه
+              </Button>
+            )}
+          </Group>
+          {filterPanel}
+        </Paper>
+
+        <Box className={classes.results}>
+          <Flex align="center" justify="space-between" gap="md" mb="md">
+            <Group gap="xs" className={classes.filterBadges}>
+              {activeFilters.map((filter) => (
+                <Badge
+                  key={filter.key}
+                  rightSection={
+                    <IconX
+                      aria-label={`حذف فیلتر ${filter.label}`}
+                      className={classes.badgeRemove}
+                      onClick={() => updateFilters({ [filter.key]: null })}
+                      size={12}
+                    />
+                  }
+                  size="lg"
+                  variant="light"
                 >
-                  <Group gap="xs">
-                    <span className={classes.label}>{selectedSort.label}</span>
-                  </Group>
-                  <IconChevronDown
-                    size="1rem"
-                    className={classes.icon}
-                    stroke={1.5}
-                  />
+                  {filter.label}
+                </Badge>
+              ))}
+            </Group>
+
+            <Menu position="bottom-end" shadow="md" width={160}>
+              <Menu.Target>
+                <UnstyledButton className={classes.sortControl}>
+                  <Text fz="sm" fw={500}>
+                    {selectedSort.label}
+                  </Text>
+                  <IconChevronDown size={16} />
                 </UnstyledButton>
               </Menu.Target>
-              <Menu.Dropdown>{items}</Menu.Dropdown>
+              <Menu.Dropdown>
+                {SORT_OPTIONS.map((option) => (
+                  <Menu.Item
+                    key={option.value}
+                    onClick={() => setSort(option.value)}
+                  >
+                    {option.label}
+                  </Menu.Item>
+                ))}
+              </Menu.Dropdown>
             </Menu>
           </Flex>
-          <SimpleGrid spacing="xs" py={"lg"} cols={{ base: 2, md: 3, xl: 4 }}>
-            {isFetchingAds && page === 1 && (
-              <>
-                {Array.from({ length: 8 }).map((_, index) => (
-                  <Skeleton key={index} height={"340px"} />
-                ))}
-              </>
-            )}
-            {adsData?.total && adsData.total > 0
-              ? products.map((item) => (
-                  <Link key={item.id} href={`/ads/${item.id}`}>
-                    <Card withBorder>
-                      <Card.Section mt={"0"} ta={"center"}>
-                        {handleImageAds(item.image as string, item.title)}
-                      </Card.Section>
-                      <Text
-                        h={40}
-                        ta={"right"}
-                        mt={"5px"}
-                        lineClamp={2}
-                        fz={"sm"}
-                      >
-                        {item.title}
-                      </Text>
-                      <Flex align={"baseline"} justify={"space-between"}>
-                        {item.price ? (
-                          <CardPartPrice
-                            tomanHeight={17}
-                            tomanWidth={17}
-                            textSize={14}
-                            isAds
-                            price={item.price}
-                          />
-                        ) : (
-                          <Text c={"#25ac9e"} mb="xs" fz={"sm"} mt={"md"}>
-                            توافقی
-                          </Text>
-                        )}
-                        <Flex>
-                          <Text ml={"2px"} fz={"11px"}>
-                            {formatJalaliTimeAgo(item.created_at)}
-                          </Text>
-                        </Flex>
-                      </Flex>
-                      <Flex justify={"flex-end"} mt="xs" align={"baseline"}>
-                        <IconFlag3 size={15} />
-                        <Text
-                          style={{ position: "relative", bottom: "3px" }}
-                          mr={"3px"}
-                          ta={"left"}
-                          fz={"11.5px"}
-                        >
-                          {provinceTitleHandler(status, item.ostan, ostan)}
-                        </Text>
-                        <Text mr={"2px"}>,</Text>
-                        <Text
-                          style={{ position: "relative", bottom: "3px" }}
-                          mr={"3px"}
-                          ta={"left"}
-                          fz={"11.5px"}
-                        >
-                          {cityTitleHandler(status, item.city, city)}
-                        </Text>
-                      </Flex>
-                    </Card>
-                  </Link>
-                ))
-              : ""}
-            {adsData?.data.length === 0 &&
-            products.length === 0 &&
-            !isFetchingAds ? (
-              <Text>آگهی یافت نشد</Text>
-            ) : (
-              ""
-            )}
-          </SimpleGrid>
-          {isFetchingAds ? (
-            <Flex justify={"center"} align={"center"}>
-              <Loader
-                styles={{ root: { alignItems: "flex-start" } }}
-                h={5400}
-                color="green"
-                type="dots"
-              />{" "}
-            </Flex>
+
+          {isError ? (
+            <Alert
+              color="red"
+              icon={<IconAlertCircle size={20} />}
+              title="آگهی‌ها بارگذاری نشدند"
+            >
+              <Text fz="sm" mb="md">
+                {getErrorMessage(error)}
+              </Text>
+              <Button
+                leftSection={<IconRefresh size={16} />}
+                onClick={refetch}
+                variant="light"
+              >
+                تلاش دوباره
+              </Button>
+            </Alert>
+          ) : isLoading ? (
+            <AdsGridSkeleton />
+          ) : data && data.data.length > 0 ? (
+            <>
+              <Box pos="relative">
+                <SimpleGrid cols={{ base: 1, xs: 2, md: 3 }} spacing="md">
+                  {data.data.map((product) => (
+                    <AdCard
+                      city={city}
+                      key={product.id}
+                      locationStatus={status}
+                      product={product}
+                      provinces={ostan}
+                    />
+                  ))}
+                </SimpleGrid>
+                {isFetching && <div className={classes.refreshOverlay} />}
+              </Box>
+              {data.last_page > 1 && (
+                <Flex justify="center" mt="xl">
+                  <Pagination
+                    boundaries={1}
+                    onChange={setPage}
+                    siblings={1}
+                    total={data.last_page}
+                    value={Math.min(page, data.last_page)}
+                  />
+                </Flex>
+              )}
+            </>
           ) : (
-            ""
+            <Paper className={classes.emptyState} p="xl" radius="lg" withBorder>
+              <IconSearchOff size={44} stroke={1.4} />
+              <Title order={3} mt="md">
+                آگهی‌ای پیدا نشد
+              </Title>
+              <Text c="dimmed" fz="sm" mt="xs" ta="center">
+                فیلترها را تغییر دهید یا عبارت دیگری جستجو کنید.
+              </Text>
+              {activeFilters.length > 0 && (
+                <Button mt="lg" onClick={clearAllFilters} variant="light">
+                  حذف همه فیلترها
+                </Button>
+              )}
+            </Paper>
           )}
-        </Grid.Col>
-      </Grid>
-      <div
-        ref={observerRef}
-        style={{ height: "20px", backgroundColor: "transparent" }}
-      />
+        </Box>
+      </div>
+
+      <Drawer
+        opened={filtersOpened}
+        onClose={closeFilters}
+        padding="md"
+        position="bottom"
+        size="85%"
+        title="فیلتر آگهی‌ها"
+      >
+        {filterPanel}
+      </Drawer>
     </Container>
   );
-};
-export default PageClient;
+}
+
+function AdsGridSkeleton() {
+  return (
+    <SimpleGrid cols={{ base: 1, xs: 2, md: 3 }} spacing="md">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <Skeleton height={330} key={index} radius="lg" />
+      ))}
+    </SimpleGrid>
+  );
+}
+
+interface AdCardProps {
+  city: Array<{ id: number; name: string }>;
+  locationStatus: "idle" | "loading" | "succeeded" | "failed";
+  product: Product;
+  provinces: Array<{ id: number; name: string }>;
+}
+
+function AdCard({ city, locationStatus, product, provinces }: AdCardProps) {
+  const image = getFirstImage(product.image);
+  return (
+    <Card
+      className={classes.adCard}
+      component={Link}
+      href={`/ads/${product.id}`}
+      padding="sm"
+      radius="lg"
+      withBorder
+    >
+      <Card.Section className={classes.imageSection}>
+        <Image
+          alt={product.title}
+          fill
+          sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, 33vw"
+          src={image || ImgNoProduct}
+          style={{ objectFit: image ? "cover" : "contain" }}
+        />
+      </Card.Section>
+      <Text fw={600} lineClamp={2} mih={48} mt="sm">
+        {product.title}
+      </Text>
+      <Flex align="center" justify="space-between" mt="md">
+        {product.price ? (
+          <CardPartPrice
+            isAds
+            price={product.price}
+            textSize={14}
+            tomanHeight={17}
+            tomanWidth={17}
+          />
+        ) : (
+          <Text c="teal" fw={600} fz="sm">
+            توافقی
+          </Text>
+        )}
+        <Text c="dimmed" fz="xs">
+          {formatJalaliTimeAgo(product.created_at)}
+        </Text>
+      </Flex>
+      <Group c="dimmed" gap={4} mt="sm" wrap="nowrap">
+        <IconFlag3 size={15} />
+        <Text fz="xs" truncate>
+          {provinceTitleHandler(locationStatus, product.ostan, provinces)}،{" "}
+          {cityTitleHandler(locationStatus, product.city, city)}
+        </Text>
+      </Group>
+    </Card>
+  );
+}

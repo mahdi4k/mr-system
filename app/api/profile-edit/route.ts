@@ -52,5 +52,25 @@ export async function PATCH(request: Request) {
     }
   }
 
+  if (body.phone !== undefined) {
+    const phone = body.phone.trim();
+    if (phone && !/^0?9\d{9}$/.test(phone)) {
+      return NextResponse.json(
+        { message: "شماره موبایل معتبر نیست." },
+        { status: 400 },
+      );
+    }
+    const { error } = await supabase
+      .from("profiles")
+      .update({ phone: phone || null })
+      .eq("id", user.id);
+    if (error) {
+      return NextResponse.json(
+        { message: "ویرایش شماره موبایل ناموفق بود." },
+        { status: 500 },
+      );
+    }
+  }
+
   return NextResponse.json({ status: true });
 }

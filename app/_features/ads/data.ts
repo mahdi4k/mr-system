@@ -4,6 +4,7 @@ import type { Database } from "../../types/database.types";
 import type {
   AdsFilters,
   AdsResponse,
+  AdCreationProgress,
   CreateAdInput,
   Product,
   UpdateAdInput,
@@ -106,6 +107,9 @@ export async function getAds(
       query = query.in("province_id", provinceIds);
     }
   }
+  if (filters.status) {
+    query = query.eq("status", filters.status);
+  }
 
   if (filters.sort === "price_asc") {
     query = query.order("price", { ascending: true, nullsFirst: false });
@@ -147,7 +151,10 @@ export async function getAdById(
   return data ? toProduct(data as unknown as AdQueryRow) : null;
 }
 
-export async function createAd(input: CreateAdInput): Promise<Product> {
+export async function createAd(
+  input: CreateAdInput,
+  onProgress?: (progress: AdCreationProgress) => void,
+): Promise<Product> {
   const client = createBrowserClient();
   const {
     data: { user },
@@ -161,6 +168,7 @@ export async function createAd(input: CreateAdInput): Promise<Product> {
     throw new Error("حداکثر سه تصویر قابل بارگذاری است.");
   }
 
+  onProgress?.({ stage: "creating", completed: 0, total: input.images.length });
   const { data: ad, error: insertError } = await client
     .from("ads")
     .insert({
@@ -181,32 +189,66 @@ export async function createAd(input: CreateAdInput): Promise<Product> {
 
   const uploadedPaths: string[] = [];
   try {
-    const imageRows = [];
-    for (let index = 0; index < input.images.length; index += 1) {
-      const image = input.images[index];
-      const extension = image.name.split(".").pop()?.toLowerCase() || "webp";
-      const storagePath = `${user.id}/${ad.id}/${crypto.randomUUID()}.${extension}`;
-      const { error: uploadError } = await client.storage
-        .from("ad-images")
-        .upload(storagePath, image, { contentType: image.type, upsert: false });
+    let completedUploads = 0;
+    onProgress?.({
+      stage: "uploading",
+      completed: completedUploads,
+      total: input.images.length,
+    });
+    const uploadResults = await Promise.allSettled(
+      input.images.map(async (image, index) => {
+        const extension = image.name.split(".").pop()?.toLowerCase() || "webp";
+        const storagePath = `${user.id}/${ad.id}/${crypto.randomUUID()}.${extension}`;
+        const { error: uploadError } = await client.storage
+          .from("ad-images")
+          .upload(storagePath, image, {
+            cacheControl: "31536000",
+            contentType: image.type,
+            upsert: false,
+          });
+        if (uploadError) throw uploadError;
 
-      if (uploadError) {
-        throw uploadError;
-      }
+        uploadedPaths.push(storagePath);
+        completedUploads += 1;
+        onProgress?.({
+          stage: "uploading",
+          completed: completedUploads,
+          total: input.images.length,
+        });
+        const { data: publicUrl } = client.storage
+          .from("ad-images")
+          .getPublicUrl(storagePath);
+        return {
+          ad_id: ad.id,
+          storage_path: storagePath,
+          url: publicUrl.publicUrl,
+          sort_order: index,
+        };
+      }),
+    );
+    const failedUpload = uploadResults.find(
+      (result): result is PromiseRejectedResult => result.status === "rejected",
+    );
+    if (failedUpload) throw failedUpload.reason;
 
-      uploadedPaths.push(storagePath);
-      const { data: publicUrl } = client.storage
-        .from("ad-images")
-        .getPublicUrl(storagePath);
-      imageRows.push({
-        ad_id: ad.id,
-        storage_path: storagePath,
-        url: publicUrl.publicUrl,
-        sort_order: index,
-      });
-    }
+    const imageRows = uploadResults.map(
+      (result) =>
+        (
+          result as PromiseFulfilledResult<{
+            ad_id: string;
+            storage_path: string;
+            url: string;
+            sort_order: number;
+          }>
+        ).value,
+    );
 
     if (imageRows.length) {
+      onProgress?.({
+        stage: "saving",
+        completed: input.images.length,
+        total: input.images.length,
+      });
       const { error: imageError } = await client
         .from("ad_images")
         .insert(imageRows);

@@ -1,10 +1,7 @@
 import "@mantine/core/styles.css";
+import "@mantine/tiptap/styles.css";
 import React from "react";
-import {
-  MantineProvider,
-  ColorSchemeScript,
-  DirectionProvider,
-} from "@mantine/core";
+import { MantineProvider, DirectionProvider } from "@mantine/core";
 import { theme } from "../theme";
 import localFont from "next/font/local";
 import "@mantine/notifications/styles.css";
@@ -16,6 +13,8 @@ import NextTopLoader from "nextjs-toploader";
 import "./global.css";
 import { Notifications } from "@mantine/notifications";
 import { getCurrentUser } from "./_lib/supabase/auth";
+import LoginSuccessNotification from "./_components/auth/LoginSuccessNotification";
+import AppChrome from "./_components/shared/AppChrome";
 
 const iranyekan = localFont({
   src: [
@@ -47,6 +46,14 @@ export default async function RootLayout({
   modal: React.ReactNode;
 }) {
   const user = await getCurrentUser();
+  const userMetadata = user?.user_metadata as
+    | { display_name?: string; full_name?: string; name?: string }
+    | undefined;
+  const userLabel =
+    userMetadata?.display_name ||
+    userMetadata?.full_name ||
+    userMetadata?.name ||
+    user?.email?.split("@")[0];
 
   return (
     <html
@@ -54,10 +61,10 @@ export default async function RootLayout({
       dir="rtl"
       lang="fa"
       className={iranyekan.variable}
+      data-mantine-color-scheme="light"
       suppressHydrationWarning
     >
       <head>
-        <ColorSchemeScript />
         <link rel="shortcut icon" href="/favicon.ico" />
         <meta
           name="viewport"
@@ -68,13 +75,18 @@ export default async function RootLayout({
         <NextTopLoader showSpinner={false} height={5} color="#87A10C" />
 
         <DirectionProvider>
-          <MantineProvider theme={theme}>
+          <MantineProvider defaultColorScheme="light" theme={theme}>
             <ReduxProviders>
               <Notifications />
-              <Header isAuthenticated={Boolean(user)} />
+              <LoginSuccessNotification />
+              <AppChrome>
+                <Header isAuthenticated={Boolean(user)} userLabel={userLabel} />
+              </AppChrome>
               {children}
               {modal}
-              <Footer />
+              <AppChrome>
+                <Footer />
+              </AppChrome>
             </ReduxProviders>
           </MantineProvider>
         </DirectionProvider>

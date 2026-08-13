@@ -29,6 +29,15 @@ interface LoginModalProps {
   style?: React.CSSProperties;
 }
 
+interface LoginFormValues {
+  code: string;
+  displayName: string;
+  email: string;
+  password: string;
+  passwordConfirmation: string;
+  phone: string;
+}
+
 function toE164(phone: string): string {
   const localNumber = phone.startsWith("0") ? phone.slice(1) : phone;
   return `+98${localNumber}`;
@@ -41,13 +50,23 @@ export default function LoginModal({
   setIsModalOpen,
   style,
 }: LoginModalProps) {
+  const phoneAuthEnabled = process.env.NEXT_PUBLIC_ENABLE_PHONE_AUTH === "true";
+  const [authMethod, setAuthMethod] = useState<"email" | "phone">("email");
   const [mode, setMode] = useState<"login" | "register">("login");
   const [otpSent, setOtpSent] = useState(false);
+  const [confirmationSent, setConfirmationSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { colorScheme } = useMantineColorScheme();
-  const form = useForm({
-    initialValues: { displayName: "", phone: "", code: "" },
+  const form = useForm<LoginFormValues>({
+    initialValues: {
+      displayName: "",
+      email: "",
+      password: "",
+      passwordConfirmation: "",
+      phone: "",
+      code: "",
+    },
     validate: {
       displayName: (value: string) =>
         mode === "register" &&
@@ -55,11 +74,112 @@ export default function LoginModal({
           ? "نام باید بین ۲ تا ۸۰ نویسه باشد"
           : null,
       phone: (value: string) =>
-        /^0?9\d{9}$/.test(value) ? null : "شماره موبایل معتبر وارد کنید",
+        authMethod === "phone" && !/^0?9\d{9}$/.test(value)
+          ? "شماره موبایل معتبر وارد کنید"
+          : null,
       code: (value: string) =>
-        otpSent && !/^\d{6}$/.test(value) ? "کد تایید باید ۶ رقم باشد" : null,
+        authMethod === "phone" && otpSent && !/^\d{6}$/.test(value)
+          ? "کد تایید باید ۶ رقم باشد"
+          : null,
+      email: (value: string) =>
+        authMethod === "email" && !/^\S+@\S+\.\S+$/.test(value.trim())
+          ? "ایمیل معتبر وارد کنید"
+          : null,
+      password: (value: string) =>
+        authMethod === "email" && value.length < 8
+          ? "رمز عبور باید حداقل ۸ نویسه باشد"
+          : null,
+      passwordConfirmation: (value: string, values: LoginFormValues) =>
+        authMethod === "email" &&
+        mode === "register" &&
+        value !== values.password
+          ? "تکرار رمز عبور مطابقت ندارد"
+          : null,
     },
   });
+
+  const getNextPath = (): string => {
+    const next = new URLSearchParams(window.location.search).get("next");
+    return next?.startsWith("/") &&
+      !next.startsWith("//") &&
+      !next.includes("\\")
+      ? next
+      : "/profile";
+  };
+
+  const finishLogin = () => {
+    onLoginSuccess?.();
+    setIsModalOpen?.(false);
+    close();
+    router.refresh();
+    const destination = new URL(getNextPath(), window.location.origin);
+    destination.searchParams.set("login", "success");
+    router.replace(`${destination.pathname}${destination.search}`);
+  };
+
+  const handleEmailAuth = async () => {
+    const validation = form.validate();
+    if (validation.hasErrors) return;
+
+    setLoading(true);
+    setConfirmationSent(false);
+    try {
+      const supabase = createClient();
+      if (mode === "register") {
+        const callbackUrl = new URL("/auth/confirm", window.location.origin);
+        callbackUrl.searchParams.set("next", getNextPath());
+        const { data, error } = await supabase.auth.signUp({
+          email: form.values.email.trim(),
+          password: form.values.password,
+          options: {
+            emailRedirectTo: callbackUrl.toString(),
+            data: { display_name: form.values.displayName.trim() },
+          },
+        });
+        if (error) throw error;
+        if (!data.session) {
+          setConfirmationSent(true);
+          return;
+        }
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: form.values.email.trim(),
+          password: form.values.password,
+        });
+        if (error) throw error;
+      }
+      finishLogin();
+    } catch {
+      notifications.show({
+        color: "red",
+        message:
+          mode === "register"
+            ? "ثبت نام ناموفق بود. ممکن است این ایمیل قبلاً ثبت شده باشد."
+            : "ایمیل یا رمز عبور صحیح نیست.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    setLoading(true);
+    try {
+      const callbackUrl = new URL("/auth/confirm", window.location.origin);
+      callbackUrl.searchParams.set("next", getNextPath());
+      const { error } = await createClient().auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: callbackUrl.toString() },
+      });
+      if (error) throw error;
+    } catch {
+      setLoading(false);
+      notifications.show({
+        color: "red",
+        message: "ورود با گوگل ناموفق بود.",
+      });
+    }
+  };
 
   const sendOtp = async () => {
     const validation = form.validate();
@@ -112,21 +232,7 @@ export default function LoginModal({
       });
       if (error) throw error;
 
-      notifications.show({ color: "green", message: "با موفقیت وارد شدید." });
-      onLoginSuccess?.();
-      setIsModalOpen?.(false);
-      close();
-      router.refresh();
-      const next = new URLSearchParams(window.location.search).get("next");
-      if (
-        next?.startsWith("/") &&
-        !next.startsWith("//") &&
-        !next.includes("\\")
-      ) {
-        router.replace(next);
-      } else if (window.location.pathname === "/login") {
-        router.replace("/profile");
-      }
+      finishLogin();
     } catch {
       notifications.show({
         color: "red",
@@ -160,7 +266,107 @@ export default function LoginModal({
           <Text fz="xs">لطفاً برای ثبت آگهی ابتدا وارد سایت شوید</Text>
         </Alert>
       )}
-      {!otpSent ? (
+      {phoneAuthEnabled && (
+        <SegmentedControl
+          fullWidth
+          mb="md"
+          value={authMethod}
+          onChange={(value) => {
+            setAuthMethod(value as "email" | "phone");
+            setOtpSent(false);
+            setConfirmationSent(false);
+            form.clearErrors();
+          }}
+          data={[
+            { label: "ایمیل", value: "email" },
+            { label: "شماره موبایل", value: "phone" },
+          ]}
+        />
+      )}
+      {authMethod === "email" ? (
+        <>
+          <SegmentedControl
+            fullWidth
+            mb="lg"
+            value={mode}
+            onChange={(value) => {
+              setMode(value as "login" | "register");
+              setConfirmationSent(false);
+              form.clearErrors();
+            }}
+            data={[
+              { label: "ورود", value: "login" },
+              { label: "ثبت نام", value: "register" },
+            ]}
+          />
+          {confirmationSent ? (
+            <Alert mb="md" color="green" variant="light">
+              لینک تایید به ایمیل شما ارسال شد. پس از تایید ایمیل می‌توانید وارد
+              شوید.
+            </Alert>
+          ) : (
+            <form onSubmit={form.onSubmit(handleEmailAuth)}>
+              {mode === "register" && (
+                <TextInput
+                  mb="md"
+                  label="نام نمایشی"
+                  autoComplete="name"
+                  {...form.getInputProps("displayName")}
+                />
+              )}
+              <TextInput
+                mb="md"
+                label="ایمیل"
+                type="email"
+                autoComplete="email"
+                {...form.getInputProps("email")}
+              />
+              <TextInput
+                mb="md"
+                label="رمز عبور"
+                type="password"
+                autoComplete={
+                  mode === "register" ? "new-password" : "current-password"
+                }
+                {...form.getInputProps("password")}
+              />
+              {mode === "register" && (
+                <TextInput
+                  mb="lg"
+                  label="تکرار رمز عبور"
+                  type="password"
+                  autoComplete="new-password"
+                  {...form.getInputProps("passwordConfirmation")}
+                />
+              )}
+              <Button
+                loading={loading}
+                disabled={loading}
+                fullWidth
+                type="submit"
+              >
+                {mode === "register" ? "ثبت نام" : "ورود"}
+              </Button>
+            </form>
+          )}
+          <Flex align="center" gap="sm" my="md">
+            <Box h={1} bg="gray.3" style={{ flex: 1 }} />
+            <Text c="dimmed" fz="xs">
+              یا
+            </Text>
+            <Box h={1} bg="gray.3" style={{ flex: 1 }} />
+          </Flex>
+          <Button
+            variant="default"
+            loading={loading}
+            disabled={loading}
+            fullWidth
+            onClick={signInWithGoogle}
+          >
+            ورود با گوگل
+          </Button>
+        </>
+      ) : !otpSent ? (
         <>
           <SegmentedControl
             fullWidth

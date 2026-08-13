@@ -13,6 +13,8 @@ export type AdStatus =
   | "archived"
   | "rejected";
 
+export type ArticleStatus = "draft" | "published" | "archived";
+
 export interface Database {
   public: {
     Tables: {
@@ -135,6 +137,156 @@ export interface Database {
           },
         ];
       };
+      conversations: {
+        Row: {
+          ad_id: string;
+          buyer_id: string;
+          created_at: string;
+          id: string;
+          seller_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          ad_id: string;
+          buyer_id: string;
+          created_at?: string;
+          id?: string;
+          seller_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          ad_id?: string;
+          buyer_id?: string;
+          created_at?: string;
+          id?: string;
+          seller_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "conversations_ad_id_fkey";
+            columns: ["ad_id"];
+            isOneToOne: false;
+            referencedRelation: "ads";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "conversations_buyer_id_fkey";
+            columns: ["buyer_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "conversations_seller_id_fkey";
+            columns: ["seller_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      articles: {
+        Row: {
+          author_id: string;
+          category_name: string;
+          category_slug: string;
+          content: string;
+          created_at: string;
+          excerpt: string;
+          featured_image_path: string | null;
+          featured_image_url: string | null;
+          id: string;
+          published_at: string | null;
+          slug: string;
+          status: ArticleStatus;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          author_id: string;
+          category_name: string;
+          category_slug: string;
+          content: string;
+          created_at?: string;
+          excerpt: string;
+          featured_image_path?: string | null;
+          featured_image_url?: string | null;
+          id?: string;
+          published_at?: string | null;
+          slug: string;
+          status?: ArticleStatus;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          author_id?: string;
+          category_name?: string;
+          category_slug?: string;
+          content?: string;
+          created_at?: string;
+          excerpt?: string;
+          featured_image_path?: string | null;
+          featured_image_url?: string | null;
+          id?: string;
+          published_at?: string | null;
+          slug?: string;
+          status?: ArticleStatus;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "articles_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      messages: {
+        Row: {
+          content: string;
+          conversation_id: string;
+          created_at: string;
+          id: number;
+          read_at: string | null;
+          sender_id: string;
+        };
+        Insert: {
+          content: string;
+          conversation_id: string;
+          created_at?: string;
+          id?: never;
+          read_at?: string | null;
+          sender_id: string;
+        };
+        Update: {
+          content?: string;
+          conversation_id?: string;
+          created_at?: string;
+          id?: never;
+          read_at?: string | null;
+          sender_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey";
+            columns: ["conversation_id"];
+            isOneToOne: false;
+            referencedRelation: "conversations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey";
+            columns: ["sender_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       profiles: {
         Row: {
           avatar_url: string | null;
@@ -164,9 +316,23 @@ export interface Database {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      get_or_create_conversation: {
+        Args: { ad_uuid: string };
+        Returns: string;
+      };
+      is_conversation_participant: {
+        Args: { conversation_uuid: string };
+        Returns: boolean;
+      };
+      mark_conversation_read: {
+        Args: { conversation_uuid: string };
+        Returns: undefined;
+      };
+    };
     Enums: {
       ad_status: AdStatus;
+      article_status: ArticleStatus;
     };
     CompositeTypes: Record<string, never>;
   };

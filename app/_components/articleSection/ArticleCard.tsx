@@ -18,6 +18,7 @@ import { usePathname } from "next/navigation";
 
 export function ArticleCard({ post }: { post: postsMO }) {
   const theme = useMantineTheme();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "";
 
   const gregorianDate = new Date(post.date);
   const options: Intl.DateTimeFormatOptions = {
@@ -33,8 +34,9 @@ export function ArticleCard({ post }: { post: postsMO }) {
       <Link href={`/blog/${post.slug}`}>
         <Card.Section mt={"0"} mb="sm">
           <Image
-            // src={post?._embedded['wp:featuredmedia'][0].link}
-            src={"/no-product.png"}
+            src={
+              post._embedded["wp:featuredmedia"][0]?.link || "/no-product.png"
+            }
             alt={post.slug}
             height={180}
           />
@@ -50,7 +52,7 @@ export function ArticleCard({ post }: { post: postsMO }) {
       </Link>
       <Card.Section className={classes.footer}>
         <Group align="center" justify="space-between" gap={0}>
-          <CopyButton value={`https://kiwipart.ir/blog/${post.slug}`}>
+          <CopyButton value={`${siteUrl}/blog/${post.slug}`}>
             {({ copied, copy }) => (
               <>
                 <ActionIcon

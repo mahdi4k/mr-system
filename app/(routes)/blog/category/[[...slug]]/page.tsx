@@ -1,42 +1,45 @@
-import React from "react";
-import { postsMO } from "@/_components/articleSection/ArticleSection";
+import type { postsMO } from "../../../../_components/articleSection/ArticleSection";
+import { getPublishedArticles } from "../../../../_features/articles/data";
+import { createClient } from "../../../../_lib/supabase/server";
 import PageClient from "./page.client";
-import { mockBlogPosts, mockBlogCategories } from "@/_redux/services/mockData";
 
-export type categoriesMO = {
+export interface categoriesMO {
   id: string;
-  slug: string;
   name: string;
-};
+  slug: string;
+}
 
 export async function generateMetadata() {
-  return {
-    title: `ریگورا - مقالات`,
-  };
-}
-async function getPosts(slug: string, categories: categoriesMO[]) {
-  const category = categories.find((c) => c.slug === slug);
-
-  if (category) {
-    return mockBlogPosts;
-  }
-
-  return mockBlogPosts;
+  return { title: "مقالات ریگورا" };
 }
 
-async function getCategories() {
-  return mockBlogCategories;
-}
-
-const Page = async (props: { params: Promise<{ slug?: string[] }> }) => {
+export default async function Page(props: {
+  params: Promise<{ slug?: string[] }>;
+}) {
   const params = await props.params;
-  const categories: categoriesMO[] = await getCategories();
-  const posts: postsMO[] = await getPosts(
-    params.slug ? params.slug[0] : "",
-    categories,
+  const category = params.slug?.[0];
+  const supabase = await createClient();
+  const [posts, categoryRows] = await Promise.all([
+    getPublishedArticles(supabase, { category, limit: 50 }),
+    supabase
+      .from("articles")
+      .select("category_name, category_slug")
+      .eq("status", "published")
+      .order("category_name"),
+  ]);
+  if (categoryRows.error) throw new Error(categoryRows.error.message);
+
+  const categories: categoriesMO[] = Array.from(
+    new Map(
+      (categoryRows.data ?? []).map((item) => [
+        item.category_slug,
+        {
+          id: item.category_slug,
+          slug: item.category_slug,
+          name: item.category_name,
+        },
+      ]),
+    ).values(),
   );
-
-  return <PageClient posts={posts} categories={categories} />;
-};
-
-export default Page;
+  return <PageClient posts={posts as postsMO[]} categories={categories} />;
+}

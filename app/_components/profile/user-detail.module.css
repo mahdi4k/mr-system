@@ -1,0 +1,25 @@
+.wrapper {
+  overflow: visible;
+  background:
+    radial-gradient(
+      circle at top left,
+      light-dark(rgba(160, 187, 95, 0.12), rgba(160, 187, 95, 0.06)),
+      transparent 38%
+    ),
+    light-dark(var(--mantine-color-white), var(--mantine-color-dark-7));
+}
+
+.detailCard {
+  background-color: light-dark(
+    rgba(255, 255, 255, 0.72),
+    rgba(37, 38, 43, 0.72)
+  );
+  transition:
+    border-color 150ms ease,
+    transform 150ms ease;
+}
+
+.detailCard:hover {
+  border-color: var(--mantine-primary-color-light-color);
+  transform: translateY(-1px);
+}

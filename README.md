@@ -7,7 +7,7 @@ Rigora is a Next.js PC hardware platform for browsing parts, building systems, r
 - Next.js 16 App Router with TypeScript
 - React 18 and Mantine 7
 - Redux Toolkit and RTK Query
-- Supabase Auth, PostgreSQL, Storage, and Row Level Security
+- Supabase email/password and Google Auth, PostgreSQL, Storage, and Row Level Security
 - Jest and React Testing Library
 
 ## Local Setup
@@ -26,6 +26,7 @@ Set these values in `.env.local`:
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_ENABLE_PHONE_AUTH=false
 ```
 
 `NEXT_PUBLIC_WORDPRESS_API` is optional and is retained only for the existing blog comment feature. Never place a Supabase service-role key, database password, or other private credential in a `NEXT_PUBLIC_*` variable.
@@ -34,12 +35,14 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 1. Create a Supabase project.
 2. Open **Project Settings > API** and copy the Project URL and Publishable key into `.env.local`.
-3. Open **SQL Editor**, paste the complete contents of `supabase/migrations/20260809000000_initial_rigora.sql`, and run it once.
+3. Open **SQL Editor** and run the migrations in filename order. Existing projects should apply each newer migration once. Run `supabase/migrations/20260812020000_articles.sql` to add dashboard article management and the `article-images` bucket.
 4. Open **Authentication > URL Configuration**.
 5. Set the Site URL to `http://localhost:3000` for local development.
 6. Add `http://localhost:3000/auth/confirm` and the equivalent production URL to Redirect URLs.
-7. In **Authentication > Providers > Phone**, enable phone authentication and configure a supported SMS provider. Rigora uses Supabase phone OTP and does not store passwords or OTP codes.
-8. Restart Next.js after changing environment variables.
+7. In **Authentication > Providers > Email**, enable email/password authentication and keep email confirmation enabled.
+8. In Google Cloud, create an OAuth web client with `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback` as an authorized redirect URI. Enable Google in **Authentication > Providers > Google** using that client ID and secret.
+9. Phone OTP is retained but hidden by default. After configuring an SMS provider or Send SMS Hook, set `NEXT_PUBLIC_ENABLE_PHONE_AUTH=true` to reveal it.
+10. Restart Next.js after changing environment variables.
 
 To grant dashboard moderation access, set a trusted user's Auth `app_metadata.role` to `admin` from the Supabase Dashboard, then have that user sign out and back in to refresh the JWT. Users cannot edit `app_metadata` through the Rigora client. Normal marketplace users do not need this role.
 
@@ -47,9 +50,19 @@ The migration creates `profiles`, `ad_categories`, `ads`, `ad_images`, the publi
 
 ## Auth And Ads
 
-The browser and server clients live under `app/_lib/supabase`. `proxy.ts` refreshes auth cookies and redirects unauthenticated requests from protected routes. Supabase Auth is the only user session source; tokens are not manually stored in Redux or local storage.
+The browser and server clients live under `app/_lib/supabase`. `proxy.ts` refreshes auth cookies and redirects unauthenticated requests from protected routes. Supabase Auth is the only user session source; tokens are not manually stored in Redux or local storage. Users sign in with email/password or Google, while the profile display name acts as their public username. Contact phone numbers are optional and are not login credentials.
 
 Public queries return published ads. Authenticated owners can create, read, update, and delete their own ads. New ads begin as pending, and only users with trusted `app_metadata.role = admin` can publish or reject them. Ownership is derived from `supabase.auth.getUser()` and enforced again by PostgreSQL RLS. Images are stored in Supabase Storage and represented by ordered URL records in `ad_images`.
+
+## Chat
+
+Chat uses the existing Supabase project and does not require a separate Socket.IO server. The chat migration creates `conversations` and `messages`, participant-only RLS policies, a secure get-or-create conversation function, read receipts, indexes, and the Realtime publication entry for persisted messages.
+
+Only a signed-in buyer can start a conversation on a published ad. The database derives the seller from the ad, prevents conversations on the buyer's own ad, and reuses an existing conversation for the same buyer and ad. Only the buyer and seller can read that conversation or send messages. The initial UI loads the latest 30 messages and subscribes to new inserts through Supabase Realtime.
+
+## Articles
+
+Administrators can create drafts or publish articles from `/dashboard/articles`. Article writes and featured-image uploads are restricted by RLS and Storage policies to users with `app_metadata.role = admin`. Public blog pages read only published articles. Article content is stored as plain text and converted to escaped paragraphs for public rendering, preventing stored HTML injection.
 
 ## Checks
 

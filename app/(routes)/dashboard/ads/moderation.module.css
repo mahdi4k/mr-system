@@ -1,0 +1,33 @@
+.statusControl {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.card {
+  overflow: hidden;
+}
+
+.imageSection {
+  position: relative;
+  height: rem(185px);
+  overflow: hidden;
+  background-color: light-dark(
+    var(--mantine-color-gray-0),
+    var(--mantine-color-dark-6)
+  );
+}
+
+.statusBadge {
+  position: absolute;
+  top: var(--mantine-spacing-sm);
+  right: var(--mantine-spacing-sm);
+}
+
+.emptyState {
+  display: flex;
+  min-height: rem(300px);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--mantine-color-dimmed);
+}

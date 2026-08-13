@@ -22,18 +22,16 @@ import { IconCircleDotFilled } from "@tabler/icons-react";
 import { ObjectIsEmpty } from "@/_utils/utils";
 import { postsMO } from "@/_components/articleSection/ArticleSection";
 import { ArticleCard } from "@/_components/articleSection/ArticleCard";
-import { mockBlogPosts, mockBlogCategories } from "@/_redux/services/mockData";
 
-type Icategory = {
-  id: string;
-  slug: string;
-};
-const PageClient: React.FC<PiecesProps> = ({ params }) => {
+interface PageClientProps extends PiecesProps {
+  relatedArticles: postsMO[];
+}
+
+const PageClient: React.FC<PageClientProps> = ({ params, relatedArticles }) => {
   const firstPiece = usePiecePc(params.slug[0]);
   const secondPiece = usePiecePc(params.slug[1]);
   const loadingEnd = useLoading();
   const [isPartSelected, setIsPartSelected] = useState<boolean>(false);
-  const [posts, setPosts] = useState<postsMO[]>([]);
 
   useEffect(() => {
     if (secondPiece.props.activeCpu && firstPiece.props.activeMotherboard) {
@@ -55,19 +53,6 @@ const PageClient: React.FC<PiecesProps> = ({ params }) => {
       );
     }
   }, [secondPiece.props, firstPiece.props]);
-
-  useEffect(() => {
-    const categories = mockBlogCategories;
-    const filteredCategories = categories.filter(
-      (item: Icategory) =>
-        item.slug === params.slug[0] || item.slug === params.slug[1],
-    );
-    fetchPostsByCategories(filteredCategories);
-  }, []);
-
-  const fetchPostsByCategories = (categoryIds: Icategory[]) => {
-    setPosts(mockBlogPosts);
-  };
 
   return (
     <>
@@ -108,15 +93,16 @@ const PageClient: React.FC<PiecesProps> = ({ params }) => {
         </Group>
       </Container>
 
-      {!ObjectIsEmpty(secondPiece.props.activeCpu) &&
+      {relatedArticles.length > 0 &&
+      !ObjectIsEmpty(secondPiece.props.activeCpu) &&
       !ObjectIsEmpty(firstPiece.props.activeMotherboard) ? (
         <Container w={"100%"} mt={"50px"} mb={"80px"} size="990px">
           <Text mb={"lg"} fw={"bolder"} fz={"1.5rem"}>
             مقالات مرتبط
           </Text>
           <Grid gutter="xl">
-            {posts.map((post) => (
-              <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+            {relatedArticles.map((post) => (
+              <Grid.Col key={post.id} span={{ base: 12, md: 6, lg: 4 }}>
                 <ArticleCard post={post} />
               </Grid.Col>
             ))}
@@ -126,15 +112,16 @@ const PageClient: React.FC<PiecesProps> = ({ params }) => {
         ""
       )}
 
-      {!ObjectIsEmpty(secondPiece.props.activeCpu) &&
+      {relatedArticles.length > 0 &&
+      !ObjectIsEmpty(secondPiece.props.activeCpu) &&
       !ObjectIsEmpty(firstPiece.props.activeGraphic) ? (
         <Container w={"100%"} mt={"50px"} mb={"80px"} size="990px">
           <Text mb={"lg"} fw={"bolder"} fz={"1.5rem"}>
             مقالات مرتبط
           </Text>
           <Grid gutter="xl">
-            {posts.map((post) => (
-              <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+            {relatedArticles.map((post) => (
+              <Grid.Col key={post.id} span={{ base: 12, md: 6, lg: 4 }}>
                 <ArticleCard post={post} />
               </Grid.Col>
             ))}
@@ -144,15 +131,16 @@ const PageClient: React.FC<PiecesProps> = ({ params }) => {
         ""
       )}
 
-      {!ObjectIsEmpty(secondPiece.props.activePower) &&
+      {relatedArticles.length > 0 &&
+      !ObjectIsEmpty(secondPiece.props.activePower) &&
       !ObjectIsEmpty(firstPiece.props.activeGraphic) ? (
         <Container w={"100%"} mt={"50px"} mb={"80px"} size="990px">
           <Text mb={"lg"} fw={"bolder"} fz={"1.5rem"}>
             مقالات مرتبط
           </Text>
           <Grid gutter="xl">
-            {posts.map((post) => (
-              <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+            {relatedArticles.map((post) => (
+              <Grid.Col key={post.id} span={{ base: 12, md: 6, lg: 4 }}>
                 <ArticleCard post={post} />
               </Grid.Col>
             ))}

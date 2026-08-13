@@ -1,0 +1,44 @@
+.editor {
+  &[data-invalid="true"],
+  &[aria-invalid="true"] {
+    border-color: var(--mantine-color-error);
+  }
+
+  :global(.mantine-RichTextEditor-toolbar) {
+    flex-wrap: wrap;
+    gap: var(--mantine-spacing-xs);
+  }
+
+  :global(.mantine-RichTextEditor-content) {
+    direction: rtl;
+    min-height: 320px;
+  }
+
+  :global(.ProseMirror) {
+    min-height: 320px;
+    padding: var(--mantine-spacing-md);
+  }
+
+  :global(.ProseMirror p.is-editor-empty:first-child::before) {
+    color: var(--mantine-color-dimmed);
+    content: attr(data-placeholder);
+    float: right;
+    height: 0;
+    pointer-events: none;
+  }
+}
+
+.error {
+  color: var(--mantine-color-error);
+  font-size: var(--mantine-font-size-xs);
+  margin-top: 5px;
+}
+
+@media (max-width: $mantine-breakpoint-sm) {
+  .editor {
+    :global(.mantine-RichTextEditor-control) {
+      min-height: 34px;
+      min-width: 34px;
+    }
+  }
+}

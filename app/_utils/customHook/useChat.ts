@@ -1,95 +1,41 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 
-export const useChat = (userId: string | undefined) => {
-  const [conversations, setConversations] = useState<any[]>([]);
-  const [selectedConversation, setSelectedConversation] = useState<any>(null);
-  const [messages, setMessages] = useState<any[]>([]);
-  const [message, setMessage] = useState("");
+import { notifications } from "@mantine/notifications";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+interface CreateConversationResponse {
+  id?: string;
+  message?: string;
+}
+
+export const useChat = () => {
+  const [creatingConversation, setCreatingConversation] = useState(false);
   const router = useRouter();
 
-  const currentUser = { id: userId };
-
-  // Fetch conversations
-  useEffect(() => {
-    fetch("/api/conversations").then((res) => console.log(res));
-    // .then(setConversations);
-  }, []);
-
-  // Fetch messages when conversation is selected
-  useEffect(() => {
-    if (selectedConversation) {
-      fetch(`/api/conversations/${selectedConversation.id}/messages`)
-        .then((res) => res.json())
-        .then(setMessages);
-    }
-  }, [selectedConversation]);
-
-  const createConversation = async (adId: string) => {
+  const createConversation = async (adId: string): Promise<void> => {
+    setCreatingConversation(true);
     try {
       const response = await fetch("/api/conversations", {
         method: "POST",
         body: JSON.stringify({ adId }),
         headers: { "Content-Type": "application/json" },
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Failed to create conversation:", errorData);
-        throw new Error(errorData.message || "Failed to create conversation");
+      const data = (await response.json()) as CreateConversationResponse;
+      if (!response.ok || !data.id) {
+        throw new Error(data.message || "ایجاد گفت‌وگو ناموفق بود.");
       }
-
-      const newConversation = await response.json();
-      router.push(`/chat?conversationId=${newConversation.id}`);
-      setConversations((prev) => [...prev, newConversation]);
-      setSelectedConversation(newConversation);
+      router.push(`/chat?conversationId=${data.id}`);
     } catch (error) {
-      console.error("Error creating conversation:", error);
-      alert("Failed to create a conversation. Please try again later.");
+      notifications.show({
+        color: "red",
+        message:
+          error instanceof Error ? error.message : "ایجاد گفت‌وگو ناموفق بود.",
+      });
+    } finally {
+      setCreatingConversation(false);
     }
   };
 
-  const sendMessage = async () => {
-    if (!message.trim() || !selectedConversation) return;
-    console.log(currentUser.id, "currentUser.id");
-
-    // Optimistic update
-    const newMessage = {
-      id: Date.now(),
-      content: message,
-      senderId: currentUser.id,
-      createdAt: new Date().toISOString(),
-    };
-
-    setMessages((prev) => [...prev, newMessage]);
-    setMessage("");
-
-    // Save to backend
-    await fetch("/api/messages", {
-      method: "POST",
-      body: JSON.stringify({
-        content: message,
-        conversationId: selectedConversation.id,
-      }),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    // Refresh messages
-    const updatedMessages = await fetch(
-      `/api/messages?conversationId=${selectedConversation.id}`,
-    ).then((res) => res.json());
-    setMessages(updatedMessages);
-  };
-
-  return {
-    conversations,
-    selectedConversation,
-    messages,
-    message,
-    setMessage,
-    createConversation,
-    selectConversation: setSelectedConversation,
-    sendMessage,
-  };
+  return { createConversation, creatingConversation };
 };

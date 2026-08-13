@@ -1,33 +1,24 @@
+import { createClient } from "../../_lib/supabase/server";
 import PageClient from "./page.client";
-import { postsMO } from "@/_components/articleSection/ArticleSection";
-import { mockAdCategories } from "@/_redux/services/mockData";
-import { Suspense } from "react";
-import { Loader } from "@mantine/core";
 
-export interface CategoryProdcut {
+export interface AdsCategory {
+  icon: string;
   id: number;
-  value: string;
   name: string;
+  value: string;
 }
 
 export async function generateMetadata() {
-  return {
-    title: "آگهی قطعات",
-  };
+  return { title: "آگهی قطعات" };
 }
 
-async function getData() {
-  return mockAdCategories;
+export default async function Page() {
+  const supabase = await createClient();
+  const { data: categories } = await supabase
+    .from("ad_categories")
+    .select("id, value, name, icon")
+    .eq("is_active", true)
+    .order("sort_order");
+
+  return <PageClient categories={categories ?? []} />;
 }
-
-const Page = async () => {
-  const categories: CategoryProdcut[] = await getData();
-
-  return (
-    <Suspense fallback={<Loader color="green" m="xl" />}>
-      <PageClient categories={categories} />
-    </Suspense>
-  );
-};
-
-export default Page;
