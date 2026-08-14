@@ -10,19 +10,23 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const withPWA = withPWAInit({
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
-  reloadOnOnline: true,
+  cacheOnFrontEndNav: false,
+  aggressiveFrontEndNavCaching: false,
+  cacheStartUrl: false,
+  dynamicStartUrl: false,
+  reloadOnOnline: false,
   dest: "public",
-  fallbacks: {
-    //image: "/static/images/fallback.png",
-    document: "/offline", // if you want to fallback to a custom page rather than /_offline
-    // font: '/static/font/fallback.woff2',
-    // audio: ...,
-    // video: ...,
-  },
+  publicExcludes: [
+    "!sw.js",
+    "!workbox-*.js",
+    "!worker-*.js",
+    "!fallback-*.js",
+    "!swe-worker-*.js",
+  ],
   workboxOptions: {
     disableDevLogs: true,
+    // Next.js build assets remain precached, but all application data stays online-only.
+    runtimeCaching: [],
   },
 });
 

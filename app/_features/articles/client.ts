@@ -1,6 +1,7 @@
 import imageCompression from "browser-image-compression";
 import { createClient } from "../../_lib/supabase/client";
-import type { ArticleInput } from "./types";
+import { getArticleImageUpdate } from "./imageUpdate";
+import type { ArticleInput, UpdateArticleInput } from "./types";
 
 async function prepareFeaturedImage(file: File): Promise<File> {
   if (file.size <= 600 * 1024 && file.type === "image/webp") return file;
@@ -62,4 +63,69 @@ export async function createArticle(input: ArticleInput): Promise<string> {
     }
     throw error;
   }
+}
+
+export async function updateArticle(
+  id: string,
+  input: UpdateArticleInput,
+): Promise<{ imageCleanupFailed: boolean }> {
+  const supabase = createClient();
+  const { data: userData, error: authError } = await supabase.auth.getUser();
+  if (authError || !userData.user) throw new Error("نشست مدیریتی معتبر نیست.");
+
+  let newImagePath: string | null = null;
+  let newImageUrl: string | null = null;
+  try {
+    if (input.featuredImage) {
+      const image = await prepareFeaturedImage(input.featuredImage);
+      newImagePath = `${userData.user.id}/${crypto.randomUUID()}.webp`;
+      const { error: uploadError } = await supabase.storage
+        .from("article-images")
+        .upload(newImagePath, image, {
+          cacheControl: "31536000",
+          contentType: image.type,
+        });
+      if (uploadError) throw uploadError;
+      newImageUrl = supabase.storage
+        .from("article-images")
+        .getPublicUrl(newImagePath).data.publicUrl;
+    }
+
+    const imageUpdate = getArticleImageUpdate(
+      newImagePath,
+      newImageUrl,
+      input.removeFeaturedImage,
+    );
+    const { error: updateError } = await supabase
+      .from("articles")
+      .update({
+        category_name: input.categoryName.trim(),
+        category_slug: input.categorySlug.trim(),
+        content: input.content.trim(),
+        excerpt: input.excerpt.trim(),
+        slug: input.slug.trim(),
+        status: input.status,
+        title: input.title.trim(),
+        ...imageUpdate,
+      })
+      .eq("id", id)
+      .select("id")
+      .single();
+    if (updateError) throw updateError;
+  } catch (error) {
+    if (newImagePath) {
+      await supabase.storage.from("article-images").remove([newImagePath]);
+    }
+    throw error;
+  }
+
+  const shouldRemoveOldImage =
+    input.currentFeaturedImagePath &&
+    (input.featuredImage || input.removeFeaturedImage);
+  if (!shouldRemoveOldImage) return { imageCleanupFailed: false };
+
+  const { error: cleanupError } = await supabase.storage
+    .from("article-images")
+    .remove([input.currentFeaturedImagePath!]);
+  return { imageCleanupFailed: Boolean(cleanupError) };
 }

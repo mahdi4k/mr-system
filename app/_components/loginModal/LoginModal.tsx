@@ -12,7 +12,6 @@ import {
   SegmentedControl,
   Text,
   TextInput,
-  useMantineColorScheme,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -57,7 +56,6 @@ export default function LoginModal({
   const [confirmationSent, setConfirmationSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { colorScheme } = useMantineColorScheme();
   const form = useForm<LoginFormValues>({
     initialValues: {
       displayName: "",
@@ -256,7 +254,7 @@ export default function LoginModal({
         <Image
           style={{ objectFit: "contain" }}
           alt="ریگورا"
-          src={colorScheme === "dark" ? "/logo-dark.png" : "/logo.png"}
+          src="/logo-dark.png"
           width={180}
           height={60}
         />

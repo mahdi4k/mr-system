@@ -90,6 +90,8 @@ export interface Database {
           price: number | null;
           province_id: number;
           status: AdStatus;
+          telegram_notification_claimed_at: string | null;
+          telegram_notified_at: string | null;
           title: string;
           updated_at: string;
           user_id: string;
@@ -103,6 +105,8 @@ export interface Database {
           price?: number | null;
           province_id: number;
           status?: AdStatus;
+          telegram_notification_claimed_at?: string | null;
+          telegram_notified_at?: string | null;
           title: string;
           updated_at?: string;
           user_id: string;
@@ -116,6 +120,8 @@ export interface Database {
           price?: number | null;
           province_id?: number;
           status?: AdStatus;
+          telegram_notification_claimed_at?: string | null;
+          telegram_notified_at?: string | null;
           title?: string;
           updated_at?: string;
           user_id?: string;
@@ -328,6 +334,19 @@ export interface Database {
       mark_conversation_read: {
         Args: { conversation_uuid: string };
         Returns: undefined;
+      };
+      update_owned_ad: {
+        Args: {
+          p_ad_id: string;
+          p_category_id: number;
+          p_city_id: number;
+          p_description: string;
+          p_images: Json | null;
+          p_price: number | null;
+          p_province_id: number;
+          p_title: string;
+        };
+        Returns: string[];
       };
     };
     Enums: {

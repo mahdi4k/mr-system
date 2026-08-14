@@ -1,7 +1,11 @@
 import "@mantine/core/styles.css";
 import "@mantine/tiptap/styles.css";
 import React from "react";
-import { MantineProvider, DirectionProvider } from "@mantine/core";
+import {
+  ColorSchemeScript,
+  DirectionProvider,
+  MantineProvider,
+} from "@mantine/core";
 import { theme } from "../theme";
 import localFont from "next/font/local";
 import "@mantine/notifications/styles.css";
@@ -61,10 +65,10 @@ export default async function RootLayout({
       dir="rtl"
       lang="fa"
       className={iranyekan.variable}
-      data-mantine-color-scheme="light"
       suppressHydrationWarning
     >
       <head>
+        <ColorSchemeScript defaultColorScheme="dark" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <meta
           name="viewport"
@@ -75,7 +79,7 @@ export default async function RootLayout({
         <NextTopLoader showSpinner={false} height={5} color="#87A10C" />
 
         <DirectionProvider>
-          <MantineProvider defaultColorScheme="light" theme={theme}>
+          <MantineProvider defaultColorScheme="dark" theme={theme}>
             <ReduxProviders>
               <Notifications />
               <LoginSuccessNotification />

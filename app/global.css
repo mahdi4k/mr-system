@@ -1,6 +1,5 @@
 :root[data-mantine-color-scheme="dark"] {
-  --mantine-color-body: #222831 !important
-;
+  --mantine-color-body: #222831 !important;
 }
 body,
 html h1,

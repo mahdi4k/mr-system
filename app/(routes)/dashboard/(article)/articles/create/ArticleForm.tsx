@@ -1,12 +1,18 @@
 "use client";
 
-import { createArticle } from "../../../../../_features/articles/client";
+import {
+  createArticle,
+  updateArticle,
+} from "../../../../../_features/articles/client";
+import type { ArticleEditRecord } from "../../../../../_features/articles/types";
 import type { ArticleStatus } from "../../../../../types/database.types";
 import {
   Alert,
   Button,
+  Checkbox,
   FileInput,
   Group,
+  Image,
   Paper,
   Select,
   SimpleGrid,
@@ -43,19 +49,24 @@ interface ArticleFormValues {
   title: string;
 }
 
-export default function ArticleForm() {
+interface ArticleFormProps {
+  article?: ArticleEditRecord;
+}
+
+export default function ArticleForm({ article }: ArticleFormProps) {
   const [loading, setLoading] = useState(false);
+  const [removeFeaturedImage, setRemoveFeaturedImage] = useState(false);
   const router = useRouter();
   const form = useForm<ArticleFormValues>({
     initialValues: {
-      title: "",
-      slug: "",
-      excerpt: "",
-      content: "",
-      categoryName: "",
-      categorySlug: "",
+      title: article?.title ?? "",
+      slug: article?.slug ?? "",
+      excerpt: article?.excerpt ?? "",
+      content: article?.content ?? "",
+      categoryName: article?.categoryName ?? "",
+      categorySlug: article?.categorySlug ?? "",
       featuredImage: null as File | null,
-      status: "draft" as ArticleStatus,
+      status: article?.status ?? ("draft" as ArticleStatus),
     },
     validate: {
       title: (value: string) =>
@@ -63,7 +74,7 @@ export default function ArticleForm() {
           ? null
           : "عنوان باید بین ۵ تا ۱۸۰ نویسه باشد.",
       slug: (value: string) =>
-        slugPattern.test(value)
+        value.length >= 3 && value.length <= 180 && slugPattern.test(value)
           ? null
           : "نامک فقط شامل حروف انگلیسی کوچک، عدد و خط تیره باشد.",
       excerpt: (value: string) =>
@@ -71,13 +82,17 @@ export default function ArticleForm() {
           ? null
           : "خلاصه باید بین ۲۰ تا ۵۰۰ نویسه باشد.",
       content: (value: string) =>
-        richTextLength(value) >= 50
+        richTextLength(value) >= 50 && value.trim().length <= 50000
           ? null
-          : "متن مقاله باید حداقل ۵۰ نویسه باشد.",
+          : "متن مقاله باید حداقل ۵۰ نویسه و حداکثر ۵۰٬۰۰۰ نویسه باشد.",
       categoryName: (value: string) =>
-        value.trim().length >= 2 ? null : "نام دسته‌بندی الزامی است.",
+        value.trim().length >= 2 && value.trim().length <= 80
+          ? null
+          : "نام دسته‌بندی باید بین ۲ تا ۸۰ نویسه باشد.",
       categorySlug: (value: string) =>
-        slugPattern.test(value) ? null : "نامک دسته‌بندی معتبر نیست.",
+        value.length >= 2 && value.length <= 80 && slugPattern.test(value)
+          ? null
+          : "نامک دسته‌بندی معتبر نیست.",
       featuredImage: (value: File | null) =>
         value && value.size > 5 * 1024 ** 2
           ? "حجم تصویر باید کمتر از ۵ مگابایت باشد."
@@ -88,13 +103,23 @@ export default function ArticleForm() {
   const submit = async (values: typeof form.values) => {
     setLoading(true);
     try {
-      await createArticle(values);
+      const result = article
+        ? await updateArticle(article.id, {
+            ...values,
+            currentFeaturedImagePath: article.featuredImagePath,
+            removeFeaturedImage,
+          })
+        : null;
+      if (!article) await createArticle(values);
       notifications.show({
-        color: "green",
-        message:
-          values.status === "published"
-            ? "مقاله منتشر شد."
-            : "پیش‌نویس ذخیره شد.",
+        color: result?.imageCleanupFailed ? "orange" : "green",
+        message: result?.imageCleanupFailed
+          ? "مقاله ذخیره شد، اما پاک‌سازی تصویر قبلی ناموفق بود."
+          : article
+            ? "تغییرات مقاله ذخیره شد."
+            : values.status === "published"
+              ? "مقاله منتشر شد."
+              : "پیش‌نویس ذخیره شد.",
       });
       router.push("/dashboard/articles");
       router.refresh();
@@ -126,7 +151,7 @@ export default function ArticleForm() {
           محتوا
         </Text>
         <Title order={1} size="h2">
-          مقاله جدید
+          {article ? "ویرایش مقاله" : "مقاله جدید"}
         </Title>
       </div>
       <Alert color="blue" icon={<IconInfoCircle size={20} />}>
@@ -148,7 +173,11 @@ export default function ArticleForm() {
           />
           <SimpleGrid cols={{ base: 1, sm: 2 }}>
             <TextInput
-              description="مثال: gaming-cpu-guide"
+              description={
+                article
+                  ? "تغییر نامک، نشانی عمومی قبلی مقاله را از دسترس خارج می‌کند."
+                  : "مثال: gaming-cpu-guide"
+              }
               label="نامک انگلیسی"
               withAsterisk
               {...form.getInputProps("slug")}
@@ -157,6 +186,7 @@ export default function ArticleForm() {
               data={[
                 { label: "پیش‌نویس", value: "draft" },
                 { label: "انتشار فوری", value: "published" },
+                { label: "بایگانی", value: "archived" },
               ]}
               label="وضعیت"
               {...form.getInputProps("status")}
@@ -205,11 +235,33 @@ export default function ArticleForm() {
             placeholder="انتخاب تصویر تا ۵ مگابایت"
             {...form.getInputProps("featuredImage")}
           />
+          {article?.featuredImageUrl && !removeFeaturedImage && (
+            <Image
+              alt={article.title}
+              fit="cover"
+              h={220}
+              radius="md"
+              src={article.featuredImageUrl}
+              w="100%"
+            />
+          )}
+          {article?.featuredImageUrl && (
+            <Checkbox
+              checked={removeFeaturedImage}
+              disabled={Boolean(form.values.featuredImage)}
+              label="حذف تصویر شاخص فعلی"
+              onChange={(event) =>
+                setRemoveFeaturedImage(event.currentTarget.checked)
+              }
+            />
+          )}
           <Group justify="flex-end">
             <Button loading={loading} type="submit">
-              {form.values.status === "published"
-                ? "انتشار مقاله"
-                : "ذخیره پیش‌نویس"}
+              {article
+                ? "ذخیره تغییرات"
+                : form.values.status === "published"
+                  ? "انتشار مقاله"
+                  : "ذخیره مقاله"}
             </Button>
           </Group>
         </Stack>

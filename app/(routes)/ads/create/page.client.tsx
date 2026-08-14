@@ -2,20 +2,21 @@
 
 import { useEffect, useState } from "react";
 import {
-  TextInput,
-  Text,
-  Button,
+  Alert,
   Box,
-  Title,
-  Group,
+  Button,
   Container,
+  Group,
   Paper,
-  Card,
+  Progress,
   SimpleGrid,
   Select,
+  Stack,
+  Text,
   Textarea,
-  Alert,
-  Progress,
+  TextInput,
+  ThemeIcon,
+  Title,
 } from "@mantine/core";
 import classes from "./ActionGrid.module.css";
 import { isNotEmpty, useForm } from "@mantine/form";
@@ -36,8 +37,23 @@ import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../../_redux/store";
 import { api } from "../../../_redux/services/api";
 import type { AdCreationProgress } from "../../../_features/ads/types";
+import { requestTelegramAdNotification } from "../../../_features/ads/telegram";
+import {
+  IconCheck,
+  IconChevronLeft,
+  IconFileDescription,
+  IconMapPin,
+  IconPhoto,
+  IconShieldCheck,
+  IconTag,
+} from "@tabler/icons-react";
+import Link from "next/link";
 
-export default function PageClient() {
+interface PageClientProps {
+  categories: Array<{ icon: string; id: number; name: string }>;
+}
+
+export default function PageClient({ categories }: PageClientProps) {
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [availableCities, setAvailableCities] = useState<City[]>([]);
@@ -51,7 +67,10 @@ export default function PageClient() {
   const [processingImages, setProcessingImages] = useState(false);
   const [creationProgress, setCreationProgress] =
     useState<AdCreationProgress | null>(null);
-  const { items, activeCategory } = UseAdsCategory();
+  const { items, activeCategory, activeCategoryName } = UseAdsCategory(
+    categories,
+    () => setShowErrorCategory(false),
+  );
   const dispatch: AppDispatch = useDispatch();
 
   const form = useForm({
@@ -126,7 +145,7 @@ export default function PageClient() {
     });
     try {
       const rawPrice = values.price.replace(/,/g, "");
-      await createAd(
+      const ad = await createAd(
         {
           title: values.title,
           description: values.description,
@@ -138,6 +157,7 @@ export default function PageClient() {
         },
         setCreationProgress,
       );
+      await requestTelegramAdNotification(ad.id);
       dispatch(api.util.invalidateTags(["ads"]));
       open();
       setImages([]);
@@ -182,154 +202,353 @@ export default function PageClient() {
       : setShowErrorCategory(false);
   };
 
+  const completedSections = [
+    form.values.title.trim().length >= 3 && activeCategory !== null,
+    images.length > 0,
+    selectedProvince !== null && Boolean(form.values.city),
+    form.values.description.trim().length >= 10,
+  ].filter(Boolean).length;
+  const completion = (completedSections / 4) * 100;
+
   return (
-    <Container w={{ base: "100%", lg: "700px" }} size={"xxl"}>
-      <Paper
-        mb={"xl"}
-        px={{ base: "xs", lg: "xl" }}
-        shadow="sm"
-        pb={"lg"}
-        mt="xl"
-      >
-        <Box mx={"auto"}>
-          <Title
-            style={{ fontFamily: "var(--font-vazirmatn)" }}
-            onClick={open}
-            order={2}
-            mb="xl"
-          >
-            ثبت آگهی
-          </Title>
-          <form onSubmit={form.onSubmit(handleSubmit, validateOtherField)}>
-            <TextInput
-              label="عنوان آگهی"
-              withAsterisk
-              {...form.getInputProps("title")}
-              mb="md"
-            />
+    <Box className={classes.page}>
+      <Container size="lg">
+        <Group className={classes.breadcrumb} gap={6} mb="md">
+          <Text component={Link} href="/ads" c="dimmed" fz="sm">
+            آگهی‌ها
+          </Text>
+          <IconChevronLeft size={14} />
+          <Text fz="sm" fw={600}>
+            ثبت آگهی جدید
+          </Text>
+        </Group>
 
-            <AdsImageForm
-              images={images}
-              onProcessingChange={setProcessingImages}
-              setImages={setImages}
-            />
+        <form onSubmit={form.onSubmit(handleSubmit, validateOtherField)}>
+          <div className={classes.layout}>
+            <Stack gap="md">
+              <Paper className={classes.section} radius="lg" withBorder>
+                <Group align="flex-start" gap="sm" mb="lg" wrap="nowrap">
+                  <ThemeIcon
+                    color="green"
+                    radius="md"
+                    size="lg"
+                    variant="light"
+                  >
+                    <IconTag size={20} />
+                  </ThemeIcon>
+                  <Box>
+                    <Text fw={800}>مشخصات اصلی</Text>
+                    <Text c="dimmed" fz="sm">
+                      خریدار باید در یک نگاه بداند چه چیزی می‌فروشید.
+                    </Text>
+                  </Box>
+                  <Text className={classes.stepNumber}>۰۱</Text>
+                </Group>
 
-            <Card withBorder radius="md" className={classes.card}>
-              <Group justify="space-between">
-                <Text className={classes.title}>انتخاب دسته‌بندی</Text>
-              </Group>
-              <SimpleGrid
-                cols={{ base: 3, lg: 4 }}
-                verticalSpacing={"xl"}
-                mt="md"
-              >
-                {items}
-              </SimpleGrid>
-              {showErrorCategory ? (
-                <Text mt={"4px"} c={"red"} size="xs">
-                  فیلد دسته‌بندی اجباری است
-                </Text>
-              ) : (
-                ""
-              )}
-            </Card>
-
-            <SimpleGrid mt={"xl"} cols={2}>
-              <Box>
-                <Select
-                  label="استان"
-                  withAsterisk
-                  value={selectedProvince ? selectedProvince.toString() : null}
-                  onChange={handleProvinceChange}
-                  data={provinces.map((province) => ({
-                    value: province.id.toString(),
-                    label: province.name,
-                  }))}
-                />
-                {showErrorOstan ? (
-                  <Text mt={"4px"} c={"red"} size="xs">
-                    فیلد استان اجباری است
-                  </Text>
-                ) : (
-                  ""
-                )}
-              </Box>
-              <Select
-                label="شهر"
-                withAsterisk
-                data={availableCities.map((city) => ({
-                  value: city.id.toString(),
-                  label: city.name,
-                }))}
-                {...form.getInputProps("city")}
-                disabled={!selectedProvince} // Disable city select if no province is selected
-              />
-            </SimpleGrid>
-
-            <TextInput
-              mt={"lg"}
-              label="قیمت (تومان)"
-              value={form.values.price}
-              onChange={handlePriceChange}
-            />
-            {priceInWords && (
-              <Text c="dimmed" mt={"3px"} mb="md" fz={"xs"}>
-                {" "}
-                {priceInWords} تومان{" "}
-              </Text>
-            )}
-
-            <Textarea
-              minRows={4}
-              autosize
-              mt={"lg"}
-              withAsterisk
-              {...form.getInputProps("description")}
-              label={"توضیحات"}
-            ></Textarea>
-            <Group w={"100%"} justify="flex-end" mt={"lg"}>
-              {creationProgress && (
-                <Alert color="green" variant="light" w="100%">
-                  <Text fz="sm" fw={600} mb="xs">
-                    {creationProgress.stage === "creating"
-                      ? "در حال ثبت اطلاعات آگهی..."
-                      : creationProgress.stage === "uploading"
-                        ? `در حال بارگذاری تصاویر (${creationProgress.completed} از ${creationProgress.total})`
-                        : "در حال نهایی‌سازی آگهی..."}
-                  </Text>
-                  <Progress
-                    animated
-                    value={
-                      creationProgress.stage === "creating"
-                        ? 10
-                        : creationProgress.stage === "saving"
-                          ? 95
-                          : creationProgress.total
-                            ? 15 +
-                              (creationProgress.completed /
-                                creationProgress.total) *
-                                75
-                            : 85
+                <Stack gap="lg">
+                  <TextInput
+                    description="نام دقیق قطعه، برند و مدل را بنویسید."
+                    label="عنوان آگهی"
+                    maxLength={120}
+                    placeholder="مثلاً کارت گرافیک ASUS RTX 3060 Dual"
+                    rightSection={
+                      <Text c="dimmed" fz="xs">
+                        {form.values.title.length}/۱۲۰
+                      </Text>
                     }
+                    rightSectionWidth={55}
+                    size="md"
+                    withAsterisk
+                    {...form.getInputProps("title")}
                   />
-                </Alert>
-              )}
-              <Button
-                disabled={processingImages}
-                loading={loading}
-                size="md"
-                w={"100%"}
-                color="var(--mantine-color-kiwi-8)"
-                px={"xl"}
-                type="submit"
-              >
-                {processingImages ? "در حال آماده‌سازی تصاویر" : "ثبت آگهی"}
-              </Button>
-            </Group>
-          </form>
-        </Box>
-      </Paper>
-      <ModalSubmit opened={opened} close={close} />
-    </Container>
+
+                  <Box>
+                    <Group justify="space-between" mb="xs">
+                      <Text fz="sm" fw={600}>
+                        دسته‌بندی{" "}
+                        <Text component="span" c="red">
+                          *
+                        </Text>
+                      </Text>
+                      {activeCategoryName && (
+                        <Text c="green.7" fz="xs" fw={700}>
+                          {activeCategoryName} انتخاب شد
+                        </Text>
+                      )}
+                    </Group>
+                    <SimpleGrid cols={{ base: 2, xs: 4 }} spacing="sm">
+                      {items}
+                    </SimpleGrid>
+                    {showErrorCategory && (
+                      <Text c="red" fz="xs" mt={6}>
+                        انتخاب دسته‌بندی الزامی است.
+                      </Text>
+                    )}
+                  </Box>
+                </Stack>
+              </Paper>
+
+              <Paper className={classes.section} radius="lg" withBorder>
+                <Group align="flex-start" gap="sm" mb="lg" wrap="nowrap">
+                  <ThemeIcon
+                    color="green"
+                    radius="md"
+                    size="lg"
+                    variant="light"
+                  >
+                    <IconPhoto size={20} />
+                  </ThemeIcon>
+                  <Box>
+                    <Text fw={800}>تصاویر محصول</Text>
+                    <Text c="dimmed" fz="sm">
+                      عکس اول به‌عنوان تصویر اصلی آگهی نمایش داده می‌شود.
+                    </Text>
+                  </Box>
+                  <Text className={classes.stepNumber}>۰۲</Text>
+                </Group>
+
+                <AdsImageForm
+                  images={images}
+                  onProcessingChange={setProcessingImages}
+                  setImages={setImages}
+                />
+              </Paper>
+
+              <Paper className={classes.section} radius="lg" withBorder>
+                <Group align="flex-start" gap="sm" mb="lg" wrap="nowrap">
+                  <ThemeIcon
+                    color="green"
+                    radius="md"
+                    size="lg"
+                    variant="light"
+                  >
+                    <IconMapPin size={20} />
+                  </ThemeIcon>
+                  <Box>
+                    <Text fw={800}>موقعیت و قیمت</Text>
+                    <Text c="dimmed" fz="sm">
+                      محل کالا را مشخص کنید و قیمت منصفانه بگذارید.
+                    </Text>
+                  </Box>
+                  <Text className={classes.stepNumber}>۰۳</Text>
+                </Group>
+
+                <SimpleGrid cols={{ base: 1, sm: 2 }}>
+                  <Box>
+                    <Select
+                      data={provinces.map((province) => ({
+                        value: province.id.toString(),
+                        label: province.name,
+                      }))}
+                      label="استان"
+                      onChange={handleProvinceChange}
+                      placeholder="انتخاب استان"
+                      searchable
+                      size="md"
+                      value={
+                        selectedProvince ? selectedProvince.toString() : null
+                      }
+                      withAsterisk
+                    />
+                    {showErrorOstan && (
+                      <Text c="red" fz="xs" mt={6}>
+                        انتخاب استان الزامی است.
+                      </Text>
+                    )}
+                  </Box>
+                  <Select
+                    data={availableCities.map((city) => ({
+                      value: city.id.toString(),
+                      label: city.name,
+                    }))}
+                    disabled={!selectedProvince}
+                    label="شهر"
+                    placeholder={
+                      selectedProvince
+                        ? "انتخاب شهر"
+                        : "ابتدا استان را انتخاب کنید"
+                    }
+                    searchable
+                    size="md"
+                    withAsterisk
+                    {...form.getInputProps("city")}
+                  />
+                </SimpleGrid>
+
+                <TextInput
+                  description={
+                    priceInWords
+                      ? `${priceInWords} تومان`
+                      : "اگر قیمت توافقی است، این بخش را خالی بگذارید."
+                  }
+                  inputMode="numeric"
+                  label="قیمت"
+                  leftSection={
+                    <Text c="dimmed" fz="xs">
+                      تومان
+                    </Text>
+                  }
+                  leftSectionWidth={48}
+                  mt="lg"
+                  onChange={handlePriceChange}
+                  placeholder="مثلاً ۱۲,۵۰۰,۰۰۰"
+                  size="md"
+                  value={form.values.price}
+                />
+              </Paper>
+
+              <Paper className={classes.section} radius="lg" withBorder>
+                <Group align="flex-start" gap="sm" mb="lg" wrap="nowrap">
+                  <ThemeIcon
+                    color="green"
+                    radius="md"
+                    size="lg"
+                    variant="light"
+                  >
+                    <IconFileDescription size={20} />
+                  </ThemeIcon>
+                  <Box>
+                    <Text fw={800}>توضیحات تکمیلی</Text>
+                    <Text c="dimmed" fz="sm">
+                      وضعیت ظاهری، مدت استفاده، سلامت و اقلام همراه را ذکر کنید.
+                    </Text>
+                  </Box>
+                  <Text className={classes.stepNumber}>۰۴</Text>
+                </Group>
+
+                <Textarea
+                  autosize
+                  label="توضیحات آگهی"
+                  maxLength={5000}
+                  minRows={7}
+                  placeholder="مثلاً قطعه ۸ ماه استفاده شده، بدون تعمیر و دارای جعبه اصلی است..."
+                  size="md"
+                  withAsterisk
+                  {...form.getInputProps("description")}
+                />
+                <Group justify="space-between" mt={6}>
+                  <Text c="dimmed" fz="xs">
+                    اطلاعات تماس را در متن آگهی وارد نکنید.
+                  </Text>
+                  <Text c="dimmed" fz="xs">
+                    {form.values.description.length}/۵۰۰۰
+                  </Text>
+                </Group>
+              </Paper>
+            </Stack>
+
+            <aside className={classes.sidebar}>
+              <Paper className={classes.summary} radius="lg" withBorder>
+                <Group justify="space-between">
+                  <Text fw={800}>آمادگی انتشار</Text>
+                  <Text c="green.7" fz="sm" fw={800}>
+                    {completedSections} از ۴
+                  </Text>
+                </Group>
+                <Progress
+                  color="green"
+                  mt="sm"
+                  radius="xl"
+                  size="sm"
+                  value={completion}
+                />
+
+                <Stack gap="sm" mt="lg">
+                  {[
+                    [
+                      "عنوان و دسته‌بندی",
+                      completedSections > 0 &&
+                        form.values.title.trim().length >= 3 &&
+                        activeCategory !== null,
+                    ],
+                    ["حداقل یک تصویر", images.length > 0],
+                    [
+                      "موقعیت آگهی",
+                      selectedProvince !== null && Boolean(form.values.city),
+                    ],
+                    [
+                      "توضیحات کامل",
+                      form.values.description.trim().length >= 10,
+                    ],
+                  ].map(([label, complete]) => (
+                    <Group gap="xs" key={String(label)} wrap="nowrap">
+                      <ThemeIcon
+                        color={complete ? "green" : "gray"}
+                        radius="xl"
+                        size={22}
+                        variant={complete ? "filled" : "light"}
+                      >
+                        <IconCheck size={13} />
+                      </ThemeIcon>
+                      <Text c={complete ? undefined : "dimmed"} fz="sm">
+                        {label}
+                      </Text>
+                    </Group>
+                  ))}
+                </Stack>
+
+                <Box className={classes.reviewNote} mt="lg">
+                  <Group align="flex-start" gap="xs" wrap="nowrap">
+                    <IconShieldCheck
+                      color="var(--mantine-color-green-7)"
+                      size={20}
+                    />
+                    <Text c="dimmed" fz="xs" lh={1.7}>
+                      آگهی پس از بررسی کوتاه تیم ریگورا منتشر می‌شود. اطلاعات
+                      دقیق، بررسی را سریع‌تر می‌کند.
+                    </Text>
+                  </Group>
+                </Box>
+
+                {creationProgress && (
+                  <Alert color="green" mt="md" variant="light">
+                    <Text fz="sm" fw={600} mb="xs">
+                      {creationProgress.stage === "creating"
+                        ? "در حال ثبت اطلاعات آگهی..."
+                        : creationProgress.stage === "uploading"
+                          ? `بارگذاری تصاویر (${creationProgress.completed} از ${creationProgress.total})`
+                          : "در حال نهایی‌سازی آگهی..."}
+                    </Text>
+                    <Progress
+                      animated
+                      value={
+                        creationProgress.stage === "creating"
+                          ? 10
+                          : creationProgress.stage === "saving"
+                            ? 95
+                            : creationProgress.total
+                              ? 15 +
+                                (creationProgress.completed /
+                                  creationProgress.total) *
+                                  75
+                              : 85
+                      }
+                    />
+                  </Alert>
+                )}
+
+                <Button
+                  className={classes.submitButton}
+                  disabled={processingImages}
+                  fullWidth
+                  loading={loading}
+                  mt="lg"
+                  size="md"
+                  type="submit"
+                >
+                  {processingImages
+                    ? "آماده‌سازی تصاویر..."
+                    : "ثبت و ارسال برای بررسی"}
+                </Button>
+                <Text c="dimmed" fz="xs" mt="xs" ta="center">
+                  ثبت آگهی رایگان است
+                </Text>
+              </Paper>
+            </aside>
+          </div>
+        </form>
+        <ModalSubmit opened={opened} close={close} />
+      </Container>
+    </Box>
   );
 }

@@ -17,7 +17,12 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "../../_features/ads/types";
-import { deleteAd, getAds } from "../../_features/ads/data";
+import {
+  deleteAd,
+  getAds,
+  updateOwnerAdStatus,
+} from "../../_features/ads/data";
+import { getAdStatusDisplay } from "../../_features/ads/status";
 import { createClient } from "../../_lib/supabase/client";
 import CardPartPrice from "../shared/CardPartPrice";
 import ImgNoProduct from "../../../public/no-product.png";
@@ -26,6 +31,7 @@ export default function UserAds() {
   const [ads, setAds] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [updatingId, setUpdatingId] = useState<string>();
   const [selectedId, setSelectedId] = useState<string>();
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -77,6 +83,34 @@ export default function UserAds() {
     }
   };
 
+  const handleStatusChange = async (
+    id: string,
+    status: "sold" | "archived",
+  ) => {
+    setUpdatingId(id);
+    try {
+      await updateOwnerAdStatus(id, status);
+      setAds((current) =>
+        current.map((ad) => (ad.id === id ? { ...ad, status } : ad)),
+      );
+      notifications.show({
+        color: "green",
+        message:
+          status === "sold" ? "آگهی فروخته‌شده ثبت شد." : "آگهی بایگانی شد.",
+      });
+    } catch (error) {
+      notifications.show({
+        color: "red",
+        message:
+          error instanceof Error
+            ? error.message
+            : "تغییر وضعیت آگهی ناموفق بود.",
+      });
+    } finally {
+      setUpdatingId(undefined);
+    }
+  };
+
   if (loading) return <Loader color="green" />;
 
   return (
@@ -84,6 +118,7 @@ export default function UserAds() {
       <SimpleGrid mb="xl" cols={{ base: 1, xs: 2, sm: 3, xl: 2 }}>
         {ads.length ? (
           ads.map((item) => {
+            const status = getAdStatusDisplay(item.status);
             const images = item.image
               ? (JSON.parse(item.image) as string[])
               : [];
@@ -103,15 +138,33 @@ export default function UserAds() {
                     </Text>
                     <Flex mt="xl" justify="space-between" align="center">
                       <CardPartPrice isAds price={item.price} />
-                      <Badge>
-                        {item.status === "published"
-                          ? "منتشر شده"
-                          : "در حال بررسی"}
-                      </Badge>
+                      <Badge color={status.color}>{status.label}</Badge>
                     </Flex>
                   </Flex>
                 </Group>
                 <Group mt="md" justify="flex-end">
+                  {item.status === "published" && (
+                    <Button
+                      color="blue"
+                      loading={updatingId === item.id}
+                      onClick={() => handleStatusChange(item.id, "sold")}
+                      size="xs"
+                      variant="light"
+                    >
+                      فروخته شد
+                    </Button>
+                  )}
+                  {item.status !== "archived" && (
+                    <Button
+                      color="gray"
+                      disabled={Boolean(updatingId)}
+                      onClick={() => handleStatusChange(item.id, "archived")}
+                      size="xs"
+                      variant="light"
+                    >
+                      بایگانی
+                    </Button>
+                  )}
                   <Button
                     component={Link}
                     href={`/ads/${item.id}/edit`}

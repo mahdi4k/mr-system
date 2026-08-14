@@ -2,15 +2,16 @@
 
 import {
   ActionIcon,
+  Badge,
   Box,
-  Flex,
   Group,
   Loader,
   Progress,
+  Stack,
   Text,
 } from "@mantine/core";
 import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
-import { IconCamera, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconPhotoPlus, IconTrash } from "@tabler/icons-react";
 import imageCompression from "browser-image-compression";
 import Image from "next/image";
 import {
@@ -20,9 +21,11 @@ import {
   useRef,
   useState,
 } from "react";
+import classes from "./ads-image-form.module.css";
 
 interface AdsImageFormProps {
   images: File[];
+  maxImages?: number;
   onProcessingChange: (processing: boolean) => void;
   setImages: Dispatch<SetStateAction<File[]>>;
 }
@@ -54,9 +57,11 @@ async function prepareImage(file: File): Promise<File> {
 
 function ImagePreview({
   file,
+  isCover,
   onRemove,
 }: {
   file: File;
+  isCover: boolean;
   onRemove: () => void;
 }) {
   const [url, setUrl] = useState("");
@@ -68,19 +73,14 @@ function ImagePreview({
   }, [file]);
 
   return (
-    <Box
-      h={{ base: 80, sm: 108 }}
-      pos="relative"
-      style={{ borderRadius: 8, overflow: "hidden" }}
-      w={{ base: 88, sm: 108 }}
-    >
+    <Box className={classes.preview}>
       <ActionIcon
         aria-label="حذف تصویر"
         color="red"
         onClick={onRemove}
         pos="absolute"
         size="sm"
-        style={{ left: 6, top: 6, zIndex: 2 }}
+        style={{ left: 8, top: 8, zIndex: 2 }}
         variant="filled"
       >
         <IconTrash size={14} />
@@ -95,12 +95,18 @@ function ImagePreview({
           unoptimized
         />
       )}
+      {isCover && (
+        <Badge className={classes.coverBadge} color="dark" size="xs">
+          تصویر اصلی
+        </Badge>
+      )}
     </Box>
   );
 }
 
 export default function AdsImageForm({
   images,
+  maxImages = MAX_IMAGES,
   onProcessingChange,
   setImages,
 }: AdsImageFormProps) {
@@ -111,8 +117,8 @@ export default function AdsImageForm({
   const openRef = useRef<() => void>(null);
 
   const handleImageUpload = async (files: File[]) => {
-    if (images.length + files.length > MAX_IMAGES) {
-      setError("حداکثر تعداد عکس ۳ است.");
+    if (images.length + files.length > maxImages) {
+      setError(`حداکثر ${maxImages} تصویر دیگر قابل انتخاب است.`);
       return;
     }
     if (files.some((file) => file.size > MAX_SOURCE_SIZE)) {
@@ -149,18 +155,15 @@ export default function AdsImageForm({
   };
 
   return (
-    <Box mb="xl" mt="xl">
+    <Box>
       <Group justify="space-between" mb="xs">
         <Box>
-          <Text fw={600} fz="sm">
-            عکس‌های آگهی
-          </Text>
           <Text c="dimmed" fz="xs">
-            حداکثر ۳ تصویر، هر تصویر تا ۱۰ مگابایت
+            JPG، PNG یا WebP، حداکثر ۳ تصویر و هرکدام تا ۱۰ مگابایت
           </Text>
         </Box>
         <Text c="dimmed" fz="xs">
-          {images.length} از {MAX_IMAGES}
+          {images.length} از {maxImages}
         </Text>
       </Group>
 
@@ -177,72 +180,64 @@ export default function AdsImageForm({
         </Box>
       )}
 
-      <Flex gap="xs" style={{ overflowX: "auto" }}>
-        {images.length < MAX_IMAGES && (
-          <Dropzone
-            accept={IMAGE_MIME_TYPE}
-            disabled={processing}
-            maxSize={MAX_SOURCE_SIZE}
-            multiple
-            onDrop={handleImageUpload}
-            onReject={() => setError("فرمت یا حجم تصویر قابل قبول نیست.")}
-            openRef={openRef}
-            p={0}
-            styles={{ root: { border: 0 } }}
-          >
-            <Flex
-              align="center"
-              direction="column"
-              h={{ base: 80, sm: 108 }}
-              justify="center"
-              style={{
-                border: "1px dashed var(--mantine-primary-color-filled)",
-                borderRadius: 8,
-                cursor: processing ? "wait" : "pointer",
-              }}
-              w={{ base: 88, sm: 108 }}
+      {images.length < maxImages && (
+        <Dropzone
+          accept={IMAGE_MIME_TYPE}
+          className={classes.dropzone}
+          disabled={processing}
+          maxSize={MAX_SOURCE_SIZE}
+          multiple
+          onDrop={handleImageUpload}
+          onReject={() => setError("فرمت یا حجم تصویر قابل قبول نیست.")}
+          openRef={openRef}
+        >
+          <Stack align="center" gap="sm" justify="center" mih={130} py="sm">
+            <Box className={classes.uploadIcon}>
+              <IconPhotoPlus size={27} />
+            </Box>
+            <Text fw={700} ta="center">
+              عکس‌ها را اینجا رها کنید
+            </Text>
+            <Text c="dimmed" fz="sm" ta="center">
+              یا برای انتخاب از دستگاه کلیک کنید
+            </Text>
+          </Stack>
+        </Dropzone>
+      )}
+
+      {images.length > 0 && (
+        <div className={classes.previewGrid}>
+          {images.map((file, index) => (
+            <ImagePreview
+              file={file}
+              isCover={index === 0}
+              key={`${file.name}-${file.lastModified}-${index}`}
+              onRemove={() =>
+                setImages((current) =>
+                  current.filter((_, itemIndex) => itemIndex !== index),
+                )
+              }
+            />
+          ))}
+          {images.length < maxImages && (
+            <button
+              aria-label="افزودن تصویر دیگر"
+              className={classes.preview}
+              disabled={processing}
+              onClick={() => openRef.current?.()}
+              style={{ cursor: "pointer" }}
+              type="button"
             >
-              <IconPlus color="var(--mantine-primary-color-filled)" size={22} />
-              <Text c="var(--mantine-primary-color-filled)" fz="xs">
-                افزودن عکس
-              </Text>
-            </Flex>
-          </Dropzone>
-        )}
-
-        {images.map((file, index) => (
-          <ImagePreview
-            file={file}
-            key={`${file.name}-${file.lastModified}-${index}`}
-            onRemove={() =>
-              setImages((current) =>
-                current.filter((_, itemIndex) => itemIndex !== index),
-              )
-            }
-          />
-        ))}
-
-        {Array.from({
-          length: Math.max(MAX_IMAGES - images.length - 1, 0),
-        }).map((_, index) => (
-          <Flex
-            align="center"
-            direction="column"
-            h={{ base: 80, sm: 108 }}
-            justify="center"
-            key={index}
-            onClick={() => !processing && openRef.current?.()}
-            style={{
-              border: "1px dashed var(--mantine-color-gray-4)",
-              borderRadius: 8,
-              cursor: processing ? "wait" : "pointer",
-            }}
-            w={{ base: 88, sm: 108 }}
-          >
-            <IconCamera color="var(--mantine-color-gray-5)" size={26} />
-          </Flex>
-        ))}
-      </Flex>
+              <Stack align="center" gap={4} justify="center" h="100%">
+                <IconPhotoPlus color="var(--mantine-color-green-7)" size={25} />
+                <Text c="green.7" fz="xs" fw={600}>
+                  افزودن عکس
+                </Text>
+              </Stack>
+            </button>
+          )}
+        </div>
+      )}
       {error && (
         <Text c="red" fz="xs" mt="xs">
           {error}

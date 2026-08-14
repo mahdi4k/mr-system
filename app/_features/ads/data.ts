@@ -7,7 +7,9 @@ import type {
   AdCreationProgress,
   CreateAdInput,
   Product,
+  UpdateAdImagesInput,
   UpdateAdInput,
+  UpdateAdResult,
 } from "./types";
 
 const AD_SELECT = `
@@ -277,24 +279,136 @@ export async function createAd(
 export async function updateAd(
   id: string,
   input: UpdateAdInput,
-): Promise<Product> {
+  imageUpdate?: UpdateAdImagesInput,
+): Promise<UpdateAdResult> {
   const client = createBrowserClient();
-  const { data, error } = await client
-    .from("ads")
-    .update(input)
-    .eq("id", id)
-    .select("id")
-    .single();
+  const uploadedPaths: string[] = [];
+  let imageRows: Array<{
+    sort_order: number;
+    storage_path: string;
+    url: string;
+  }> | null = null;
+  let updateCommitted = false;
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  try {
+    if (imageUpdate) {
+      const {
+        data: { user },
+        error: authError,
+      } = await client.auth.getUser();
+      if (authError || !user) {
+        throw new Error("برای ویرایش تصاویر ابتدا وارد حساب کاربری شوید.");
+      }
 
-  const product = await getAdById(data.id, client);
-  if (!product) {
-    throw new Error("آگهی یافت نشد.");
+      const { data: existingImages, error: readError } = await client
+        .from("ad_images")
+        .select("storage_path, url")
+        .eq("ad_id", id)
+        .order("sort_order");
+      if (readError) throw readError;
+
+      const existingByUrl = new Map(
+        existingImages.map((image) => [image.url, image]),
+      );
+      const retainedImages = imageUpdate.retainedUrls.map((url) =>
+        existingByUrl.get(url),
+      );
+      if (
+        new Set(imageUpdate.retainedUrls).size !==
+          imageUpdate.retainedUrls.length ||
+        retainedImages.some((image) => !image) ||
+        retainedImages.length + imageUpdate.newImages.length > 3
+      ) {
+        throw new Error("فهرست تصاویر آگهی معتبر نیست.");
+      }
+
+      const uploadResults = await Promise.allSettled(
+        imageUpdate.newImages.map(async (image, index) => {
+          const extension =
+            image.name.split(".").pop()?.toLowerCase() || "webp";
+          const storagePath = `${user.id}/${id}/${crypto.randomUUID()}.${extension}`;
+          const { error: uploadError } = await client.storage
+            .from("ad-images")
+            .upload(storagePath, image, {
+              cacheControl: "31536000",
+              contentType: image.type,
+              upsert: false,
+            });
+          if (uploadError) throw uploadError;
+          uploadedPaths.push(storagePath);
+
+          const { data: publicUrl } = client.storage
+            .from("ad-images")
+            .getPublicUrl(storagePath);
+          return {
+            sort_order: retainedImages.length + index,
+            storage_path: storagePath,
+            url: publicUrl.publicUrl,
+          };
+        }),
+      );
+      const failedUpload = uploadResults.find(
+        (result): result is PromiseRejectedResult =>
+          result.status === "rejected",
+      );
+      if (failedUpload) throw failedUpload.reason;
+
+      imageRows = [
+        ...retainedImages.map((image, index) => ({
+          sort_order: index,
+          storage_path: image!.storage_path,
+          url: image!.url,
+        })),
+        ...uploadResults.map(
+          (result) =>
+            (
+              result as PromiseFulfilledResult<{
+                sort_order: number;
+                storage_path: string;
+                url: string;
+              }>
+            ).value,
+        ),
+      ];
+    }
+
+    const { data: removedPaths, error: updateError } = await client.rpc(
+      "update_owned_ad",
+      {
+        p_ad_id: id,
+        p_category_id: input.category_id,
+        p_city_id: input.city_id,
+        p_description: input.description,
+        p_images: imageRows,
+        p_price: input.price,
+        p_province_id: input.province_id,
+        p_title: input.title,
+      },
+    );
+    if (updateError) throw updateError;
+    updateCommitted = true;
+
+    let storageCleanupFailed = false;
+    if (removedPaths?.length) {
+      const { error: storageError } = await client.storage
+        .from("ad-images")
+        .remove(removedPaths);
+      storageCleanupFailed = Boolean(storageError);
+    }
+
+    const product = await getAdById(id, client);
+    if (!product) {
+      throw new Error("آگهی یافت نشد.");
+    }
+    return { product, storageCleanupFailed };
+  } catch (error) {
+    if (!updateCommitted && uploadedPaths.length) {
+      await client.storage.from("ad-images").remove(uploadedPaths);
+    }
+    throw new Error(
+      error instanceof Error ? error.message : "ویرایش آگهی ناموفق بود.",
+    );
   }
-  return product;
 }
 
 export async function moderateAd(
@@ -311,6 +425,25 @@ export async function moderateAd(
 
   if (error || !data) {
     throw new Error(error?.message || "ویرایش وضعیت آگهی ناموفق بود.");
+  }
+}
+
+export async function updateOwnerAdStatus(
+  id: string,
+  status: "sold" | "archived",
+): Promise<void> {
+  const client = createBrowserClient();
+  const { data, error } = await client
+    .from("ads")
+    .update({ status })
+    .eq("id", id)
+    .select("id")
+    .single();
+
+  if (error || !data) {
+    throw new Error(
+      error?.message || "تغییر وضعیت آگهی ناموفق بود یا اجازه آن را ندارید.",
+    );
   }
 }
 

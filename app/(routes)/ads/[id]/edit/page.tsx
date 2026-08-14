@@ -16,5 +16,12 @@ export default async function EditAdPage({
   const ad = await getAdById(id, await createClient());
   if (!ad || ad.user_id !== user.id) notFound();
 
-  return <PageClient ad={ad} />;
+  const { data: categories, error } = await (await createClient())
+    .from("ad_categories")
+    .select("id, name")
+    .eq("is_active", true)
+    .order("sort_order");
+  if (error) throw new Error(error.message);
+
+  return <PageClient ad={ad} categories={categories ?? []} />;
 }

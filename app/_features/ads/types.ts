@@ -64,10 +64,20 @@ export interface AdCreationProgress {
 }
 
 export interface UpdateAdInput {
-  category_id?: number;
-  city_id?: number;
-  description?: string;
-  price?: number | null;
-  province_id?: number;
-  title?: string;
+  category_id: number;
+  city_id: number;
+  description: string;
+  price: number | null;
+  province_id: number;
+  title: string;
+}
+
+export interface UpdateAdImagesInput {
+  newImages: File[];
+  retainedUrls: string[];
+}
+
+export interface UpdateAdResult {
+  product: Product;
+  storageCleanupFailed: boolean;
 }

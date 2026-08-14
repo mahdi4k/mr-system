@@ -9,6 +9,13 @@ describe("Rigora advertisement RLS migration", () => {
     ),
     "utf8",
   );
+  const lifecycleMigration = fs.readFileSync(
+    path.join(
+      process.cwd(),
+      "supabase/migrations/20260814000000_owner_ad_lifecycle.sql",
+    ),
+    "utf8",
+  );
 
   it("enables RLS on every user-owned table", () => {
     expect(migration).toContain(
@@ -46,5 +53,25 @@ describe("Rigora advertisement RLS migration", () => {
   it("reserves moderation changes for administrators", () => {
     expect(migration).toContain("protect_ad_moderation_fields");
     expect(migration).toContain("Administrators update all ads");
+  });
+
+  it("only permits owner sold and archive lifecycle transitions", () => {
+    expect(lifecycleMigration).toContain(
+      "old.status = 'published' and new.status = 'sold'",
+    );
+    expect(lifecycleMigration).toContain("new.status = 'archived'");
+    expect(lifecycleMigration).toContain(
+      "raise exception 'Only administrators can change advertisement moderation status'",
+    );
+  });
+
+  it("returns owner content and image edits to moderation", () => {
+    expect(lifecycleMigration).toContain("new.status = 'pending'");
+    expect(lifecycleMigration).toContain(
+      "create trigger ad_images_reset_ad_status",
+    );
+    expect(lifecycleMigration).toContain(
+      "and status in ('published', 'rejected', 'sold')",
+    );
   });
 });

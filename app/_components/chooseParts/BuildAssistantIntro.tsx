@@ -30,8 +30,8 @@ const BuildAssistantIntro = () => {
           </Group>
 
           <Text className={classes.introText} size="sm">
-            قطعات هوشمندانه انتخاب کن، خرید و فروش کن و از تازه‌ترین
-            اخبار سخت‌افزار باخبر باش.{" "}
+            قطعات هوشمندانه انتخاب کن، خرید و فروش کن و از تازه‌ترین اخبار
+            سخت‌افزار باخبر باش.{" "}
           </Text>
 
           <div className={classes.benefits}>

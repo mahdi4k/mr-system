@@ -22,6 +22,7 @@ import {
   IconArticle,
   IconDotsVertical,
   IconExternalLink,
+  IconPencil,
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
@@ -145,6 +146,13 @@ export default function ArticlesClient({
                     </ActionIcon>
                   </Menu.Target>
                   <Menu.Dropdown>
+                    <Menu.Item
+                      component={Link}
+                      href={`/dashboard/articles/${article.id}/edit`}
+                      leftSection={<IconPencil size={16} />}
+                    >
+                      ویرایش
+                    </Menu.Item>
                     {article.status !== "published" && (
                       <Menu.Item
                         onClick={() => void changeStatus(article, "published")}

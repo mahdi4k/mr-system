@@ -27,9 +27,13 @@ NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_ENABLE_PHONE_AUTH=false
+# Required only for private Telegram notifications about newly submitted ads.
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVER_ONLY_SERVICE_ROLE_KEY
+TELEGRAM_BOT_TOKEN=YOUR_BOTFATHER_TOKEN
+TELEGRAM_ADMIN_CHAT_ID=YOUR_PRIVATE_CHAT_ID
 ```
 
-`NEXT_PUBLIC_WORDPRESS_API` is optional and is retained only for the existing blog comment feature. Never place a Supabase service-role key, database password, or other private credential in a `NEXT_PUBLIC_*` variable.
+`NEXT_PUBLIC_WORDPRESS_API` is optional and is retained only for the existing blog comment feature. The service-role and Telegram values are server-only secrets. Never place them in a `NEXT_PUBLIC_*` variable or expose them to browser code.
 
 ## Supabase Setup
 
@@ -47,6 +51,10 @@ NEXT_PUBLIC_ENABLE_PHONE_AUTH=false
 To grant dashboard moderation access, set a trusted user's Auth `app_metadata.role` to `admin` from the Supabase Dashboard, then have that user sign out and back in to refresh the JWT. Users cannot edit `app_metadata` through the Rigora client. Normal marketplace users do not need this role.
 
 The migration creates `profiles`, `ad_categories`, `ads`, `ad_images`, the public `ad-images` Storage bucket, indexes, timestamps, profile creation trigger, and all RLS/Storage policies. It can also be applied with the Supabase CLI because it uses the standard `supabase/migrations` layout.
+
+### Telegram Ad Notifications
+
+Run `supabase/migrations/20260814010000_telegram_ad_notifications.sql`, create a bot with Telegram `@BotFather`, send the bot `/start`, and obtain your private chat ID from the Bot API `getUpdates` response. Add `SUPABASE_SERVICE_ROLE_KEY`, `TELEGRAM_BOT_TOKEN`, and `TELEGRAM_ADMIN_CHAT_ID` only to the server deployment environment. After an ad and its images save successfully, Rigora calls a protected owner-only endpoint and sends one private moderation notification. Failed sends release their claim so the browser can retry without failing ad creation.
 
 ## Auth And Ads
 

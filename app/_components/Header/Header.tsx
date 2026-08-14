@@ -38,7 +38,7 @@ import UseLoading from "@/_utils/customHook/useLoading";
 import Image from "next/image";
 import DrawerHeader from "./Drawer";
 import LoginModal from "../loginModal/LoginModal";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "../../_lib/supabase/client";
 
@@ -51,14 +51,12 @@ export function Header({ isAuthenticated, userLabel }: HeaderProps) {
   const [opened, { open, close }] = useDisclosure(false);
   const [openedModal, { open: openModal, close: closeModal }] =
     useDisclosure(false);
-  const { setColorScheme, colorScheme } = useMantineColorScheme();
+  const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   });
   const isLoading = UseLoading();
   const router = useRouter();
-  const [logoSrc, setLogoSrc] = useState<string | null>(null); // Default to null
-
   const pathname = usePathname();
   const hideHeaderFooter = pathname === "/login";
 
@@ -86,19 +84,6 @@ export function Header({ isAuthenticated, userLabel }: HeaderProps) {
       openModal();
     }
   };
-  useEffect(() => {
-    if (colorScheme === "dark") {
-      setLogoSrc("/logo-dark.png");
-    } else {
-      setLogoSrc("/logo.png");
-    }
-  }, [colorScheme]);
-
-  // Only render the image once the logo source is set
-  if (!logoSrc) {
-    return null; // Prevent rendering until logoSrc is determined
-  }
-
   return (
     <header
       style={{ display: hideHeaderFooter ? "none" : "block" }}
@@ -116,7 +101,7 @@ export function Header({ isAuthenticated, userLabel }: HeaderProps) {
             <Image
               style={{ objectFit: "contain" }}
               alt="ریگورا"
-              src={logoSrc}
+              src="/logo-dark.png"
               width={80}
               height={40}
             />

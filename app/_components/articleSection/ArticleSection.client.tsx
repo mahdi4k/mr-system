@@ -44,7 +44,7 @@ const ArticleSectionClient = ({ posts }: { posts: postsMO[] }) => {
             />
 
             <Flex align={"center"} justify={"center"} mt={"sm"}>
-              <Link href={"/blog/category"}>
+              <Link href={"/blog"}>
                 <Button
                   mt={"md"}
                   variant="gradient"

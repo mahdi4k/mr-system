@@ -43,6 +43,7 @@ import AdsGalleryModal from "@/_components/adsSection/AdsGalleryModal";
 import { useChat } from "@/_utils/customHook/useChat";
 import { useDisclosure } from "@mantine/hooks";
 import LoginModal from "@/_components/loginModal/LoginModal";
+import { getAdStatusDisplay } from "../../../_features/ads/status";
 
 type props = {
   product: Product;
@@ -140,6 +141,7 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
   };
   const { createConversation, creatingConversation } = useChat();
   const isOwnAd = currentUserId === product.user_id;
+  const statusDisplay = getAdStatusDisplay(product.status);
 
   const handleStartChat = () => {
     if (currentUserId) {
@@ -188,9 +190,9 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
                   ""
                 )
               }
-              color={product.status === "published" ? "green" : "orange"}
+              color={statusDisplay.color}
             >
-              {product.status === "published" ? "منتشر شده" : "منتشر نشده"}
+              {statusDisplay.label}
             </Badge>
           </Group>
           <Flex

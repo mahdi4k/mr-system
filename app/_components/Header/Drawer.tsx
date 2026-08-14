@@ -261,7 +261,7 @@ const DrawerHeader: FC<Props> = ({ opened, close }) => {
               icon={
                 <Link
                   style={{ marginBottom: "10px" }}
-                  href={`/ads?total_page=1&category=${part.name}`}
+                  href={`/ads?category=${part.name}`}
                 >
                   <ThemeIcon variant="transparent" size={24} radius="xl">
                     <Image
@@ -276,7 +276,7 @@ const DrawerHeader: FC<Props> = ({ opened, close }) => {
             >
               <Link
                 style={{ marginBottom: "10px" }}
-                href={`/ads?total_page=1&category=${part.name}`}
+                href={`/ads?category=${part.name}`}
               >
                 <Text fz={"lg"}> {part.title}</Text>
               </Link>

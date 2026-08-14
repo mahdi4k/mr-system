@@ -10,19 +10,29 @@ import {
   Group,
   Breadcrumbs,
   Anchor,
+  Button,
+  Stack,
 } from "@mantine/core";
 import React from "react";
 import classes from "./categoryCard.module.css";
 import Link from "next/link";
-import { categoriesMO } from "./page";
+import type { PublicArticleCategory } from "../../../../_features/articles/types";
 
 const PageClient = ({
   posts,
   categories,
+  category,
+  page,
+  totalPages,
 }: {
   posts: postsMO[];
-  categories: categoriesMO[];
+  categories: PublicArticleCategory[];
+  category?: string;
+  page: number;
+  totalPages: number;
 }) => {
+  const listingPath = category ? `/blog/category/${category}` : "/blog";
+
   return (
     <div>
       <Container mt={"50px"} mb={"80px"} size="lg">
@@ -33,6 +43,13 @@ const PageClient = ({
         <Grid>
           <Grid.Col span={{ base: 12, md: 8 }}>
             <Grid>
+              {!posts.length && (
+                <Grid.Col span={12}>
+                  <Text c="dimmed" py="xl" ta="center">
+                    هنوز مقاله‌ای در این بخش منتشر نشده است.
+                  </Text>
+                </Grid.Col>
+              )}
               {posts.map((post) => {
                 const gregorianDate = new Date(post.date);
                 const options: Intl.DateTimeFormatOptions = {
@@ -60,6 +77,7 @@ const PageClient = ({
                           gap={0}
                         >
                           <Image
+                            alt={post.title.rendered}
                             style={{ width: "320px" }}
                             src={post?._embedded["wp:featuredmedia"][0].link}
                             height={220}
@@ -92,6 +110,32 @@ const PageClient = ({
                 );
               })}
             </Grid>
+            {totalPages > 1 && (
+              <Group justify="center" mt="xl">
+                <Button
+                  component={Link}
+                  disabled={page <= 1}
+                  href={`${listingPath}?page=${page - 1}`}
+                  variant="default"
+                >
+                  صفحه قبل
+                </Button>
+                <Stack align="center" gap={0} miw={90}>
+                  <Text fw={700}>{page.toLocaleString("fa-IR")}</Text>
+                  <Text c="dimmed" fz="xs">
+                    از {totalPages.toLocaleString("fa-IR")}
+                  </Text>
+                </Stack>
+                <Button
+                  component={Link}
+                  disabled={page >= totalPages}
+                  href={`${listingPath}?page=${page + 1}`}
+                  variant="default"
+                >
+                  صفحه بعد
+                </Button>
+              </Group>
+            )}
           </Grid.Col>
 
           <Grid.Col visibleFrom="md" span={4}>
@@ -104,6 +148,11 @@ const PageClient = ({
                 دسته بندی‌ ها
               </Text>
               <ul style={{ paddingRight: "5px", marginTop: "30px" }}>
+                <li className={classes.categoryList}>
+                  <Link href="/blog">
+                    <Text fz="sm">همه مقالات</Text>
+                  </Link>
+                </li>
                 {categories.map((category) => (
                   <li key={category.id} className={classes.categoryList}>
                     <Link href={`/blog/category/${category.slug}`}>

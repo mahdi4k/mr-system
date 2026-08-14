@@ -1,13 +1,5 @@
-import type { postsMO } from "../../../../_components/articleSection/ArticleSection";
-import { getPublishedArticles } from "../../../../_features/articles/data";
-import { createClient } from "../../../../_lib/supabase/server";
-import PageClient from "./page.client";
-
-export interface categoriesMO {
-  id: string;
-  name: string;
-  slug: string;
-}
+import { notFound, permanentRedirect } from "next/navigation";
+import ArticleListing from "../../ArticleListing";
 
 export async function generateMetadata() {
   return { title: "مقالات ریگورا" };
@@ -15,31 +7,19 @@ export async function generateMetadata() {
 
 export default async function Page(props: {
   params: Promise<{ slug?: string[] }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
-  const params = await props.params;
-  const category = params.slug?.[0];
-  const supabase = await createClient();
-  const [posts, categoryRows] = await Promise.all([
-    getPublishedArticles(supabase, { category, limit: 50 }),
-    supabase
-      .from("articles")
-      .select("category_name, category_slug")
-      .eq("status", "published")
-      .order("category_name"),
+  const [params, searchParams] = await Promise.all([
+    props.params,
+    props.searchParams,
   ]);
-  if (categoryRows.error) throw new Error(categoryRows.error.message);
-
-  const categories: categoriesMO[] = Array.from(
-    new Map(
-      (categoryRows.data ?? []).map((item) => [
-        item.category_slug,
-        {
-          id: item.category_slug,
-          slug: item.category_slug,
-          name: item.category_name,
-        },
-      ]),
-    ).values(),
-  );
-  return <PageClient posts={posts as postsMO[]} categories={categories} />;
+  const category = params.slug?.[0];
+  if ((params.slug?.length ?? 0) > 1) notFound();
+  const requestedPage = Number(searchParams.page);
+  const page =
+    Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  if (!category) {
+    permanentRedirect(page > 1 ? `/blog?page=${page}` : "/blog");
+  }
+  return <ArticleListing category={category} page={page} />;
 }
