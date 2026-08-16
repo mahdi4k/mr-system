@@ -16,7 +16,7 @@ import Image from "next/image";
 import usePcparts from "@/_utils/customHook/usePcParts";
 import { Carousel, Embla } from "@mantine/carousel";
 import CardPartPrice from "../shared/CardPartPrice";
-import { IconFlag3, IconSquarePlus2 } from "@tabler/icons-react";
+import { IconFlag3, IconPlus } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useLazyGetAdsListCategoryQuery } from "@/_redux/services/adsApi";
 import {
@@ -168,36 +168,17 @@ const AdsSection = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
             withControls={false}
           >
             <Carousel.Slide mt={"sm"}>
-              <Link href={"/ads/create"}>
-                <Card
-                  styles={{
-                    root: { borderStyle: "dashed", cursor: "pointer" },
-                  }}
-                  h={"340px"}
-                  withBorder
-                >
-                  <Card.Section h={"100%"} mt={"0"} ta={"center"}>
-                    <Flex
-                      h={"100%"}
-                      align={"center"}
-                      justify={"center"}
-                      direction={"column"}
-                    >
-                      <IconSquarePlus2
-                        style={{ marginTop: "20px" }}
-                        color="var(--mantine-color-kiwi-7)"
-                        size={77}
-                      />
-                      <Text
-                        my={"lg"}
-                        ta={"center"}
-                        lineClamp={1}
-                        c={"gr"}
-                        fz={"sm"}
-                      >
-                        افزودن آگهی
+              <Link className={classess.createAdLink} href={"/ads/create"}>
+                <Card className={classess.createAdCard} h={"340px"} withBorder>
+                  <Card.Section className={classess.createAdSection} h="100%">
+                    <Box className={classess.createAdIcon}>
+                      <IconPlus aria-hidden size={34} stroke={2.4} />
+                    </Box>
+                    <Box className={classess.createAdAction}>
+                      <Text component="span" fz="sm" fw={700}>
+                        افزودن
                       </Text>
-                    </Flex>
+                    </Box>
                   </Card.Section>
                 </Card>
               </Link>

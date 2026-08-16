@@ -7,6 +7,7 @@ import {
   IconPlus,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import AppChrome from "../shared/AppChrome";
 import classes from "./footer.module.css";
 
 const serviceLinks = [
@@ -69,32 +70,34 @@ export function Footer() {
   return (
     <footer className={classes.footer}>
       <Container className={classes.container} size="lg">
-        <section aria-labelledby="footer-cta-title" className={classes.cta}>
-          <div className={classes.ctaCopy}>
-            <Text className={classes.eyebrow}>از انتخاب تا اسمبل</Text>
-            <Text
-              className={classes.ctaTitle}
-              component="h2"
-              id="footer-cta-title"
-            >
-              سیستم بعدی‌ات را هوشمندانه بساز
-            </Text>
-            <Text className={classes.ctaDescription}>
-              قطعات سازگار را کنار هم بچین یا قطعه‌ای که نیاز نداری برای فروش
-              آگهی کن.
-            </Text>
-          </div>
-          <Group className={classes.ctaActions} gap="sm">
-            <Link className={classes.primaryAction} href="/choose-part">
-              <IconCpu aria-hidden size={19} />
-              شروع اسمبل آنلاین
-            </Link>
-            <Link className={classes.secondaryAction} href="/ads/create">
-              <IconPlus aria-hidden size={19} />
-              ثبت آگهی
-            </Link>
-          </Group>
-        </section>
+        <AppChrome homeOnly>
+          <section aria-labelledby="footer-cta-title" className={classes.cta}>
+            <div className={classes.ctaCopy}>
+              <Text className={classes.eyebrow}>از انتخاب تا اسمبل</Text>
+              <Text
+                className={classes.ctaTitle}
+                component="h2"
+                id="footer-cta-title"
+              >
+                سیستم بعدی‌ات را هوشمندانه بساز
+              </Text>
+              <Text className={classes.ctaDescription}>
+                قطعات سازگار را کنار هم بچین یا قطعه‌ای که نیاز نداری برای فروش
+                آگهی کن.
+              </Text>
+            </div>
+            <Group className={classes.ctaActions} gap="sm">
+              <Link className={classes.primaryAction} href="/choose-part">
+                <IconCpu aria-hidden size={19} />
+                شروع اسمبل آنلاین
+              </Link>
+              <Link className={classes.secondaryAction} href="/ads/create">
+                <IconPlus aria-hidden size={19} />
+                ثبت آگهی
+              </Link>
+            </Group>
+          </section>
+        </AppChrome>
 
         <div className={classes.mainGrid}>
           <section

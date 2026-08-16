@@ -5,10 +5,21 @@ import { usePathname } from "next/navigation";
 
 interface AppChromeProps {
   children: ReactNode;
+  homeOnly?: boolean;
 }
 
-export default function AppChrome({ children }: AppChromeProps) {
+export default function AppChrome({
+  children,
+  homeOnly = false,
+}: AppChromeProps) {
   const pathname = usePathname();
-  if (pathname === "/login" || pathname.startsWith("/dashboard")) return null;
+  if (
+    pathname === "/login" ||
+    pathname.startsWith("/dashboard") ||
+    (homeOnly && pathname !== "/")
+  ) {
+    return null;
+  }
+
   return children;
 }

@@ -1,7 +1,17 @@
 import { render, screen } from "../../../test-utils";
 import { Footer } from "./Footer";
 
+const mockUsePathname = jest.fn(() => "/");
+
+jest.mock("next/navigation", () => ({
+  usePathname: () => mockUsePathname(),
+}));
+
 describe("Footer", () => {
+  afterEach(() => {
+    mockUsePathname.mockReturnValue("/");
+  });
+
   it("links to the main user actions", () => {
     render(<Footer />);
 
@@ -45,5 +55,18 @@ describe("Footer", () => {
     expect(
       screen.getByRole("link", { name: "پشتیبانی ریگورا در تلگرام" }),
     ).toHaveAttribute("target", "_blank");
+  });
+
+  it("shows the call to action only on the home page", () => {
+    mockUsePathname.mockReturnValue("/ads");
+
+    render(<Footer />);
+
+    expect(
+      screen.queryByRole("heading", {
+        name: "سیستم بعدی‌ات را هوشمندانه بساز",
+      }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("درباره ریگورا")).toBeInTheDocument();
   });
 });

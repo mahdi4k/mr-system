@@ -213,10 +213,10 @@ export default function UserDetail() {
 
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
         <DetailItem
-          actionLabel="ویرایش نام نمایشی"
-          emptyText="یک نام نمایشی انتخاب کنید"
+          actionLabel="ویرایش نام کاربری"
+          emptyText="یک نام کاربری انتخاب کنید"
           icon={<IconUser size={20} />}
-          label="نام نمایشی"
+          label="نام کاربری"
           onEdit={openName}
           value={userData.name}
         />
