@@ -2,6 +2,7 @@ import { api } from "./api";
 import { IResult } from "./caseApi";
 import { filterCpus, getCpu } from "@/_data/productCatalog";
 import type { RecommendableProduct } from "@/_data/products/types";
+import { enrichCatalogParts } from "../../_features/productCatalog/client";
 
 export type CPU = RecommendableProduct & {
   id: number;
@@ -23,47 +24,8 @@ export type CPU = RecommendableProduct & {
   torobUrl?: string;
 };
 
-interface TorobProduct {
-  title: string;
-  price?: number | null;
-  image?: string | null;
-  url: string;
-}
-
-interface TorobProductResponse {
-  success: boolean;
-  product?: TorobProduct;
-  error?: string;
-}
-
-const fetchTorobProduct = async (url: string): Promise<TorobProduct> => {
-  const params = new URLSearchParams({ url });
-  const response = await fetch(`/api/torob-product?${params}`);
-  const result = (await response.json()) as TorobProductResponse;
-
-  if (!response.ok || !result.success || !result.product) {
-    throw new Error(result.error ?? "Failed to fetch Torob product");
-  }
-
-  return result.product;
-};
-
-const enrichCpuWithTorob = async (cpu: CPU): Promise<CPU> => {
-  if (!cpu.torobUrl) return cpu;
-
-  try {
-    const product = await fetchTorobProduct(cpu.torobUrl);
-
-    return {
-      ...cpu,
-      price: product.price == null ? cpu.price : String(product.price),
-      image: product.image ?? cpu.image,
-      links: product.url,
-    };
-  } catch {
-    return cpu;
-  }
-};
+const enrichCpusWithCatalog = (cpus: CPU[]): Promise<CPU[]> =>
+  enrichCatalogParts<CPU>(cpus, "cpu");
 
 export const cpuApi = api.injectEndpoints({
   overrideExisting: process.env.NODE_ENV === "development",
@@ -72,7 +34,7 @@ export const cpuApi = api.injectEndpoints({
       {
         queryFn: async ({ manufacturer, search }) => {
           const canonicalCpus = filterCpus({ manufacturer, search });
-          const data = await Promise.all(canonicalCpus.map(enrichCpuWithTorob));
+          const data = await enrichCpusWithCatalog(canonicalCpus);
           return { data };
         },
         providesTags: ["cpu"],
@@ -86,7 +48,7 @@ export const cpuApi = api.injectEndpoints({
           return { error: { status: 404, data: "CPU یافت نشد" } };
         }
 
-        const data = await enrichCpuWithTorob(cpu);
+        const data = (await enrichCpusWithCatalog([cpu]))[0];
         return { data: { message: "CPU یافت شد", data } };
       },
       providesTags: ["cpu"],

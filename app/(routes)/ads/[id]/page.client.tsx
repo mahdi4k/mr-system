@@ -157,11 +157,11 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
       size={"lg"}
     >
       <Breadcrumbs mb={"lg"} mt={"lg"}>
-        <Anchor c={"var(--mantine-color-kiwi-2)"} size="sm" href={"/"}>
+        <Anchor c={"var(--mantine-color-rigora-2)"} size="sm" href={"/"}>
           خانه
         </Anchor>
         <Anchor
-          c={"var(--mantine-color-kiwi-2)"}
+          c={"var(--mantine-color-rigora-2)"}
           size="sm"
           href={`/ads?category=${product.category.value}`}
         >

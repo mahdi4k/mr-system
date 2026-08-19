@@ -45,7 +45,7 @@ export function HeroHeader({ isAuthenticated }: { isAuthenticated: boolean }) {
             <IconMoodSmile
               className={classes.IconSmile}
               size={50}
-              color="var(--mantine-color-kiwi-8)"
+              color="var(--mantine-color-rigora-8)"
             />
           </Title>
           <ListItem isAuthenticated={isAuthenticated} />

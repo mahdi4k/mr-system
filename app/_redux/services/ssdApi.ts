@@ -2,6 +2,7 @@ import { api } from "./api";
 import { IResult } from "./caseApi";
 import { getSsd, ssds } from "@/_data/productCatalog";
 import type { RecommendableProduct } from "@/_data/products/types";
+import { enrichCatalogParts } from "../../_features/productCatalog/client";
 
 export type SSD = RecommendableProduct & {
   id: number;
@@ -20,41 +21,8 @@ export type SSD = RecommendableProduct & {
   torobUrl?: string;
 };
 
-interface TorobProduct {
-  price?: number | null;
-  image?: string | null;
-  url: string;
-}
-
-interface TorobProductResponse {
-  success: boolean;
-  product?: TorobProduct;
-  error?: string;
-}
-
-const enrichSsdWithTorob = async (ssd: SSD): Promise<SSD> => {
-  if (!ssd.torobUrl) return ssd;
-
-  try {
-    const params = new URLSearchParams({ url: ssd.torobUrl });
-    const response = await fetch(`/api/torob-product?${params}`);
-    const result = (await response.json()) as TorobProductResponse;
-
-    if (!response.ok || !result.success || !result.product) {
-      throw new Error(result.error ?? "Failed to fetch Torob product");
-    }
-
-    return {
-      ...ssd,
-      price:
-        result.product.price == null ? ssd.price : String(result.product.price),
-      image: result.product.image ?? ssd.image,
-      links: result.product.url,
-    };
-  } catch {
-    return ssd;
-  }
-};
+const enrichSsdWithCatalog = (ssds: SSD[]): Promise<SSD[]> =>
+  enrichCatalogParts<SSD>(ssds, "ssd");
 
 export const SsdApi = api.injectEndpoints({
   overrideExisting: process.env.NODE_ENV === "development",
@@ -68,7 +36,7 @@ export const SsdApi = api.injectEndpoints({
             ssd.name.toLowerCase().includes(searchLower),
           );
         }
-        return { data: await Promise.all(data.map(enrichSsdWithTorob)) };
+        return { data: await enrichSsdWithCatalog(data) };
       },
       providesTags: ["ssd"],
     }),
@@ -76,7 +44,7 @@ export const SsdApi = api.injectEndpoints({
       queryFn: async ({ id }) => {
         const ssd = getSsd(id);
         if (ssd) {
-          const data = await enrichSsdWithTorob(ssd);
+          const data = (await enrichSsdWithCatalog([ssd]))[0];
           return { data: { message: "SSD یافت شد", data } };
         }
         return { data: { message: "SSD یافت نشد", data: ssds[0] } };

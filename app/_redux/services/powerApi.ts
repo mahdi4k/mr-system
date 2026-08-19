@@ -2,6 +2,7 @@ import { api } from "./api";
 import { IResult } from "./caseApi";
 import { filterPowers, getPower, powers } from "@/_data/productCatalog";
 import type { RecommendableProduct } from "@/_data/products/types";
+import { enrichCatalogParts } from "../../_features/productCatalog/client";
 
 export type POWER = RecommendableProduct & {
   id: number;
@@ -17,43 +18,8 @@ export type POWER = RecommendableProduct & {
   torobUrl?: string;
 };
 
-interface TorobProduct {
-  price?: number | null;
-  image?: string | null;
-  url: string;
-}
-
-interface TorobProductResponse {
-  success: boolean;
-  product?: TorobProduct;
-  error?: string;
-}
-
-const enrichPowerWithTorob = async (power: POWER): Promise<POWER> => {
-  if (!power.torobUrl) return power;
-
-  try {
-    const params = new URLSearchParams({ url: power.torobUrl });
-    const response = await fetch(`/api/torob-product?${params}`);
-    const result = (await response.json()) as TorobProductResponse;
-
-    if (!response.ok || !result.success || !result.product) {
-      throw new Error(result.error ?? "Failed to fetch Torob product");
-    }
-
-    return {
-      ...power,
-      price:
-        result.product.price == null
-          ? power.price
-          : String(result.product.price),
-      image: result.product.image ?? power.image,
-      links: result.product.url,
-    };
-  } catch {
-    return power;
-  }
-};
+const enrichPowerWithCatalog = (powers: POWER[]): Promise<POWER[]> =>
+  enrichCatalogParts<POWER>(powers, "power");
 
 export const PowerApi = api.injectEndpoints({
   overrideExisting: process.env.NODE_ENV === "development",
@@ -68,9 +34,7 @@ export const PowerApi = api.injectEndpoints({
     >({
       queryFn: async ({ modular, eighty_plus, search }) => {
         const canonicalPowers = filterPowers({ modular, search });
-        const data = await Promise.all(
-          canonicalPowers.map(enrichPowerWithTorob),
-        );
+        const data = await enrichPowerWithCatalog(canonicalPowers);
         return { data };
       },
       providesTags: ["power"],
@@ -79,7 +43,7 @@ export const PowerApi = api.injectEndpoints({
       queryFn: async ({ id }) => {
         const power = getPower(id);
         if (power) {
-          const data = await enrichPowerWithTorob(power);
+          const data = (await enrichPowerWithCatalog([power]))[0];
           return { data: { message: "Power یافت شد", data } };
         }
         return { data: { message: "Power یافت نشد", data: powers[0] } };

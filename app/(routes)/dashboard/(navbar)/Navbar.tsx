@@ -2,6 +2,7 @@
 
 import {
   IconAd,
+  IconBolt,
   IconBox,
   IconCpu,
   IconDashboard,
@@ -75,6 +76,15 @@ export default function Navbar({ onNavigate, pathname }: NavbarProps) {
           leftSection={<IconMessageCircle size={19} />}
           onClick={onNavigate}
           rightSection={<IconExternalLink size={14} />}
+        />
+        <NavLink
+          active={pathname.startsWith("/dashboard/catalog")}
+          component={Link}
+          href="/dashboard/catalog"
+          label="قیمت و کاتالوگ"
+          leftSection={<IconBolt size={19} />}
+          onClick={onNavigate}
+          variant="light"
         />
 
         <Divider my="md" />

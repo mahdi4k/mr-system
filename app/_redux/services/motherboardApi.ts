@@ -6,6 +6,7 @@ import {
   motherboards,
 } from "@/_data/productCatalog";
 import type { RecommendableProduct } from "@/_data/products/types";
+import { enrichCatalogParts } from "../../_features/productCatalog/client";
 
 export type Motherboard = RecommendableProduct & {
   id: number;
@@ -28,45 +29,10 @@ export type Motherboard = RecommendableProduct & {
   torobUrl?: string;
 };
 
-interface TorobProduct {
-  price?: number | null;
-  image?: string | null;
-  url: string;
-}
-
-interface TorobProductResponse {
-  success: boolean;
-  product?: TorobProduct;
-  error?: string;
-}
-
-const enrichMotherboardWithTorob = async (
-  motherboard: Motherboard,
-): Promise<Motherboard> => {
-  if (!motherboard.torobUrl) return motherboard;
-
-  try {
-    const params = new URLSearchParams({ url: motherboard.torobUrl });
-    const response = await fetch(`/api/torob-product?${params}`);
-    const result = (await response.json()) as TorobProductResponse;
-
-    if (!response.ok || !result.success || !result.product) {
-      throw new Error(result.error ?? "Failed to fetch Torob product");
-    }
-
-    return {
-      ...motherboard,
-      price:
-        result.product.price == null
-          ? motherboard.price
-          : String(result.product.price),
-      image: result.product.image ?? motherboard.image,
-      links: result.product.url,
-    };
-  } catch {
-    return motherboard;
-  }
-};
+const enrichMotherboardWithCatalog = (
+  motherboards: Motherboard[],
+): Promise<Motherboard[]> =>
+  enrichCatalogParts<Motherboard>(motherboards, "motherboard");
 
 export const motherboardApi = api.injectEndpoints({
   overrideExisting: process.env.NODE_ENV === "development",
@@ -80,9 +46,7 @@ export const motherboardApi = api.injectEndpoints({
           manufacturer,
           search,
         });
-        const data = await Promise.all(
-          canonicalMotherboards.map(enrichMotherboardWithTorob),
-        );
+        const data = await enrichMotherboardWithCatalog(canonicalMotherboards);
         return { data };
       },
       providesTags: ["motherboards"],
@@ -91,7 +55,7 @@ export const motherboardApi = api.injectEndpoints({
       queryFn: async ({ id }) => {
         const motherboard = getMotherboard(id);
         if (motherboard) {
-          const data = await enrichMotherboardWithTorob(motherboard);
+          const data = (await enrichMotherboardWithCatalog([motherboard]))[0];
           return {
             data: { message: "Motherboard یافت شد", data },
           };

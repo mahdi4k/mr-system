@@ -17,11 +17,11 @@ type Props = {
 const BreadCrumbKiwi: FC<Props> = ({ title, type }) => {
   return (
     <Breadcrumbs mb={"lg"} mt={"lg"}>
-      <Anchor c={"var(--mantine-color-kiwi-2)"} size="sm" href={"/"}>
+      <Anchor c={"var(--mantine-color-rigora-2)"} size="sm" href={"/"}>
         خانه
       </Anchor>
       <Anchor
-        c={"var(--mantine-color-kiwi-2)"}
+        c={"var(--mantine-color-rigora-2)"}
         size="sm"
         href={`/category/${type}`}
       >

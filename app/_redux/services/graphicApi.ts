@@ -2,6 +2,7 @@ import { api } from "./api";
 import { IResult } from "./caseApi";
 import { filterGraphics, getGraphic, graphics } from "@/_data/productCatalog";
 import type { RecommendableProduct } from "@/_data/products/types";
+import { enrichCatalogParts } from "../../_features/productCatalog/client";
 
 export type Graphic = RecommendableProduct & {
   id: number;
@@ -22,43 +23,8 @@ export type Graphic = RecommendableProduct & {
   torobUrl?: string;
 };
 
-interface TorobProduct {
-  price?: number | null;
-  image?: string | null;
-  url: string;
-}
-
-interface TorobProductResponse {
-  success: boolean;
-  product?: TorobProduct;
-  error?: string;
-}
-
-const enrichGraphicWithTorob = async (graphic: Graphic): Promise<Graphic> => {
-  if (!graphic.torobUrl) return graphic;
-
-  try {
-    const params = new URLSearchParams({ url: graphic.torobUrl });
-    const response = await fetch(`/api/torob-product?${params}`);
-    const result = (await response.json()) as TorobProductResponse;
-
-    if (!response.ok || !result.success || !result.product) {
-      throw new Error(result.error ?? "Failed to fetch Torob product");
-    }
-
-    return {
-      ...graphic,
-      price:
-        result.product.price == null
-          ? graphic.price
-          : String(result.product.price),
-      image: result.product.image ?? graphic.image,
-      links: result.product.url,
-    };
-  } catch {
-    return graphic;
-  }
-};
+const enrichGraphicWithCatalog = (graphics: Graphic[]): Promise<Graphic[]> =>
+  enrichCatalogParts<Graphic>(graphics, "graphic");
 
 export const graphicApi = api.injectEndpoints({
   overrideExisting: process.env.NODE_ENV === "development",
@@ -69,9 +35,7 @@ export const graphicApi = api.injectEndpoints({
     >({
       queryFn: async ({ manufacturer, search }) => {
         const canonicalGraphics = filterGraphics({ manufacturer, search });
-        const data = await Promise.all(
-          canonicalGraphics.map(enrichGraphicWithTorob),
-        );
+        const data = await enrichGraphicWithCatalog(canonicalGraphics);
         return { data };
       },
       providesTags: ["graphic"],
@@ -80,7 +44,7 @@ export const graphicApi = api.injectEndpoints({
       queryFn: async ({ id }) => {
         const graphic = getGraphic(id);
         if (graphic) {
-          const data = await enrichGraphicWithTorob(graphic);
+          const data = (await enrichGraphicWithCatalog([graphic]))[0];
           return { data: { message: "Graphic یافت شد", data } };
         }
         return { data: { message: "Graphic یافت نشد", data: graphics[0] } };

@@ -2,7 +2,7 @@
     transition: all .3s;
 
     &:hover {
-        box-shadow: var(--mantine-color-kiwi-outline-hover) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
-        border: 1px solid var(--mantine-color-kiwi-filled-hover);
+        box-shadow: var(--mantine-color-rigora-outline-hover) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
+        border: 1px solid var(--mantine-color-rigora-filled-hover);
     }
 }

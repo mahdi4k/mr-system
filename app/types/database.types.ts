@@ -15,6 +15,22 @@ export type AdStatus =
 
 export type ArticleStatus = "draft" | "published" | "archived";
 
+export type CatalogPartType =
+  | "cpu"
+  | "motherboard"
+  | "graphic"
+  | "power"
+  | "ram"
+  | "fan"
+  | "ssd"
+  | "case";
+
+export type CatalogSyncStatus = "active" | "failed" | "retrying" | "never";
+
+export type PriceSource = "automatic" | "manual";
+
+export type MatchStatus = "pending" | "approved" | "rejected";
+
 export interface Database {
   public: {
     Tables: {
@@ -320,6 +336,183 @@ export interface Database {
         };
         Relationships: [];
       };
+      catalog_audit_history: {
+        Row: {
+          action: string;
+          changed_at: string;
+          changed_by: string | null;
+          id: number;
+          part_type: CatalogPartType;
+          price_after: number | null;
+          price_before: number | null;
+          product_id: number;
+          title_after: string | null;
+          title_before: string | null;
+        };
+        Insert: {
+          action: string;
+          changed_at?: string;
+          changed_by?: string | null;
+          id?: never;
+          part_type: CatalogPartType;
+          price_after?: number | null;
+          price_before?: number | null;
+          product_id: number;
+          title_after?: string | null;
+          title_before?: string | null;
+        };
+        Update: {
+          action?: string;
+          changed_at?: string;
+          changed_by?: string | null;
+          id?: never;
+          part_type?: CatalogPartType;
+          price_after?: number | null;
+          price_before?: number | null;
+          product_id?: number;
+          title_after?: string | null;
+          title_before?: string | null;
+        };
+        Relationships: [];
+      };
+      catalog_product_content: {
+        Row: {
+          claim_token: string | null;
+          claimed_at: string | null;
+          created_at: string;
+          current_price: number | null;
+          failure_count: number;
+          fetched_at: string | null;
+          image_url: string | null;
+          last_error: string | null;
+          last_success_at: string | null;
+          lease_until: string | null;
+          next_fetch_at: string | null;
+          part_type: CatalogPartType;
+          price_source: PriceSource;
+          product_id: number;
+          sync_status: CatalogSyncStatus;
+          title: string;
+          torob_product_id: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          claim_token?: string | null;
+          claimed_at?: string | null;
+          created_at?: string;
+          current_price?: number | null;
+          failure_count?: number;
+          fetched_at?: string | null;
+          image_url?: string | null;
+          last_error?: string | null;
+          last_success_at?: string | null;
+          lease_until?: string | null;
+          next_fetch_at?: string | null;
+          part_type: CatalogPartType;
+          price_source?: PriceSource;
+          product_id: number;
+          sync_status?: CatalogSyncStatus;
+          title: string;
+          torob_product_id?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          claim_token?: string | null;
+          claimed_at?: string | null;
+          created_at?: string;
+          current_price?: number | null;
+          failure_count?: number;
+          fetched_at?: string | null;
+          image_url?: string | null;
+          last_error?: string | null;
+          last_success_at?: string | null;
+          lease_until?: string | null;
+          next_fetch_at?: string | null;
+          part_type?: CatalogPartType;
+          price_source?: PriceSource;
+          product_id?: number;
+          sync_status?: CatalogSyncStatus;
+          title?: string;
+          torob_product_id?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      price_history: {
+        Row: {
+          id: number;
+          part_type: CatalogPartType;
+          price: number;
+          product_id: number;
+          provider: string;
+          recorded_at: string;
+        };
+        Insert: {
+          id?: never;
+          part_type: CatalogPartType;
+          price: number;
+          product_id: number;
+          provider?: string;
+          recorded_at?: string;
+        };
+        Update: {
+          id?: never;
+          part_type?: CatalogPartType;
+          price?: number;
+          product_id?: number;
+          provider?: string;
+          recorded_at?: string;
+        };
+        Relationships: [];
+      };
+      torob_match_candidates: {
+        Row: {
+          candidate_image_url: string | null;
+          candidate_name: string;
+          candidate_price: number | null;
+          candidate_torob_product_id: string;
+          created_at: string;
+          id: string;
+          part_type: CatalogPartType;
+          product_id: number;
+          rank: number;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          search_query: string;
+          status: MatchStatus;
+        };
+        Insert: {
+          candidate_image_url?: string | null;
+          candidate_name: string;
+          candidate_price?: number | null;
+          candidate_torob_product_id: string;
+          created_at?: string;
+          id?: string;
+          part_type: CatalogPartType;
+          product_id: number;
+          rank: number;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          search_query: string;
+          status?: MatchStatus;
+        };
+        Update: {
+          candidate_image_url?: string | null;
+          candidate_name?: string;
+          candidate_price?: number | null;
+          candidate_torob_product_id?: string;
+          created_at?: string;
+          id?: string;
+          part_type?: CatalogPartType;
+          product_id?: number;
+          rank?: number;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          search_query?: string;
+          status?: MatchStatus;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -352,6 +545,10 @@ export interface Database {
     Enums: {
       ad_status: AdStatus;
       article_status: ArticleStatus;
+      catalog_part_type: CatalogPartType;
+      catalog_sync_status: CatalogSyncStatus;
+      match_status: MatchStatus;
+      price_source: PriceSource;
     };
     CompositeTypes: Record<string, never>;
   };

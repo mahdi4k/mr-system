@@ -2,6 +2,7 @@ import { api } from "./api";
 import { IResult } from "./caseApi";
 import { fans, getFan } from "@/_data/productCatalog";
 import type { RecommendableProduct } from "@/_data/products/types";
+import { enrichCatalogParts } from "../../_features/productCatalog/client";
 
 export type FAN = RecommendableProduct & {
   id: number;
@@ -20,41 +21,8 @@ export type FAN = RecommendableProduct & {
   torobUrl?: string;
 };
 
-interface TorobProduct {
-  price?: number | null;
-  image?: string | null;
-  url: string;
-}
-
-interface TorobProductResponse {
-  success: boolean;
-  product?: TorobProduct;
-  error?: string;
-}
-
-const enrichFanWithTorob = async (fan: FAN): Promise<FAN> => {
-  if (!fan.torobUrl) return fan;
-
-  try {
-    const params = new URLSearchParams({ url: fan.torobUrl });
-    const response = await fetch(`/api/torob-product?${params}`);
-    const result = (await response.json()) as TorobProductResponse;
-
-    if (!response.ok || !result.success || !result.product) {
-      throw new Error(result.error ?? "Failed to fetch Torob product");
-    }
-
-    return {
-      ...fan,
-      price:
-        result.product.price == null ? fan.price : String(result.product.price),
-      image: result.product.image ?? fan.image,
-      links: result.product.url,
-    };
-  } catch {
-    return fan;
-  }
-};
+const enrichFanWithCatalog = (fans: FAN[]): Promise<FAN[]> =>
+  enrichCatalogParts<FAN>(fans, "fan");
 
 export const FanApi = api.injectEndpoints({
   overrideExisting: process.env.NODE_ENV === "development",
@@ -68,7 +36,7 @@ export const FanApi = api.injectEndpoints({
             fan.name.toLowerCase().includes(searchLower),
           );
         }
-        return { data: await Promise.all(data.map(enrichFanWithTorob)) };
+        return { data: await enrichFanWithCatalog(data) };
       },
       providesTags: ["fan"],
     }),
@@ -76,7 +44,7 @@ export const FanApi = api.injectEndpoints({
       queryFn: async ({ id }) => {
         const fan = getFan(id);
         if (fan) {
-          const data = await enrichFanWithTorob(fan);
+          const data = (await enrichFanWithCatalog([fan]))[0];
           return { data: { message: "Fan یافت شد", data } };
         }
         return { data: { message: "Fan یافت نشد", data: fans[0] } };

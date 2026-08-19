@@ -1,6 +1,7 @@
 import { api } from "./api";
 import { cases, getCase } from "@/_data/productCatalog";
 import type { RecommendableProduct } from "@/_data/products/types";
+import { enrichCatalogParts } from "../../_features/productCatalog/client";
 
 export interface IResult<T> {
   message: string;
@@ -23,43 +24,8 @@ export type CASE = RecommendableProduct & {
   torobUrl?: string;
 };
 
-interface TorobProduct {
-  price?: number | null;
-  image?: string | null;
-  url: string;
-}
-
-interface TorobProductResponse {
-  success: boolean;
-  product?: TorobProduct;
-  error?: string;
-}
-
-const enrichCaseWithTorob = async (caseItem: CASE): Promise<CASE> => {
-  if (!caseItem.torobUrl) return caseItem;
-
-  try {
-    const params = new URLSearchParams({ url: caseItem.torobUrl });
-    const response = await fetch(`/api/torob-product?${params}`);
-    const result = (await response.json()) as TorobProductResponse;
-
-    if (!response.ok || !result.success || !result.product) {
-      throw new Error(result.error ?? "Failed to fetch Torob product");
-    }
-
-    return {
-      ...caseItem,
-      price:
-        result.product.price == null
-          ? caseItem.price
-          : String(result.product.price),
-      image: result.product.image ?? caseItem.image,
-      links: result.product.url,
-    };
-  } catch {
-    return caseItem;
-  }
-};
+const enrichCaseWithCatalog = (cases: CASE[]): Promise<CASE[]> =>
+  enrichCatalogParts<CASE>(cases, "case");
 
 export const CaseApi = api.injectEndpoints({
   overrideExisting: process.env.NODE_ENV === "development",
@@ -71,7 +37,7 @@ export const CaseApi = api.injectEndpoints({
           const searchLower = search.toLowerCase();
           data = data.filter((c) => c.name.toLowerCase().includes(searchLower));
         }
-        return { data: await Promise.all(data.map(enrichCaseWithTorob)) };
+        return { data: await enrichCaseWithCatalog(data) };
       },
       providesTags: ["case"],
     }),
@@ -79,7 +45,7 @@ export const CaseApi = api.injectEndpoints({
       queryFn: async ({ id }) => {
         const caseItem = getCase(id);
         if (caseItem) {
-          const data = await enrichCaseWithTorob(caseItem);
+          const data = (await enrichCaseWithCatalog([caseItem]))[0];
           return { data: { message: "Case یافت شد", data } };
         }
         return { data: { message: "Case یافت نشد", data: cases[0] } };

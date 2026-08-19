@@ -2,6 +2,7 @@ import { api } from "./api";
 import { IResult } from "./caseApi";
 import { getRam, rams } from "@/_data/productCatalog";
 import type { RecommendableProduct } from "@/_data/products/types";
+import { enrichCatalogParts } from "../../_features/productCatalog/client";
 
 export type RAM = RecommendableProduct & {
   id: number;
@@ -18,41 +19,8 @@ export type RAM = RecommendableProduct & {
   torobUrl?: string;
 };
 
-interface TorobProduct {
-  price?: number | null;
-  image?: string | null;
-  url: string;
-}
-
-interface TorobProductResponse {
-  success: boolean;
-  product?: TorobProduct;
-  error?: string;
-}
-
-const enrichRamWithTorob = async (ram: RAM): Promise<RAM> => {
-  if (!ram.torobUrl) return ram;
-
-  try {
-    const params = new URLSearchParams({ url: ram.torobUrl });
-    const response = await fetch(`/api/torob-product?${params}`);
-    const result = (await response.json()) as TorobProductResponse;
-
-    if (!response.ok || !result.success || !result.product) {
-      throw new Error(result.error ?? "Failed to fetch Torob product");
-    }
-
-    return {
-      ...ram,
-      price:
-        result.product.price == null ? ram.price : String(result.product.price),
-      image: result.product.image ?? ram.image,
-      links: result.product.url,
-    };
-  } catch {
-    return ram;
-  }
-};
+const enrichRamWithCatalog = (rams: RAM[]): Promise<RAM[]> =>
+  enrichCatalogParts<RAM>(rams, "ram");
 
 export const RamApi = api.injectEndpoints({
   overrideExisting: process.env.NODE_ENV === "development",
@@ -66,7 +34,7 @@ export const RamApi = api.injectEndpoints({
             ram.name.toLowerCase().includes(searchLower),
           );
         }
-        return { data: await Promise.all(data.map(enrichRamWithTorob)) };
+        return { data: await enrichRamWithCatalog(data) };
       },
       providesTags: ["ram"],
     }),
@@ -81,7 +49,7 @@ export const RamApi = api.injectEndpoints({
       queryFn: async ({ id }) => {
         const ram = getRam(id);
         if (ram) {
-          const data = await enrichRamWithTorob(ram);
+          const data = (await enrichRamWithCatalog([ram]))[0];
           return { data: { message: "RAM یافت شد", data } };
         }
         return { data: { message: "RAM یافت نشد", data: rams[0] } };
