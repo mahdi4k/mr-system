@@ -2,21 +2,31 @@
 
 import { useEffect, useState } from "react";
 import {
+  ActionIcon,
   Alert,
   Badge,
   Box,
   Button,
+  FileInput,
   Group,
   Image,
   Loader,
+  Modal,
+  NumberInput,
   Stack,
   Table,
   Tabs,
   Text,
   TextInput,
   Title,
+  Tooltip,
 } from "@mantine/core";
-import { IconCloudDownload, IconSearch } from "@tabler/icons-react";
+import {
+  IconCloudDownload,
+  IconEdit,
+  IconRefresh,
+  IconSearch,
+} from "@tabler/icons-react";
 import { CATALOG_PART_TYPES } from "../../../_features/productCatalog/types";
 
 interface CatalogProduct {
@@ -67,6 +77,16 @@ export default function CatalogAdmin() {
   const [loadingMatches, setLoadingMatches] = useState(false);
   const [suggestQuery, setSuggestQuery] = useState("");
   const [suggestFor, setSuggestFor] = useState<number>(1);
+
+  // Edit modal state
+  const [editProduct, setEditProduct] = useState<CatalogProduct | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editPrice, setEditPrice] = useState<number | "">("");
+  const [editImage, setEditImage] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  // Parse.bot sync state
+  const [syncingId, setSyncingId] = useState<number | null>(null);
 
   const loadCatalog = async (pt: string) => {
     setLoadingCatalog(true);
@@ -130,6 +150,87 @@ export default function CatalogAdmin() {
     loadCatalog(partType);
   };
 
+  // Edit modal
+  const openEditModal = (product: CatalogProduct) => {
+    setEditProduct(product);
+    setEditPrice(product.price ?? "");
+    setEditImage(null);
+    setEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setEditModalOpen(false);
+    setEditProduct(null);
+    setEditImage(null);
+    setEditPrice("");
+  };
+
+  const saveEdit = async () => {
+    if (!editProduct) return;
+    setSaving(true);
+    setError("");
+
+    try {
+      const formData = new FormData();
+
+      if (editPrice !== "" && editPrice !== null) {
+        formData.append("price", String(editPrice));
+      }
+
+      if (editImage) {
+        formData.append("image", editImage);
+      }
+
+      if (Array.from(formData.entries()).length === 0) {
+        closeEditModal();
+        return;
+      }
+
+      const res = await fetch(`/api/catalog/${partType}/${editProduct.id}`, {
+        method: "PATCH",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error ?? "بروزرسانی ناموفق بود");
+      }
+
+      closeEditModal();
+      loadCatalog(partType);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const editImagePreview = editImage
+    ? URL.createObjectURL(editImage)
+    : editProduct?.image ?? null;
+
+  // Parse.bot sync
+  const syncFromParseBot = async (product: CatalogProduct) => {
+    setSyncingId(product.id);
+    setError("");
+    try {
+      const res = await fetch(
+        `/api/catalog/${partType}/${product.id}/parse`,
+        { method: "POST" },
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error ?? "خطا در همگام‌سازی از تورب");
+      }
+      loadCatalog(partType);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setSyncingId(null);
+    }
+  };
+
   return (
     <Stack gap="lg">
       <Title order={2}>مدیریت کاتالوگ و همگام‌سازی قیمت</Title>
@@ -168,39 +269,16 @@ export default function CatalogAdmin() {
               </Button>
               <Button
                 variant="light"
-                loading={running === "images"}
-                onClick={() =>
-                  runAction("دریافت تصاویر", "/api/price-sync/import-images", {
-                    limit: 100,
-                  })
-                }
-              >
-                دریافت تصاویر (۵ عدد)
-              </Button>
-            </Group>
-            {result && <Text size="sm">{result}</Text>}
-          </Stack>
-        </Tabs.Panel>
-
-        <Tabs.Panel value="match" pt="md">
-          <Stack gap="sm">
-            <Group align="end">
-              <TextInput
-                label="تعداد کاتالوگ / اسم کالا"
-                value={suggestQuery}
-                onChange={(e) => setSuggestQuery(e.currentTarget.value)}
-                placeholder="e.g. Intel Core i5-12400F"
-              />
-              <Button
-                variant="light"
                 loading={running === "suggest"}
-                onClick={() =>
-                  runAction("پیشنهاد کاندیدا", "/api/match-candidates", {
-                    partType,
-                    productId: Number(suggestFor),
-                    query: suggestQuery,
-                  }).then(loadCandidates)
-                }
+                onClick={() => {
+                  setError("");
+                  if (suggestQuery.trim())
+                    runAction("پیشنهاد", "/api/match-candidates/suggest", {
+                      part_type: "cpu",
+                      product_id: suggestFor,
+                      query: suggestQuery,
+                    }).then(loadCandidates);
+                }}
               >
                 پیشنهاد کاندیداها
               </Button>
@@ -292,6 +370,7 @@ export default function CatalogAdmin() {
                   <Table.Tr>
                     <Table.Th>#</Table.Th>
                     <Table.Th>نام</Table.Th>
+                    <Table.Th>عملیات</Table.Th>
                     <Table.Th>قیمت</Table.Th>
                     <Table.Th>مرجع تورب</Table.Th>
                     <Table.Th>وضعیت</Table.Th>
@@ -302,6 +381,29 @@ export default function CatalogAdmin() {
                     <Table.Tr key={p.id}>
                       <Table.Td>{p.id}</Table.Td>
                       <Table.Td>{p.title}</Table.Td>
+                      <Table.Td>
+                        <Group gap={4} wrap="nowrap">
+                          <ActionIcon
+                            variant="light"
+                            color="blue"
+                            onClick={() => openEditModal(p)}
+                          >
+                            <IconEdit size={16} />
+                          </ActionIcon>
+                          {p.torobProductId && (
+                            <Tooltip label="دریافت از تورب">
+                              <ActionIcon
+                                variant="light"
+                                color="green"
+                                loading={syncingId === p.id}
+                                onClick={() => syncFromParseBot(p)}
+                              >
+                                <IconRefresh size={16} />
+                              </ActionIcon>
+                            </Tooltip>
+                          )}
+                        </Group>
+                      </Table.Td>
                       <Table.Td>
                         {p.price != null
                           ? p.price.toLocaleString("fa-IR") + " ت"
@@ -334,6 +436,55 @@ export default function CatalogAdmin() {
           </Stack>
         </Tabs.Panel>
       </Tabs>
+
+      <Modal
+        opened={editModalOpen}
+        onClose={closeEditModal}
+        title={`ویرایش ${editProduct?.title ?? ""}`}
+        centered
+      >
+        <Stack gap="md">
+          {editImagePreview && (
+            <Image
+              src={editImagePreview}
+              h={160}
+              w="auto"
+              fit="contain"
+              alt="تصویر محصول"
+              style={{ alignSelf: "center" }}
+            />
+          )}
+
+          <FileInput
+            label="تصویر جدید"
+            placeholder="انتخاب تصویر..."
+            accept="image/*"
+            clearable
+            value={editImage}
+            onChange={setEditImage}
+          />
+
+          <NumberInput
+            label="قیمت (تومان)"
+            placeholder="قیمت را وارد کنید"
+            value={editPrice}
+            onChange={(val) => setEditPrice(val === "" ? "" : Number(val))}
+            thousandSeparator
+            min={0}
+            hideControls
+          />
+
+          <Group justify="flex-end" mt="md">
+            <Button variant="light" onClick={closeEditModal}>
+              انصراف
+            </Button>
+            <Button onClick={saveEdit} loading={saving}>
+              ذخیره
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
       <Box />
     </Stack>
   );
