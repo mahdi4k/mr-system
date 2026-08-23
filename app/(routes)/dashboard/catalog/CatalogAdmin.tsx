@@ -7,6 +7,7 @@ import {
   Badge,
   Box,
   Button,
+  Checkbox,
   FileInput,
   Group,
   Image,
@@ -24,6 +25,7 @@ import {
 import {
   IconCloudDownload,
   IconEdit,
+  IconPlayerPlay,
   IconRefresh,
   IconSearch,
 } from "@tabler/icons-react";
@@ -87,6 +89,12 @@ export default function CatalogAdmin() {
 
   // Parse.bot sync state
   const [syncingId, setSyncingId] = useState<number | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [batchSyncing, setBatchSyncing] = useState(false);
+  const [syncProgress, setSyncProgress] = useState<{
+    done: number;
+    total: number;
+  } | null>(null);
 
   const loadCatalog = async (pt: string) => {
     setLoadingCatalog(true);
@@ -210,7 +218,7 @@ export default function CatalogAdmin() {
     ? URL.createObjectURL(editImage)
     : editProduct?.image ?? null;
 
-  // Parse.bot sync
+  // Parse.bot sync (single)
   const syncFromParseBot = async (product: CatalogProduct) => {
     setSyncingId(product.id);
     setError("");
@@ -229,6 +237,77 @@ export default function CatalogAdmin() {
     } finally {
       setSyncingId(null);
     }
+  };
+
+  // Batch sequential sync
+  const syncSelected = async () => {
+    const ids = products.filter(
+      (p) => selectedIds.has(p.id) && p.torobProductId,
+    );
+    if (ids.length === 0) return;
+
+    setBatchSyncing(true);
+    setSyncProgress({ done: 0, total: ids.length });
+    setError("");
+
+    for (const product of ids) {
+      setSyncingId(product.id);
+      try {
+        const res = await fetch(
+          `/api/catalog/${partType}/${product.id}/parse`,
+          { method: "POST" },
+        );
+        const data = await res.json();
+        if (!res.ok) {
+          console.error(
+            `Sync failed for ${product.id}:`,
+            data.error ?? "خطا",
+          );
+        }
+      } catch (e) {
+        console.error(
+          `Sync error for ${product.id}:`,
+          e instanceof Error ? e.message : String(e),
+        );
+      } finally {
+        setSyncingId(null);
+        setSyncProgress((prev) =>
+          prev ? { ...prev, done: prev.done + 1 } : null,
+        );
+      }
+    }
+
+    setBatchSyncing(false);
+    setSyncProgress(null);
+    setSelectedIds(new Set());
+    loadCatalog(partType);
+  };
+
+  const selectableCount = products.filter((p) => p.torobProductId).length;
+  const allSelected =
+    selectableCount > 0 &&
+    products.every((p) => !p.torobProductId || selectedIds.has(p.id));
+
+  const toggleAll = () => {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(
+        new Set(
+          products.filter((p) => p.torobProductId).map((p) => p.id),
+        ),
+      );
+    }
+  };
+
+  const toggleOne = (id: number) => {
+    const next = new Set(selectedIds);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    setSelectedIds(next);
   };
 
   return (
@@ -362,12 +441,41 @@ export default function CatalogAdmin() {
                 </Button>
               ))}
             </Group>
+
+            {selectedIds.size > 0 && !batchSyncing && (
+              <Group>
+                <Button
+                  leftSection={<IconPlayerPlay size={16} />}
+                  onClick={syncSelected}
+                >
+                  همگام‌سازی انتخاب‌شده ({selectedIds.size})
+                </Button>
+              </Group>
+            )}
+
+            {batchSyncing && syncProgress && (
+              <Text size="sm" c="dimmed">
+                در حال همگام‌سازی: {syncProgress.done} از {syncProgress.total}
+              </Text>
+            )}
+
             {loadingCatalog ? (
               <Loader />
             ) : (
               <Table striped withTableBorder>
                 <Table.Thead>
                   <Table.Tr>
+                    <Table.Th w={40}>
+                      <Checkbox
+                        aria-label="انتخاب همه"
+                        checked={allSelected}
+                        indeterminate={
+                          selectedIds.size > 0 && !allSelected
+                        }
+                        onChange={toggleAll}
+                        disabled={selectableCount === 0 || batchSyncing}
+                      />
+                    </Table.Th>
                     <Table.Th>#</Table.Th>
                     <Table.Th>نام</Table.Th>
                     <Table.Th>عملیات</Table.Th>
@@ -377,59 +485,79 @@ export default function CatalogAdmin() {
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                  {products.map((p) => (
-                    <Table.Tr key={p.id}>
-                      <Table.Td>{p.id}</Table.Td>
-                      <Table.Td>{p.title}</Table.Td>
-                      <Table.Td>
-                        <Group gap={4} wrap="nowrap">
-                          <ActionIcon
-                            variant="light"
-                            color="blue"
-                            onClick={() => openEditModal(p)}
-                          >
-                            <IconEdit size={16} />
-                          </ActionIcon>
-                          {p.torobProductId && (
-                            <Tooltip label="دریافت از تورب">
-                              <ActionIcon
-                                variant="light"
-                                color="green"
-                                loading={syncingId === p.id}
-                                onClick={() => syncFromParseBot(p)}
-                              >
-                                <IconRefresh size={16} />
-                              </ActionIcon>
-                            </Tooltip>
+                  {products.map((p) => {
+                    const hasTorob = Boolean(p.torobProductId);
+                    return (
+                      <Table.Tr
+                        key={p.id}
+                        bg={
+                          selectedIds.has(p.id)
+                            ? "var(--mantine-color-blue-light)"
+                            : undefined
+                        }
+                      >
+                        <Table.Td>
+                          <Checkbox
+                            aria-label={`انتخاب ${p.title}`}
+                            checked={selectedIds.has(p.id)}
+                            onChange={() => toggleOne(p.id)}
+                            disabled={!hasTorob || batchSyncing}
+                          />
+                        </Table.Td>
+                        <Table.Td>{p.id}</Table.Td>
+                        <Table.Td>{p.title}</Table.Td>
+                        <Table.Td>
+                          <Group gap={4} wrap="nowrap">
+                            <ActionIcon
+                              variant="light"
+                              color="blue"
+                              onClick={() => openEditModal(p)}
+                            >
+                              <IconEdit size={16} />
+                            </ActionIcon>
+                            {hasTorob && (
+                              <Tooltip label="دریافت از تورب">
+                                <ActionIcon
+                                  variant="light"
+                                  color="green"
+                                  loading={syncingId === p.id}
+                                  onClick={() => syncFromParseBot(p)}
+                                >
+                                  <IconRefresh size={16} />
+                                </ActionIcon>
+                              </Tooltip>
+                            )}
+                          </Group>
+                        </Table.Td>
+                        <Table.Td>
+                          {p.price != null
+                            ? p.price.toLocaleString("fa-IR") + " ت"
+                            : "-"}
+                        </Table.Td>
+                        <Table.Td>
+                          {hasTorob ? (
+                            <Badge size="xs">آماده</Badge>
+                          ) : (
+                            <Badge size="xs" color="gray">
+                              ندارد
+                            </Badge>
                           )}
-                        </Group>
-                      </Table.Td>
-                      <Table.Td>
-                        {p.price != null
-                          ? p.price.toLocaleString("fa-IR") + " ت"
-                          : "-"}
-                      </Table.Td>
-                      <Table.Td>
-                        {p.torobProductId ? (
-                          <Badge size="xs">آماده</Badge>
-                        ) : (
-                          <Badge size="xs" color="gray">
-                            ندارد
+                        </Table.Td>
+                        <Table.Td>
+                          <Badge
+                            size="xs"
+                            color={
+                              p.overlay.syncStatus === "failed"
+                                ? "red"
+                                : "blue"
+                            }
+                          >
+                            {p.overlay.syncStatus}
                           </Badge>
-                        )}
-                      </Table.Td>
-                      <Table.Td>
-                        <Badge
-                          size="xs"
-                          color={
-                            p.overlay.syncStatus === "failed" ? "red" : "blue"
-                          }
-                        >
-                          {p.overlay.syncStatus}
-                        </Badge>
-                      </Table.Td>
-                    </Table.Tr>
-                  ))}
+                        </Table.Td>
+                      </Table.Tr>
+                    );
+                  })}
                 </Table.Tbody>
               </Table>
             )}
