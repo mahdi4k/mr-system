@@ -1,5 +1,13 @@
-import { Box, Tooltip, Text, Divider, Flex, ActionIcon } from "@mantine/core";
-import React, { FC, useEffect, useState } from "react";
+import {
+  Box,
+  Tooltip,
+  Text,
+  Divider,
+  Flex,
+  ActionIcon,
+  Skeleton,
+} from "@mantine/core";
+import React, { FC } from "react";
 import Image from "next/image";
 import classes from "./choosePart.module.css";
 import { useDisclosure } from "@mantine/hooks";
@@ -18,6 +26,7 @@ interface Props {
   type: string;
   itemData?: Partial<CPU>;
   partEmpty: boolean;
+  loading?: boolean;
 }
 
 const ChoosePartItem: FC<Props> = ({
@@ -26,21 +35,17 @@ const ChoosePartItem: FC<Props> = ({
   type,
   itemData,
   partEmpty,
+  loading = false,
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [currentItemData, setCurrentItemData] = useState<
-    Partial<CPU> | undefined
-  >(itemData);
   const ramQuantity = parseRamQuantity(searchParams.get("ramQuantity"));
 
-  useEffect(() => {
-    if (itemData) {
-      setCurrentItemData(itemData);
-    }
-  }, [itemData, partEmpty]);
+  const [opened, { open }] = useDisclosure(false);
 
-  const [opened, { open, close }] = useDisclosure(false);
+  // Derive display directly from props — RTK Query cache keeps removed
+  // items around, so partEmpty must always win over a stale itemData.
+  const currentItemData = partEmpty ? undefined : itemData;
 
   const removeSelected = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -55,14 +60,8 @@ const ChoosePartItem: FC<Props> = ({
     }
 
     router.push(`/choose-part?${params.toString()}`);
-    setCurrentItemData(undefined); // Clear the item data
   };
 
-  useEffect(() => {
-    if (partEmpty) {
-      setCurrentItemData(undefined); // Clear the item data
-    }
-  }, [partEmpty]);
   return (
     <>
       {currentItemData ? (
@@ -94,13 +93,21 @@ const ChoosePartItem: FC<Props> = ({
             >
               <IconX size={18} />
             </ActionIcon>
-            <ProductConditionBadge condition={currentItemData.condition} />
+            <ProductConditionBadge
+              condition={currentItemData.condition}
+              className={classes.conditionBadge}
+            />
             <Box w={"100%"} ta={"center"} className={classes.categoryImage}>
               {currentItemData.image && (
                 <KiwiImage
                   width={300}
                   height={300}
                   img={currentItemData.image}
+                  fallbackSrc={
+                    currentItemData.staticImage !== currentItemData.image
+                      ? currentItemData.staticImage
+                      : undefined
+                  }
                   alt={currentItemData.name ?? ""}
                 />
               )}
@@ -123,6 +130,19 @@ const ChoosePartItem: FC<Props> = ({
             <ShopsLink justIcon={true} currentPiece={currentItemData} />
           </Box>
         </>
+      ) : loading ? (
+        <Box
+          w={{ base: "175px", lg: "255px" }}
+          bg={"var(--mantine-color-body)"}
+          className={classes.box}
+          p={"20px"}
+          style={{ borderRadius: "10px" }}
+          component="div"
+        >
+          <Skeleton height={110} radius="sm" mb="lg" />
+          <Skeleton height={14} radius="sm" mb="xs" />
+          <Skeleton height={14} width="60%" radius="sm" mx="auto" />
+        </Box>
       ) : (
         <Tooltip label={title}>
           <Box

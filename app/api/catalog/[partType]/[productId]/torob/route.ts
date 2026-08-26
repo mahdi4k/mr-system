@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "../../../../../_lib/supabase/server";
 import { getMergedCatalogProduct } from "../../../../../_features/productCatalog/data";
-import { getProductDetails } from "../../../../../_features/parseBot/provider";
+import { getTorobProductDetailsForPriceRefresh } from "../../../../../_features/torob/provider";
+import { DEFAULT_REFRESH_INTERVAL_MS } from "../../../../../_features/priceSync/worker";
 import { CATALOG_PART_TYPES } from "../../../../../_features/productCatalog/types";
 
 export const dynamic = "force-dynamic";
@@ -62,29 +63,61 @@ export async function POST(
       );
     }
 
-    // Call parse.bot get_product_details
-    const details = await getProductDetails(currentRow.torob_product_id);
+    // Direct Torob fetch: mint a fresh search_id via title search, then
+    // fetch details for the prk we already trust. No fallback — failures
+    // surface here and Parse.bot remains a separate manual option.
+    const details = await getTorobProductDetailsForPriceRefresh(
+      currentRow.torob_product_id,
+      currentRow.title,
+    );
 
-    // Build update payload
-    const updatePayload: {
-      current_price?: number;
-      price_source?: "automatic";
-      image_url?: string;
-      updated_at: string;
-    } = {
-      updated_at: new Date().toISOString(),
-    };
+    const updatedAt = new Date().toISOString();
 
-    if (details.price) {
-      updatePayload.current_price = details.price;
-      updatePayload.price_source = "automatic";
+    // Record price history first, mirroring the background worker.
+    const { error: historyError } = await supabase
+      .from("price_history")
+      .insert({
+        part_type: pt,
+        product_id: productId,
+        provider: "torob",
+        price: details.price,
+      });
+
+    if (historyError) {
+      console.error("Price history insert error:", historyError);
+      // Non-fatal: log but don't fail the sync
     }
 
-    if (details.image_url) {
+    // Update the row with the same bookkeeping the worker applies.
+    const updatePayload: {
+      current_price: number;
+      price_source: "automatic";
+      image_url?: string;
+      sync_status: "active";
+      fetched_at: string;
+      last_success_at: string;
+      last_error: null;
+      failure_count: number;
+      next_fetch_at: string;
+      updated_at: string;
+    } = {
+      current_price: details.price,
+      price_source: "automatic",
+      sync_status: "active",
+      fetched_at: updatedAt,
+      last_success_at: updatedAt,
+      last_error: null,
+      failure_count: 0,
+      next_fetch_at: new Date(
+        Date.now() + DEFAULT_REFRESH_INTERVAL_MS,
+      ).toISOString(),
+      updated_at: updatedAt,
+    };
+
+    if (details.image_url && typeof details.image_url === "string") {
       updatePayload.image_url = details.image_url;
     }
 
-    // Update the row
     const { error: updateError } = await supabase
       .from("catalog_product_content")
       .update(updatePayload)
@@ -102,11 +135,6 @@ export async function POST(
     // Insert audit log
     const changedBy = (await supabase.auth.getUser()).data.user?.id ?? null;
 
-    const newPrice =
-      updatePayload.current_price !== undefined
-        ? updatePayload.current_price
-        : currentRow.current_price;
-
     await supabase.from("catalog_audit_history").insert({
       part_type: pt,
       product_id: productId,
@@ -114,7 +142,7 @@ export async function POST(
       title_before: currentRow.title,
       title_after: currentRow.title,
       price_before: currentRow.current_price,
-      price_after: newPrice,
+      price_after: details.price,
       changed_by: changedBy,
     });
 
@@ -133,9 +161,11 @@ export async function POST(
 
     return NextResponse.json(updatedProduct);
   } catch (error) {
-    console.error("Parse.bot sync error:", error);
-    const message =
-      error instanceof Error ? error.message : "خطا در همگام‌سازی از تورب";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("Torob direct sync error:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    return NextResponse.json(
+      { error: `دریافت مستقیم از تورب ناموفق بود: ${message}` },
+      { status: 500 },
+    );
   }
 }

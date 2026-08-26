@@ -208,6 +208,7 @@ const PageClient: React.FC<PageClientProps> = ({ showAssistant = false }) => {
               <ChoosePartItem
                 itemData={cpuData?.data}
                 partEmpty={isPartEmpty.cpu}
+                loading={isFetchingCpu && !cpuData}
                 svg={"/svg/cpu.svg"}
                 title="cpu"
                 type="cpu"
@@ -232,6 +233,7 @@ const PageClient: React.FC<PageClientProps> = ({ showAssistant = false }) => {
               <ChoosePartItem
                 itemData={motherboardData?.data}
                 partEmpty={isPartEmpty.motherboard}
+                loading={isFetchingMotherboard && !motherboardData}
                 svg={"/svg/motherboard.svg"}
                 type="motherboard"
                 title="motherboard"
@@ -252,6 +254,7 @@ const PageClient: React.FC<PageClientProps> = ({ showAssistant = false }) => {
               <ChoosePartItem
                 itemData={graphicData?.data}
                 partEmpty={isPartEmpty.graphic}
+                loading={isFetchingGraphic && !graphicData}
                 svg={"/svg/graphic.svg"}
                 type="graphic"
                 title="graphic"
@@ -272,6 +275,7 @@ const PageClient: React.FC<PageClientProps> = ({ showAssistant = false }) => {
               <ChoosePartItem
                 itemData={powerData?.data}
                 partEmpty={isPartEmpty.power}
+                loading={isFetchingPower && !powerData}
                 svg={"/svg/power.svg"}
                 type="power"
                 title="power"
@@ -292,6 +296,7 @@ const PageClient: React.FC<PageClientProps> = ({ showAssistant = false }) => {
               <ChoosePartItem
                 itemData={ramData?.data}
                 partEmpty={isPartEmpty.ram}
+                loading={isFetchingRam && !ramData}
                 svg={"/svg/ram.svg"}
                 type="ram"
                 title="رم"
@@ -312,6 +317,7 @@ const PageClient: React.FC<PageClientProps> = ({ showAssistant = false }) => {
               <ChoosePartItem
                 itemData={fanData?.data}
                 partEmpty={isPartEmpty.fan}
+                loading={isFetchingFan && !fanData}
                 svg={"/svg/fan.svg"}
                 type="fan"
                 title="فن"
@@ -332,6 +338,7 @@ const PageClient: React.FC<PageClientProps> = ({ showAssistant = false }) => {
               <ChoosePartItem
                 itemData={ssdData?.data}
                 partEmpty={isPartEmpty.ssd}
+                loading={isFetchingSsd && !ssdData}
                 svg={"/svg/ssd.svg"}
                 type="ssd"
                 title="ssd"
@@ -352,6 +359,7 @@ const PageClient: React.FC<PageClientProps> = ({ showAssistant = false }) => {
               <ChoosePartItem
                 itemData={caseData?.data}
                 partEmpty={isPartEmpty.case}
+                loading={isFetchingCase && !caseData}
                 svg={"/svg/case.svg"}
                 type="case"
                 title="کیس"

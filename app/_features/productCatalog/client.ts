@@ -20,12 +20,16 @@ export interface MergedCatalogProduct {
 /**
  * Load the merged catalog (static + Supabase overlay) for a part type.
  * Used in place of the old per-product /api/torob-product scrape.
+ *
+ * The timeout keeps RTK Query queryFn promises from hanging forever when
+ * the dev server or Supabase stalls — callers fall back to static data.
  */
 export async function fetchMergedCatalog(
   partType: CatalogPartType,
 ): Promise<MergedCatalogProduct[]> {
   const response = await fetch(`/api/catalog/${partType}`, {
     cache: "no-store",
+    signal: AbortSignal.timeout(5000),
   });
   if (!response.ok) {
     throw new Error(`Failed to load catalog for ${partType}`);
@@ -78,6 +82,9 @@ export async function enrichCatalogParts<
     const merged = await fetchMergedCatalog(partType);
     return items.map((item) => ({
       ...item,
+      // Keep the reliable static image around so the UI can fall back to it
+      // when the overlay image (e.g. torob CDN) fails to load.
+      staticImage: item.image,
       ...catalogOverridesFor(item.id, merged),
     }));
   } catch {

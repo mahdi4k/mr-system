@@ -73,3 +73,10 @@
   border: 1px solid rgb(39 121 68 / 24%);
   box-shadow: 0 5px 14px rgb(36 113 63 / 20%);
 }
+
+.conditionBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+}

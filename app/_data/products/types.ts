@@ -13,4 +13,5 @@ export type ProductCondition = "new" | "used";
 export interface RecommendableProduct {
   recommendations?: Partial<Record<PartType, number[]>>;
   condition?: ProductCondition;
+  staticImage?: string;
 }

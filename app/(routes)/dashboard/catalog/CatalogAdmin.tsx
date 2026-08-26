@@ -66,6 +66,12 @@ async function postJson(url: string, body?: unknown) {
   return (await res.json().catch(() => ({}))) as Record<string, unknown>;
 }
 
+// Pacing for the direct-Torob batch loop — keep requests human-paced so the
+// anti-bot layer is less likely to flag us.
+const TOROB_DIRECT_BATCH_DELAY_MS = 1500;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export default function CatalogAdmin() {
   const [tab, setTab] = useState<string | null>("sync");
   const [partType, setPartType] = useState<string>("cpu");
@@ -92,6 +98,14 @@ export default function CatalogAdmin() {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [batchSyncing, setBatchSyncing] = useState(false);
   const [syncProgress, setSyncProgress] = useState<{
+    done: number;
+    total: number;
+  } | null>(null);
+
+  // Torob direct sync state
+  const [directSyncingId, setDirectSyncingId] = useState<number | null>(null);
+  const [directBatchSyncing, setDirectBatchSyncing] = useState(false);
+  const [directProgress, setDirectProgress] = useState<{
     done: number;
     total: number;
   } | null>(null);
@@ -216,17 +230,16 @@ export default function CatalogAdmin() {
 
   const editImagePreview = editImage
     ? URL.createObjectURL(editImage)
-    : editProduct?.image ?? null;
+    : (editProduct?.image ?? null);
 
   // Parse.bot sync (single)
   const syncFromParseBot = async (product: CatalogProduct) => {
     setSyncingId(product.id);
     setError("");
     try {
-      const res = await fetch(
-        `/api/catalog/${partType}/${product.id}/parse`,
-        { method: "POST" },
-      );
+      const res = await fetch(`/api/catalog/${partType}/${product.id}/parse`, {
+        method: "POST",
+      });
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error ?? "خطا در همگام‌سازی از تورب");
@@ -259,10 +272,7 @@ export default function CatalogAdmin() {
         );
         const data = await res.json();
         if (!res.ok) {
-          console.error(
-            `Sync failed for ${product.id}:`,
-            data.error ?? "خطا",
-          );
+          console.error(`Sync failed for ${product.id}:`, data.error ?? "خطا");
         }
       } catch (e) {
         console.error(
@@ -283,6 +293,74 @@ export default function CatalogAdmin() {
     loadCatalog(partType);
   };
 
+  // Torob direct sync (single)
+  const syncFromTorobDirect = async (product: CatalogProduct) => {
+    setDirectSyncingId(product.id);
+    setError("");
+    try {
+      const res = await fetch(`/api/catalog/${partType}/${product.id}/torob`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error ?? "خطا در دریافت مستقیم از تورب");
+      }
+      loadCatalog(partType);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setDirectSyncingId(null);
+    }
+  };
+
+  // Batch sequential direct-Torob sync
+  const syncSelectedDirect = async () => {
+    const ids = products.filter(
+      (p) => selectedIds.has(p.id) && p.torobProductId,
+    );
+    if (ids.length === 0) return;
+
+    setDirectBatchSyncing(true);
+    setDirectProgress({ done: 0, total: ids.length });
+    setError("");
+
+    for (let i = 0; i < ids.length; i++) {
+      const product = ids[i];
+      setDirectSyncingId(product.id);
+      try {
+        const res = await fetch(
+          `/api/catalog/${partType}/${product.id}/torob`,
+          { method: "POST" },
+        );
+        const data = await res.json();
+        if (!res.ok) {
+          console.error(
+            `Torob direct sync failed for ${product.id}:`,
+            data.error ?? "خطا",
+          );
+        }
+      } catch (e) {
+        console.error(
+          `Torob direct sync error for ${product.id}:`,
+          e instanceof Error ? e.message : String(e),
+        );
+      } finally {
+        setDirectSyncingId(null);
+        setDirectProgress((prev) =>
+          prev ? { ...prev, done: prev.done + 1 } : null,
+        );
+      }
+      if (i < ids.length - 1) {
+        await sleep(TOROB_DIRECT_BATCH_DELAY_MS);
+      }
+    }
+
+    setDirectBatchSyncing(false);
+    setDirectProgress(null);
+    setSelectedIds(new Set());
+    loadCatalog(partType);
+  };
+
   const selectableCount = products.filter((p) => p.torobProductId).length;
   const allSelected =
     selectableCount > 0 &&
@@ -293,9 +371,7 @@ export default function CatalogAdmin() {
       setSelectedIds(new Set());
     } else {
       setSelectedIds(
-        new Set(
-          products.filter((p) => p.torobProductId).map((p) => p.id),
-        ),
+        new Set(products.filter((p) => p.torobProductId).map((p) => p.id)),
       );
     }
   };
@@ -442,7 +518,7 @@ export default function CatalogAdmin() {
               ))}
             </Group>
 
-            {selectedIds.size > 0 && !batchSyncing && (
+            {selectedIds.size > 0 && !batchSyncing && !directBatchSyncing && (
               <Group>
                 <Button
                   leftSection={<IconPlayerPlay size={16} />}
@@ -450,12 +526,27 @@ export default function CatalogAdmin() {
                 >
                   همگام‌سازی انتخاب‌شده ({selectedIds.size})
                 </Button>
+                <Button
+                  variant="light"
+                  color="blue"
+                  leftSection={<IconSearch size={16} />}
+                  onClick={syncSelectedDirect}
+                >
+                  دریافت مستقیم از تورب ({selectedIds.size})
+                </Button>
               </Group>
             )}
 
             {batchSyncing && syncProgress && (
               <Text size="sm" c="dimmed">
                 در حال همگام‌سازی: {syncProgress.done} از {syncProgress.total}
+              </Text>
+            )}
+
+            {directBatchSyncing && directProgress && (
+              <Text size="sm" c="dimmed">
+                در حال دریافت مستقیم از تورب: {directProgress.done} از{" "}
+                {directProgress.total}
               </Text>
             )}
 
@@ -469,11 +560,13 @@ export default function CatalogAdmin() {
                       <Checkbox
                         aria-label="انتخاب همه"
                         checked={allSelected}
-                        indeterminate={
-                          selectedIds.size > 0 && !allSelected
-                        }
+                        indeterminate={selectedIds.size > 0 && !allSelected}
                         onChange={toggleAll}
-                        disabled={selectableCount === 0 || batchSyncing}
+                        disabled={
+                          selectableCount === 0 ||
+                          batchSyncing ||
+                          directBatchSyncing
+                        }
                       />
                     </Table.Th>
                     <Table.Th>#</Table.Th>
@@ -501,7 +594,9 @@ export default function CatalogAdmin() {
                             aria-label={`انتخاب ${p.title}`}
                             checked={selectedIds.has(p.id)}
                             onChange={() => toggleOne(p.id)}
-                            disabled={!hasTorob || batchSyncing}
+                            disabled={
+                              !hasTorob || batchSyncing || directBatchSyncing
+                            }
                           />
                         </Table.Td>
                         <Table.Td>{p.id}</Table.Td>
@@ -516,16 +611,30 @@ export default function CatalogAdmin() {
                               <IconEdit size={16} />
                             </ActionIcon>
                             {hasTorob && (
-                              <Tooltip label="دریافت از تورب">
-                                <ActionIcon
-                                  variant="light"
-                                  color="green"
-                                  loading={syncingId === p.id}
-                                  onClick={() => syncFromParseBot(p)}
-                                >
-                                  <IconRefresh size={16} />
-                                </ActionIcon>
-                              </Tooltip>
+                              <>
+                                <Tooltip label="دریافت از تورب (Parse.bot)">
+                                  <ActionIcon
+                                    variant="light"
+                                    color="green"
+                                    loading={syncingId === p.id}
+                                    disabled={directBatchSyncing}
+                                    onClick={() => syncFromParseBot(p)}
+                                  >
+                                    <IconRefresh size={16} />
+                                  </ActionIcon>
+                                </Tooltip>
+                                <Tooltip label="دریافت مستقیم از تورب">
+                                  <ActionIcon
+                                    variant="light"
+                                    color="blue"
+                                    loading={directSyncingId === p.id}
+                                    disabled={batchSyncing}
+                                    onClick={() => syncFromTorobDirect(p)}
+                                  >
+                                    <IconSearch size={16} />
+                                  </ActionIcon>
+                                </Tooltip>
+                              </>
                             )}
                           </Group>
                         </Table.Td>
@@ -547,9 +656,7 @@ export default function CatalogAdmin() {
                           <Badge
                             size="xs"
                             color={
-                              p.overlay.syncStatus === "failed"
-                                ? "red"
-                                : "blue"
+                              p.overlay.syncStatus === "failed" ? "red" : "blue"
                             }
                           >
                             {p.overlay.syncStatus}

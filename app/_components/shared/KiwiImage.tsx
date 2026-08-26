@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import Image from "next/image";
 import { useMantineColorScheme } from "@mantine/core";
 
@@ -11,10 +11,29 @@ type Props = {
   height: number;
   url?: string;
   objectFit?: "cover" | "contain" | "none";
+  fallbackSrc?: string;
 };
 
-const KiwiImage: FC<Props> = ({ img, alt, width, height, url, objectFit }) => {
+const KiwiImage: FC<Props> = ({
+  img,
+  alt,
+  width,
+  height,
+  url,
+  objectFit,
+  fallbackSrc,
+}) => {
   const { colorScheme } = useMantineColorScheme();
+  const [primaryFailed, setPrimaryFailed] = useState(false);
+
+  // Reset the failure flag whenever the primary source changes so a new
+  // product gets a fresh chance at its own image.
+  useEffect(() => {
+    setPrimaryFailed(false);
+  }, [img, url]);
+
+  const resolvedSrc =
+    primaryFailed && fallbackSrc ? fallbackSrc : url ? url : img;
 
   const shimmer = (w: number, h: number) => `
     <svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">
@@ -44,7 +63,10 @@ const KiwiImage: FC<Props> = ({ img, alt, width, height, url, objectFit }) => {
       style={{ objectFit: objectFit ? objectFit : "contain" }}
       alt={alt}
       fill
-      src={url ? url : img}
+      src={resolvedSrc}
+      onError={() => {
+        if (fallbackSrc) setPrimaryFailed(true);
+      }}
     />
   );
 };

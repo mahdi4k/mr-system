@@ -34,6 +34,12 @@ const usePcparts = () => {
       title: "لوازم جانبی",
       svg: "/svg/accessories.svg",
     },
+    {
+      name: "bundle",
+      link: "/category/bundle",
+      title: "باندل",
+      svg: "/svg/bundle.svg",
+    },
   ];
 
   return pcParts;
