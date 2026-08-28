@@ -1,4 +1,5 @@
 import { createClient } from "../../_lib/supabase/server";
+import { Suspense } from "react";
 import PageClient from "./page.client";
 
 export interface AdsCategory {
@@ -20,5 +21,9 @@ export default async function Page() {
     .eq("is_active", true)
     .order("sort_order");
 
-  return <PageClient categories={categories ?? []} />;
+  return (
+    <Suspense fallback={<div>در حال بارگذاری...</div>}>
+      <PageClient categories={categories ?? []} />
+    </Suspense>
+  );
 }
