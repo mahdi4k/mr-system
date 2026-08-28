@@ -1,6 +1,6 @@
 import "@mantine/core/styles.css";
 import "@mantine/tiptap/styles.css";
-import React from "react";
+import React, { Suspense } from "react";
 import {
   ColorSchemeScript,
   DirectionProvider,
@@ -82,7 +82,9 @@ export default async function RootLayout({
           <MantineProvider defaultColorScheme="dark" theme={theme}>
             <ReduxProviders>
               <Notifications />
-              <LoginSuccessNotification />
+              <Suspense fallback={null}>
+                <LoginSuccessNotification />
+              </Suspense>
               <AppChrome>
                 <Header isAuthenticated={Boolean(user)} userLabel={userLabel} />
               </AppChrome>
