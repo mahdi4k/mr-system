@@ -165,7 +165,7 @@
     .createAdIcon {
       color: var(--mantine-color-dark-9);
       background-color: var(--create-ad-accent-hover);
-      transform: rotate(90deg) scale(1.05);
+      transform: scale(1.05);
     }
 
     .createAdAction {
