@@ -7,7 +7,17 @@ function getAnonClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) return null;
-  return createSupabaseClient<Database>(url, key);
+  const fetchWithTimeout: typeof fetch = (input, init) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 5000);
+    return fetch(input as RequestInfo, {
+      ...(init as RequestInit),
+      signal: controller.signal,
+    }).finally(() => clearTimeout(id));
+  };
+  return createSupabaseClient<Database>(url, key, {
+    global: { fetch: fetchWithTimeout },
+  });
 }
 
 type featuredmedia = {
@@ -26,14 +36,19 @@ export type postsMO = {
   _embedded: { "wp:featuredmedia": featuredmedia[] };
 };
 
-async function getData() {
-  const anon = getAnonClient();
-  if (!anon) return [];
-  return getPublishedArticles(anon, { limit: 8 });
+async function getData(): Promise<postsMO[]> {
+  try {
+    const anon = getAnonClient();
+    if (!anon) return [];
+    return await getPublishedArticles(anon, { limit: 8 });
+  } catch (error) {
+    console.warn("[ArticleSection] failed to load homepage articles", error);
+    return [];
+  }
 }
 
 const ArticleSection = async () => {
-  const posts: postsMO[] = await getData();
+  const posts = await getData();
 
   return <ArticleSectionClient posts={posts} />;
 };

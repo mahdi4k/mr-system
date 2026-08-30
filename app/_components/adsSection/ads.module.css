@@ -224,3 +224,21 @@
     background-color 180ms ease,
     transform 180ms ease;
 }
+
+.emptyAdCard {
+  border-style: dashed;
+  background-color: light-dark(
+    var(--mantine-color-gray-0),
+    var(--mantine-color-dark-7)
+  );
+}
+
+.emptyAdSection {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mantine-spacing-xs);
+  padding: var(--mantine-spacing-lg);
+  text-align: center;
+}

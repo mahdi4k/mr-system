@@ -46,8 +46,17 @@ const AdsSection = () => {
       isSuccess: isSuccessAds,
       isLoading,
       isFetching: isFetchingAds,
+      isError: isErrorAds,
     },
   ] = useLazyGetAdsListCategoryQuery();
+
+  const isLoadingAds = isLoading || isFetchingAds;
+  const hasAds = Boolean(
+    isSuccessAds && adsData?.data && adsData.data.length > 0,
+  );
+  const isEmptyAds = Boolean(
+    isSuccessAds && !isLoadingAds && adsData && adsData.data.length === 0,
+  );
 
   const dispatch: AppDispatch = useDispatch();
   const { ostan, city, status } = useSelector((state: RootState) => state.ads);
@@ -182,10 +191,8 @@ const AdsSection = () => {
                 </Card>
               </Link>
             </Carousel.Slide>
-            {adsData &&
-              !isFetchingAds &&
-              isSuccessAds &&
-              adsData.data.map((item) => (
+            {hasAds &&
+              adsData!.data.map((item) => (
                 <Carousel.Slide key={item.id} mt={"sm"}>
                   <Link href={`/ads/${item.id}`}>
                     <Card withBorder shadow="sm">
@@ -233,7 +240,7 @@ const AdsSection = () => {
                   </Link>
                 </Carousel.Slide>
               ))}
-            {isFetchingAds && (
+            {isLoadingAds && !hasAds && !isEmptyAds && !isErrorAds && (
               <Group wrap="nowrap" mt={"md"} gap={"lg"}>
                 {Array.from({ length: 3 }).map((_, index) => (
                   <Box className={classess.adsSkeleton} key={index}>
@@ -241,6 +248,38 @@ const AdsSection = () => {
                   </Box>
                 ))}
               </Group>
+            )}
+            {isEmptyAds && (
+              <Carousel.Slide mt={"sm"}>
+                <Card h="340px" withBorder className={classess.emptyAdCard}>
+                  <Card.Section className={classess.emptyAdSection} h="100%">
+                    <Text c="dimmed" fz="sm" fw={600} ta="center">
+                      هنوز آگهی‌ای در این دسته ثبت نشده
+                    </Text>
+                    <Text c="dimmed" fz="xs" ta="center">
+                      اولین آگهی را شما ثبت کنید
+                    </Text>
+                  </Card.Section>
+                </Card>
+              </Carousel.Slide>
+            )}
+            {isErrorAds && !isLoadingAds && (
+              <Carousel.Slide mt={"sm"}>
+                <Card h="340px" withBorder>
+                  <Card.Section
+                    h="100%"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text c="dimmed" fz="sm" ta="center">
+                      خطا در دریافت آگهی‌ها
+                    </Text>
+                  </Card.Section>
+                </Card>
+              </Carousel.Slide>
             )}
           </Carousel>
         </Tabs.Panel>

@@ -1,1 +1,0 @@
-(()=>{"use strict";self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(e=>Promise.all(e.filter(e=>!e.startsWith("workbox-precache")).map(e=>caches.delete(e)))))})})();

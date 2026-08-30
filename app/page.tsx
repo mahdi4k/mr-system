@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { HeroHeader } from "@/_components/HeroHome/HeroHeader";
 import CardService from "@/_components/cardService/CardService";
 import CpuGraphic from "@/_components/cpuGraphic/CpuGraphic";
@@ -10,7 +10,7 @@ import BannerSection from "./_components/BannerSection/BannerSection";
 import { Metadata, Viewport } from "next";
 import SuggestSection from "./_components/suggestSection/SuggestSection";
 import LazyAdsSection from "./_components/adsSection/LazyAdsSection";
-import { Container, Text } from "@mantine/core";
+import { Container, Skeleton, Text } from "@mantine/core";
 import { IconArrowLeft, IconCircleCheck } from "@tabler/icons-react";
 import BuildAssistantIntro from "@/_components/chooseParts/BuildAssistantIntro";
 import Image from "next/image";
@@ -169,7 +169,15 @@ const page = () => {
       </Container> */}
       <BannerSection />
       {/* <CardService /> */}
-      <ArticleSection />
+      <Suspense
+        fallback={
+          <Container size="lg" mt={50} mb={80}>
+            <Skeleton height={280} radius="lg" />
+          </Container>
+        }
+      >
+        <ArticleSection />
+      </Suspense>
     </div>
   );
 };
