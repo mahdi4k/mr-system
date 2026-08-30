@@ -24,6 +24,9 @@ export async function updateSession(
     return response;
   }
 
+  // Public pages do not need a session lookup. This keeps them fast and cacheable.
+  if (!isProtected) return response;
+
   const supabase = createServerClient<Database>(url, publishableKey, {
     cookies: {
       getAll() {

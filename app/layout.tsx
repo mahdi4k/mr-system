@@ -1,5 +1,4 @@
 import "@mantine/core/styles.css";
-import "@mantine/tiptap/styles.css";
 import React, { Suspense } from "react";
 import {
   ColorSchemeScript,
@@ -9,14 +8,12 @@ import {
 import { theme } from "../theme";
 import localFont from "next/font/local";
 import "@mantine/notifications/styles.css";
-import "@mantine/carousel/styles.css";
 import { ReduxProviders } from "@/_redux/provider";
 import { Header } from "@/_components/Header/Header";
 import { Footer } from "@/_components/Footer/Footer";
 import NextTopLoader from "nextjs-toploader";
 import "./global.css";
 import { Notifications } from "@mantine/notifications";
-import { getCurrentUser } from "./_lib/supabase/auth";
 import LoginSuccessNotification from "./_components/auth/LoginSuccessNotification";
 import AppChrome from "./_components/shared/AppChrome";
 
@@ -27,14 +24,10 @@ const iranyekan = localFont({
       weight: "100 900",
       style: "normal",
     },
-    {
-      path: "../public/fonts/IRANYekanXVFaNumVF.woff",
-      weight: "100 900",
-      style: "normal",
-    },
   ],
   variable: "--font-vazirmatn",
   display: "swap",
+  preload: true,
 });
 
 export const metadata = {
@@ -42,23 +35,13 @@ export const metadata = {
   description: "Rigora PC hardware platform",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
   modal,
 }: {
   children: React.ReactNode;
   modal: React.ReactNode;
 }) {
-  const user = await getCurrentUser();
-  const userMetadata = user?.user_metadata as
-    | { display_name?: string; full_name?: string; name?: string }
-    | undefined;
-  const userLabel =
-    userMetadata?.display_name ||
-    userMetadata?.full_name ||
-    userMetadata?.name ||
-    user?.email?.split("@")[0];
-
   return (
     <html
       style={{ height: "100%" }}
@@ -86,7 +69,7 @@ export default async function RootLayout({
                 <LoginSuccessNotification />
               </Suspense>
               <AppChrome>
-                <Header isAuthenticated={Boolean(user)} userLabel={userLabel} />
+                <Header />
               </AppChrome>
               {children}
               {modal}

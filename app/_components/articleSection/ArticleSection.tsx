@@ -1,6 +1,14 @@
 import ArticleSectionClient from "./ArticleSection.client";
 import { getPublishedArticles } from "../../_features/articles/data";
-import { createClient } from "../../_lib/supabase/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "../../types/database.types";
+
+function getAnonClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) return null;
+  return createSupabaseClient<Database>(url, key);
+}
 
 type featuredmedia = {
   id: number;
@@ -19,7 +27,9 @@ export type postsMO = {
 };
 
 async function getData() {
-  return getPublishedArticles(await createClient(), { limit: 8 });
+  const anon = getAnonClient();
+  if (!anon) return [];
+  return getPublishedArticles(anon, { limit: 8 });
 }
 
 const ArticleSection = async () => {

@@ -1,9 +1,10 @@
 "use client";
 
 import { Carousel, Embla } from "@mantine/carousel";
-import { Box, Button, Container, Flex, Grid } from "@mantine/core";
-import React, { FC, useEffect, useState } from "react";
-import SVG from "react-inlinesvg";
+import "@mantine/carousel/styles.css";
+import { Box, Button, Card, Container, Flex, Grid, Text } from "@mantine/core";
+import React, { useEffect, useState } from "react";
+import { IconBook2 } from "@tabler/icons-react";
 import { ArticleCard } from "./ArticleCard";
 import classess from "./Article.module.css";
 import { postsMO } from "./ArticleSection";
@@ -17,6 +18,34 @@ const ArticleSectionClient = ({ posts }: { posts: postsMO[] }) => {
       embla?.reInit({ direction: "rtl" });
     }
   }, [embla]);
+
+  if (!posts.length) {
+    return (
+      <Container className={classess.articleEmptyContainer} size="lg">
+        <Card className={classess.articleEmpty} withBorder radius="lg">
+          <Box className={classess.articleEmptyIcon}>
+            <IconBook2 aria-hidden size={36} stroke={1.8} />
+          </Box>
+          <Text className={classess.articleEmptyTitle} fw={800}>
+            به‌زودی با مقاله‌های تازه برمی‌گردیم
+          </Text>
+          <Text className={classess.articleEmptyText} c="dimmed" size="sm">
+            راهنماها و تجربه‌های کاربردی برای انتخاب و ساخت سیستم بهتر در راه
+            هستند.
+          </Text>
+          <Button
+            component={Link}
+            href="/"
+            variant="light"
+            color="teal"
+            radius="xl"
+          >
+            بازگشت به صفحه اصلی
+          </Button>
+        </Card>
+      </Container>
+    );
+  }
 
   return (
     <Container mt={"50px"} mb={"80px"} size="lg">

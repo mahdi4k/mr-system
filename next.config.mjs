@@ -36,9 +36,16 @@ export default withPWA(
     reactStrictMode: false,
     output: "standalone",
     experimental: {
-      optimizePackageImports: ["@mantine/core", "@mantine/hooks"],
+      optimizePackageImports: [
+        "@mantine/core",
+        "@mantine/hooks",
+        "@mantine/carousel",
+        "@mantine/notifications",
+        "@tabler/icons-react",
+      ],
     },
     images: {
+      formats: ["image/avif", "image/webp"],
       remotePatterns: [
         {
           protocol: "http",

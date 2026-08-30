@@ -17,7 +17,6 @@ import usePcparts from "@/_utils/customHook/usePcParts";
 import { Carousel, Embla } from "@mantine/carousel";
 import CardPartPrice from "../shared/CardPartPrice";
 import { IconFlag3, IconPlus } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
 import { useLazyGetAdsListCategoryQuery } from "@/_redux/services/adsApi";
 import {
   cityTitleHandler,
@@ -31,12 +30,12 @@ import { fetchCity, fetchOstan } from "@/_redux/features/ads";
 import { ThunkDispatch, AnyAction } from "@reduxjs/toolkit";
 import ImgNoProduct from "../../../public/no-product.png";
 import classess from "./ads.module.css";
+import "@mantine/carousel/styles.css";
 
 type AppDispatch = ThunkDispatch<RootState, void, AnyAction>;
 
-const AdsSection = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
+const AdsSection = () => {
   const [embla, setEmbla] = useState<Embla | null>(null);
-  const router = useRouter();
   const parts = usePcparts();
   const [activeTab, setActiveTab] = useState<string | null>("cpu");
 
@@ -54,8 +53,8 @@ const AdsSection = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const { ostan, city, status } = useSelector((state: RootState) => state.ads);
 
   useEffect(() => {
-    router.prefetch("/ads/create");
-  }, [router]);
+    return undefined;
+  }, []);
 
   useEffect(() => {
     if (!ostan.length) {
@@ -170,7 +169,7 @@ const AdsSection = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
             <Carousel.Slide mt={"sm"}>
               <Link className={classess.createAdLink} href={"/ads/create"}>
                 <Card className={classess.createAdCard} h={"340px"} withBorder>
-                  <Card.Section className={classess.createAdSection} h="100%">
+                  <Card.Section className={classess.createAdSection}>
                     <Box className={classess.createAdIcon}>
                       <IconPlus aria-hidden size={34} stroke={2.4} />
                     </Box>

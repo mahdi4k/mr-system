@@ -2,6 +2,7 @@
 
 import { Card, Container, Grid, rem, SimpleGrid, Text } from "@mantine/core";
 import React from "react";
+import Image from "next/image";
 import classes from "./ImageCard.module.css";
 import {
   getSuggestedBuildHref,
@@ -26,11 +27,13 @@ const SuggestSection = () => {
               component="a"
               href={getSuggestedBuildHref(suggestedBuilds[0])}
             >
-              <div
+              <Image
+                alt={suggestedBuilds[0].title}
                 className={classes.image}
-                style={{
-                  backgroundImage: `url(${suggestedBuilds[0].image})`,
-                }}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                src={suggestedBuilds[0].image}
+                priority={false}
               />
               <div className={classes.overlay} />
               <div className={classes.content}>
@@ -51,11 +54,12 @@ const SuggestSection = () => {
               component="a"
               href={getSuggestedBuildHref(suggestedBuilds[1])}
             >
-              <div
+              <Image
+                alt={suggestedBuilds[1].title}
                 className={classes.image}
-                style={{
-                  backgroundImage: `url(${suggestedBuilds[1].image})`,
-                }}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                src={suggestedBuilds[1].image}
               />
               <div className={classes.overlay} />
               <div className={classes.content}>
@@ -78,11 +82,12 @@ const SuggestSection = () => {
               component="a"
               href={getSuggestedBuildHref(suggestedBuilds[2])}
             >
-              <div
+              <Image
+                alt={suggestedBuilds[2].title}
                 className={classes.image}
-                style={{
-                  backgroundImage: `url(${suggestedBuilds[2].image})`,
-                }}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                src={suggestedBuilds[2].image}
               />
               <div className={classes.overlay} />
               <div className={classes.content}>
@@ -103,11 +108,12 @@ const SuggestSection = () => {
               component="a"
               href={getSuggestedBuildHref(suggestedBuilds[3])}
             >
-              <div
+              <Image
+                alt={suggestedBuilds[3].title}
                 className={classes.image}
-                style={{
-                  backgroundImage: `url(${suggestedBuilds[3].image})`,
-                }}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                src={suggestedBuilds[3].image}
               />
               <div className={classes.overlay} />
               <div className={classes.content}>

@@ -127,6 +127,8 @@
 .createAdCard {
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   cursor: pointer;
   border-color: light-dark(
     var(--create-ad-accent),
@@ -178,7 +180,8 @@
 .createAdSection {
   position: relative;
   z-index: 1;
-  display: flex;
+  display: flex !important;
+  flex: 1;
   flex-direction: column;
   gap: rem(24px);
   align-items: center;

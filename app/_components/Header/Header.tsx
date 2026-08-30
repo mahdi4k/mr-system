@@ -38,16 +38,23 @@ import UseLoading from "@/_utils/customHook/useLoading";
 import Image from "next/image";
 import DrawerHeader from "./Drawer";
 import LoginModal from "../loginModal/LoginModal";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "../../_lib/supabase/client";
 
 interface HeaderProps {
-  isAuthenticated: boolean;
+  isAuthenticated?: boolean;
   userLabel?: string;
 }
 
-export function Header({ isAuthenticated, userLabel }: HeaderProps) {
+export function Header({
+  isAuthenticated: initialIsAuthenticated = false,
+  userLabel: initialUserLabel,
+}: HeaderProps) {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    initialIsAuthenticated,
+  );
+  const [userLabel, setUserLabel] = useState(initialUserLabel);
   const [opened, { open, close }] = useDisclosure(false);
   const [openedModal, { open: openModal, close: closeModal }] =
     useDisclosure(false);
@@ -61,8 +68,30 @@ export function Header({ isAuthenticated, userLabel }: HeaderProps) {
   const hideHeaderFooter = pathname === "/login";
 
   useEffect(() => {
-    router.prefetch("/profile");
-  }, [router]);
+    let active = true;
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!active) return;
+      if (!user) {
+        setIsAuthenticated(false);
+        setUserLabel(undefined);
+        return;
+      }
+      const metadata = user.user_metadata as
+        | { display_name?: string; full_name?: string; name?: string }
+        | undefined;
+      setIsAuthenticated(true);
+      setUserLabel(
+        metadata?.display_name ||
+          metadata?.full_name ||
+          metadata?.name ||
+          user.email?.split("@")[0],
+      );
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleAccountPage = () => {
     if (isAuthenticated) {

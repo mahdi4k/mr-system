@@ -9,14 +9,13 @@ import ArticleSection from "./_components/articleSection/ArticleSection";
 import BannerSection from "./_components/BannerSection/BannerSection";
 import { Metadata, Viewport } from "next";
 import SuggestSection from "./_components/suggestSection/SuggestSection";
-import AdsSection from "./_components/adsSection/AdsSection";
-import { Container, Group, Text } from "@mantine/core";
+import LazyAdsSection from "./_components/adsSection/LazyAdsSection";
+import { Container, Text } from "@mantine/core";
 import { IconArrowLeft, IconCircleCheck } from "@tabler/icons-react";
 import BuildAssistantIntro from "@/_components/chooseParts/BuildAssistantIntro";
 import Image from "next/image";
 import Link from "next/link";
 import classes from "./page.module.css";
-import { getCurrentUser } from "./_lib/supabase/auth";
 
 const exampleParts = [
   {
@@ -40,6 +39,8 @@ const exampleParts = [
     image: "/svg/ram.svg",
   },
 ];
+
+export const revalidate = 300;
 
 export const viewport: Viewport = {
   themeColor: "#87A10C",
@@ -89,9 +90,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const page = async () => {
-  const user = await getCurrentUser();
-
+const page = () => {
   return (
     <div>
       <BuildAssistantIntro />
@@ -161,7 +160,7 @@ const page = async () => {
       </Container>
       <SuggestSection />
 
-      <AdsSection isAuthenticated={Boolean(user)} />
+      <LazyAdsSection />
       {/* <Container my={"xl"} size="lg">
         <Group>
           <CpuMotherboard />

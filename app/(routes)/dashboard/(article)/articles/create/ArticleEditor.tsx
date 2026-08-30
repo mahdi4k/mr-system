@@ -1,5 +1,6 @@
 "use client";
 
+import "@mantine/tiptap/styles.css";
 import { Link, RichTextEditor } from "@mantine/tiptap";
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";

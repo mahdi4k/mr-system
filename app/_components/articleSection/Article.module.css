@@ -41,3 +41,92 @@
         width: 57% !important;
     }
 }
+
+.articleEmptyContainer {
+    margin-top: 50px;
+    margin-bottom: 80px;
+}
+
+.articleEmpty {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--mantine-spacing-sm);
+    padding: 42px var(--mantine-spacing-lg);
+    text-align: center;
+    border-color: light-dark(rgba(14, 163, 93, 0.2), rgba(91, 207, 161, 0.2));
+    background:
+        radial-gradient(circle at 12% 0%, rgba(14, 163, 93, 0.1), transparent 30%),
+        radial-gradient(circle at 88% 100%, rgba(12, 119, 115, 0.1), transparent 34%),
+        var(--mantine-color-body);
+
+    &::before,
+    &::after {
+        position: absolute;
+        width: 110px;
+        height: 110px;
+        content: "";
+        border: 1px solid rgba(14, 163, 93, 0.12);
+        border-radius: 50%;
+    }
+
+    &::before {
+        top: -65px;
+        left: 12%;
+    }
+
+    &::after {
+        right: 10%;
+        bottom: -72px;
+    }
+}
+
+.articleEmptyIcon {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    width: 72px;
+    height: 72px;
+    place-items: center;
+    color: var(--mantine-color-teal-7);
+    border: 1px solid rgba(14, 163, 93, 0.25);
+    border-radius: 22px;
+    background: linear-gradient(135deg, rgba(14, 163, 93, 0.14), rgba(12, 119, 115, 0.08));
+    box-shadow: 0 0 0 8px rgba(14, 163, 93, 0.06);
+}
+
+.articleEmptyTitle,
+.articleEmptyText,
+.articleEmpty :global(.mantine-Button-root) {
+    position: relative;
+    z-index: 1;
+}
+
+.articleEmptyTitle {
+    margin-top: var(--mantine-spacing-xs);
+    color: light-dark(var(--mantine-color-teal-9), var(--mantine-color-teal-2));
+}
+
+.articleEmptyText {
+    max-width: 440px;
+    line-height: 1.9;
+}
+
+@media (max-width: $mantine-breakpoint-sm) {
+    .articleEmptyContainer {
+        margin-top: 28px;
+        margin-bottom: 40px;
+        padding-inline: var(--mantine-spacing-sm);
+    }
+
+    .articleEmpty {
+        gap: var(--mantine-spacing-xs);
+        padding: 32px var(--mantine-spacing-md);
+    }
+
+    .articleEmptyTitle {
+        font-size: var(--mantine-font-size-sm);
+    }
+}

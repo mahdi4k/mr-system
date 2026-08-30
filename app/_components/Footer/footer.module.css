@@ -385,6 +385,9 @@
   .linkGroup:nth-child(3) .linkList {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .cta {
+    display: none !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
