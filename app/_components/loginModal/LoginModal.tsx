@@ -83,7 +83,9 @@ export default function LoginModal({
   const [mode, setMode] = useState<"login" | "register">("login");
   const [otpSent, setOtpSent] = useState(false);
   const [confirmationSent, setConfirmationSent] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
   const router = useRouter();
   const form = useForm<LoginFormValues>({
     initialValues: {
@@ -148,7 +150,7 @@ export default function LoginModal({
     const validation = form.validate();
     if (validation.hasErrors) return;
 
-    setLoading(true);
+    setEmailLoading(true);
     setConfirmationSent(false);
     try {
       const supabase = createClient();
@@ -185,12 +187,12 @@ export default function LoginModal({
             : "ایمیل یا رمز عبور صحیح نیست.",
       });
     } finally {
-      setLoading(false);
+      setEmailLoading(false);
     }
   };
 
   const signInWithGoogle = async () => {
-    setLoading(true);
+    setGoogleLoading(true);
     try {
       const callbackUrl = new URL("/auth/confirm", window.location.origin);
       callbackUrl.searchParams.set("next", getNextPath());
@@ -200,7 +202,7 @@ export default function LoginModal({
       });
       if (error) throw error;
     } catch {
-      setLoading(false);
+      setGoogleLoading(false);
       notifications.show({
         color: "red",
         message: "ورود با گوگل ناموفق بود.",
@@ -212,7 +214,7 @@ export default function LoginModal({
     const validation = form.validate();
     if (validation.hasErrors) return;
 
-    setLoading(true);
+    setOtpLoading(true);
     try {
       const { error } = await createClient().auth.signInWithOtp({
         phone: toE164(form.values.phone),
@@ -240,7 +242,7 @@ export default function LoginModal({
         classNames: classes,
       });
     } finally {
-      setLoading(false);
+      setOtpLoading(false);
     }
   };
 
@@ -250,7 +252,7 @@ export default function LoginModal({
       return;
     }
 
-    setLoading(true);
+    setOtpLoading(true);
     try {
       const { error } = await createClient().auth.verifyOtp({
         phone: toE164(form.values.phone),
@@ -266,7 +268,7 @@ export default function LoginModal({
         message: "کد تایید اشتباه یا منقضی شده است.",
       });
     } finally {
-      setLoading(false);
+      setOtpLoading(false);
     }
   };
 
@@ -284,8 +286,8 @@ export default function LoginModal({
           style={{ objectFit: "contain" }}
           alt="ریگورا"
           src="/logo-dark.png"
-          width={180}
-          height={60}
+          width={100}
+          height={27}
         />
       </Flex>
       {isAdsSection && (
@@ -367,8 +369,8 @@ export default function LoginModal({
                 />
               )}
               <Button
-                loading={loading}
-                disabled={loading}
+                loading={emailLoading}
+                disabled={emailLoading}
                 fullWidth
                 type="submit"
               >
@@ -385,8 +387,8 @@ export default function LoginModal({
           </Flex>
           <Button
             variant="default"
-            loading={loading}
-            disabled={loading}
+            loading={googleLoading}
+            disabled={googleLoading}
             fullWidth
             leftSection={<GoogleIcon />}
             onClick={signInWithGoogle}
@@ -426,8 +428,8 @@ export default function LoginModal({
               placeholder="09123456789"
             />
             <Button
-              loading={loading}
-              disabled={loading}
+              loading={otpLoading}
+              disabled={otpLoading}
               fullWidth
               type="submit"
             >
@@ -456,7 +458,12 @@ export default function LoginModal({
               {form.errors.code}
             </Text>
           )}
-          <Button loading={loading} disabled={loading} fullWidth type="submit">
+          <Button
+            loading={otpLoading}
+            disabled={otpLoading}
+            fullWidth
+            type="submit"
+          >
             تایید و ورود
           </Button>
           <Flex mt="sm" justify="space-between">
@@ -471,7 +478,7 @@ export default function LoginModal({
               variant="subtle"
               size="xs"
               onClick={sendOtp}
-              loading={loading}
+              loading={otpLoading}
             >
               ارسال دوباره کد
             </Button>
