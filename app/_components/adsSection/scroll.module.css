@@ -1,20 +1,25 @@
 .scrollbar {
+  &,
+  &:hover {
+    background-color: light-dark(
+      var(--mantine-color-gray-0),
+      var(--mantine-color-dark-6)
+    );
+  }
 
-    &,
-    &:hover {
-        background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
-    }
+  &[data-orientation="vertical"] .thumb {
+    background-color: var(--mantine-color-green-7);
+  }
 
-    &[data-orientation='vertical'] .thumb {
-        background-color: var(--mantine-color-green-7);
-    }
-
-    &[data-orientation='horizontal'] .thumb {
-        background-color: var(--mantine-color-green-6);
-    }
+  &[data-orientation="horizontal"] .thumb {
+    background-color: var(--mantine-color-green-6);
+  }
 }
 
 .corner {
-    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
-    opacity: 1;
+  background-color: light-dark(
+    var(--mantine-color-gray-0),
+    var(--mantine-color-dark-6)
+  );
+  opacity: 1;
 }

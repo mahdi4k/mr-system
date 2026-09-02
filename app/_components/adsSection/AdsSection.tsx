@@ -12,6 +12,7 @@ import {
   Text,
 } from "@mantine/core";
 import React, { useEffect, useState } from "react";
+import { useMediaQuery } from "@mantine/hooks";
 import Image from "next/image";
 import usePcparts from "@/_utils/customHook/usePcParts";
 import { Carousel, Embla } from "@mantine/carousel";
@@ -36,6 +37,10 @@ type AppDispatch = ThunkDispatch<RootState, void, AnyAction>;
 
 const AdsSection = () => {
   const [embla, setEmbla] = useState<Embla | null>(null);
+  // Mobile: the "create ad" card is replaced by a full-width button below the carousel
+  const isMobile = useMediaQuery("(max-width: 36em)", false, {
+    getInitialValueInEffect: true,
+  });
   const parts = usePcparts();
   const [activeTab, setActiveTab] = useState<string | null>("cpu");
 
@@ -78,7 +83,7 @@ const AdsSection = () => {
     if (embla) {
       embla?.reInit({ direction: "rtl" });
     }
-  }, [embla]);
+  }, [embla, isMobile]);
 
   // const handleAddAdsPage = () => {
   //     if (token || success) {
@@ -96,9 +101,9 @@ const AdsSection = () => {
     if (!image) {
       return (
         <Image
-          style={{ objectFit: "contain" }}
-          width={190}
-          height={170}
+          fill
+          style={{ objectFit: "contain", padding: "14px" }}
+          sizes="220px"
           alt="no img"
           src={ImgNoProduct}
         />
@@ -116,18 +121,18 @@ const AdsSection = () => {
       return (
         <Image
           alt={title}
-          style={{ borderRadius: "7px", objectFit: "contain", padding: "30px" }}
-          width={190}
-          height={180}
+          fill
+          style={{ objectFit: "contain", padding: "10px" }}
+          sizes="220px"
           src={`${images[0]}`}
         />
       );
     } else {
       return (
         <Image
-          style={{ objectFit: "contain" }}
-          width={190}
-          height={180}
+          fill
+          style={{ objectFit: "contain", padding: "14px" }}
+          sizes="220px"
           alt="no img"
           src={ImgNoProduct}
         />
@@ -148,7 +153,19 @@ const AdsSection = () => {
         mt={"lg"}
         variant="outline"
         color="teal"
-        styles={{ list: { flexWrap: "nowrap", overflow: "auto" } }}
+        styles={{
+          // The default outline line is an ::before inside the scrollable list,
+          // so it only spans the visible width when the tabs overflow.
+          // Draw the border on each tab instead so it covers the full scroll width.
+          list: {
+            flexWrap: "nowrap",
+            overflow: "auto",
+            "&::before": { display: "none" },
+          },
+          tab: {
+            "--tab-border-bottom-color": "var(--tab-border-color)",
+          },
+        }}
         defaultValue={activeTab}
         onChange={setActiveTab}
       >
@@ -168,71 +185,84 @@ const AdsSection = () => {
 
         <Tabs.Panel style={{ direction: "rtl" }} value={activeTab as string}>
           <Carousel
-            slideSize={{ base: "52%", xs: "28%", xl: "21%" }}
+            slideSize={{ base: "45%", xs: "26%", xl: "20%" }}
             slideGap={{ base: "sm", sm: "md" }}
             getEmblaApi={setEmbla}
             align="start"
             dragFree
             withControls={false}
           >
-            <Carousel.Slide mt={"sm"}>
-              <Link className={classess.createAdLink} href={"/ads/create"}>
-                <Card className={classess.createAdCard} h={"340px"} withBorder>
-                  <Card.Section className={classess.createAdSection}>
-                    <Box className={classess.createAdIcon}>
-                      <IconPlus aria-hidden size={34} stroke={2.4} />
-                    </Box>
-                    <Box className={classess.createAdAction}>
-                      <Text component="span" fz="sm" fw={700}>
-                        افزودن
-                      </Text>
-                    </Box>
-                  </Card.Section>
-                </Card>
-              </Link>
-            </Carousel.Slide>
+            {!isMobile && (
+              <Carousel.Slide mt={"sm"}>
+                <Link className={classess.createAdLink} href={"/ads/create"}>
+                  <Card className={classess.createAdCard} h="276px" withBorder>
+                    <Card.Section className={classess.createAdSection}>
+                      <Box className={classess.createAdIcon}>
+                        <IconPlus aria-hidden size={34} stroke={2.4} />
+                      </Box>
+                      <Box className={classess.createAdAction}>
+                        <Text component="span" fz="sm" fw={700}>
+                          افزودن
+                        </Text>
+                      </Box>
+                    </Card.Section>
+                  </Card>
+                </Link>
+              </Carousel.Slide>
+            )}
             {hasAds &&
               adsData!.data.map((item) => (
                 <Carousel.Slide key={item.id} mt={"sm"}>
-                  <Link href={`/ads/${item.id}`}>
-                    <Card withBorder shadow="sm">
-                      <Card.Section mt={"0"} ta={"center"}>
+                  <Link href={`/ads/${item.id}`} className={classess.adLink}>
+                    <Card
+                      withBorder
+                      shadow="sm"
+                      padding="sm"
+                      className={classess.adCard}
+                    >
+                      <Card.Section mt={"0"} className={classess.adImageBox}>
                         {handleImageAds(item.image, item.title)}
                       </Card.Section>
-                      <Text ta={"right"} mt={"5px"} lineClamp={1} fz={"md"}>
+                      <Text
+                        ta={"right"}
+                        mt={"xs"}
+                        lineClamp={1}
+                        fz={"sm"}
+                        fw={600}
+                        className={classess.adTitle}
+                      >
                         {item.title}
                       </Text>
-                      <Flex align={"baseline"} justify={"space-between"}>
+                      <Flex
+                        align={"baseline"}
+                        justify={"space-between"}
+                        gap={"xs"}
+                      >
                         {item.price ? (
                           <CardPartPrice isAds price={item.price} />
                         ) : (
-                          <Text fz={"md"} c={"#25ac9e"} mb="xs" mt="md">
+                          <Text fz={"sm"} c={"#25ac9e"}>
                             توافقی
                           </Text>
                         )}
-                        <Flex>
-                          <Text ml={"2px"} fz={"xs"}>
-                            {formatJalaliTimeAgo(item.created_at)}
-                          </Text>
-                        </Flex>
-                      </Flex>
-                      <Flex justify={"flex-end"} mt="xs" align={"baseline"}>
-                        <IconFlag3 size={15} />
                         <Text
-                          style={{ position: "relative", bottom: "3px" }}
-                          mr={"3px"}
-                          ta={"left"}
-                          fz={"11.5px"}
+                          fz={"11px"}
+                          c="dimmed"
+                          style={{ whiteSpace: "nowrap" }}
                         >
-                          {provinceTitleHandler(status, item.ostan, ostan)}
+                          {formatJalaliTimeAgo(item.created_at)}
                         </Text>
-                        <Text mr={"2px"}>,</Text>
-                        <Text
-                          style={{ position: "relative", bottom: "3px" }}
-                          mr={"3px"}
-                          ta={"left"}
-                          fz={"11.5px"}
-                        >
+                      </Flex>
+                      <Flex
+                        justify={"flex-end"}
+                        mt={6}
+                        align={"center"}
+                        gap={4}
+                        wrap="nowrap"
+                      >
+                        <IconFlag3 size={13} style={{ flexShrink: 0 }} />
+                        <Text fz={"11px"} c="dimmed" lineClamp={1}>
+                          {provinceTitleHandler(status, item.ostan, ostan)}،{" "}
                           {cityTitleHandler(status, item.city, city)}
                         </Text>
                       </Flex>
@@ -244,14 +274,14 @@ const AdsSection = () => {
               <Group wrap="nowrap" mt={"md"} gap={"lg"}>
                 {Array.from({ length: 3 }).map((_, index) => (
                   <Box className={classess.adsSkeleton} key={index}>
-                    <Skeleton height="340px" />
+                    <Skeleton height="100%" radius="md" />
                   </Box>
                 ))}
               </Group>
             )}
             {isEmptyAds && (
               <Carousel.Slide mt={"sm"}>
-                <Card h="340px" withBorder className={classess.emptyAdCard}>
+                <Card h="276px" withBorder className={classess.emptyAdCard}>
                   <Card.Section className={classess.emptyAdSection} h="100%">
                     <Text c="dimmed" fz="sm" fw={600} ta="center">
                       هنوز آگهی‌ای در این دسته ثبت نشده
@@ -265,7 +295,7 @@ const AdsSection = () => {
             )}
             {isErrorAds && !isLoadingAds && (
               <Carousel.Slide mt={"sm"}>
-                <Card h="340px" withBorder>
+                <Card h="276px" withBorder>
                   <Card.Section
                     h="100%"
                     style={{
@@ -282,6 +312,19 @@ const AdsSection = () => {
               </Carousel.Slide>
             )}
           </Carousel>
+          <Box display={{ base: "block", xs: "none" }} mt="md">
+            <Link href={"/ads/create"} style={{ textDecoration: "none" }}>
+              <Button
+                fullWidth
+                h={"48px"}
+                color="#9bb814"
+                radius="xl"
+                leftSection={<IconPlus size={20} stroke={2.4} />}
+              >
+                افزودن آگهی
+              </Button>
+            </Link>
+          </Box>
         </Tabs.Panel>
       </Tabs>
     </Container>

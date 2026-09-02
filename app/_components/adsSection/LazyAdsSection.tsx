@@ -1,12 +1,16 @@
 "use client";
 
-import { Box, Skeleton } from "@mantine/core";
+import { Box, Container, Skeleton } from "@mantine/core";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 
 const AdsSection = dynamic(() => import("./AdsSection"), {
   ssr: false,
-  loading: () => <Skeleton height={460} mt="100px" />,
+  loading: () => (
+    <Container mt="100px" size="lg">
+      <Skeleton height={460} radius="md" />
+    </Container>
+  ),
 });
 
 export default function LazyAdsSection() {
@@ -33,7 +37,13 @@ export default function LazyAdsSection() {
 
   return (
     <Box ref={containerRef}>
-      {shouldLoad ? <AdsSection /> : <Skeleton height={460} mt="100px" />}
+      {shouldLoad ? (
+        <AdsSection />
+      ) : (
+        <Container mt="100px" size="lg">
+          <Skeleton height={460} radius="md" />
+        </Container>
+      )}
     </Box>
   );
 }

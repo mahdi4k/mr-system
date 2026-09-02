@@ -134,7 +134,7 @@ const CopyPartList: React.FC<CopyPartListProps> = ({
       {hasParts && (
         <Card
           maw={"380px"}
-          bg={"var(--mantine-color-body)"}
+          bg="light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-7))"
           mt={"lg"}
           shadow="sm"
           radius={"md"}
