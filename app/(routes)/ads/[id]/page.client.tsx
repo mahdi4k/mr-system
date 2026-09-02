@@ -38,6 +38,9 @@ import { AppDispatch, RootState } from "@/_redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { useLazyGetAdsListCategoryQuery } from "@/_redux/services/adsApi";
 import { Carousel, Embla } from "@mantine/carousel";
+// Required: without these styles the carousel container is not a flex row
+// and slides stack vertically instead of sliding.
+import "@mantine/carousel/styles.css";
 import AdsRelated from "@/_components/adsSection/AdsRelated";
 import AdsGalleryModal from "@/_components/adsSection/AdsGalleryModal";
 import { useChat } from "@/_utils/customHook/useChat";
@@ -94,51 +97,18 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
     setOpenedImageModal(true);
   };
 
-  const handleImageAds = (image: string | undefined, title: string) => {
-    if (image) {
-      const images: string[] = JSON.parse(image);
-      return (
-        <>
-          <Carousel
-            slideSize={{
-              base: images.length === 1 ? "100%" : "62%",
-              sm: "40%",
-              lg: "21%",
-            }}
-            slideGap={{ base: "sm", sm: "md" }}
-            getEmblaApi={setEmbla}
-            align="start"
-            dragFree
-            withControls={false}
-          >
-            {images.map((img, index) => (
-              <Carousel.Slide key={index} mt={"sm"}>
-                <Box onClick={() => openModal(index)}>
-                  <Group
-                    wrap="nowrap"
-                    justify="center"
-                    className={classes.adsImages}
-                    key={index}
-                  >
-                    <KiwiImage
-                      objectFit="cover"
-                      url={img}
-                      width={300}
-                      height={300}
-                      img={img}
-                      alt={title}
-                    />
-                  </Group>
-                </Box>
-              </Carousel.Slide>
-            ))}
-          </Carousel>
-        </>
-      );
-    } else {
-      return <></>;
+  const galleryImages: string[] = (() => {
+    if (!product.image) return [];
+    try {
+      const parsed: unknown = JSON.parse(product.image);
+      return Array.isArray(parsed)
+        ? parsed.filter((img): img is string => typeof img === "string")
+        : [];
+    } catch {
+      return [];
     }
-  };
+  })();
+
   const { createConversation, creatingConversation } = useChat();
   const isOwnAd = currentUserId === product.user_id;
   const statusDisplay = getAdStatusDisplay(product.status);
@@ -172,7 +142,38 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
         </Text>
       </Breadcrumbs>
 
-      {handleImageAds(product.image, product.title)}
+      {galleryImages.length > 0 && (
+        <Carousel
+          slideSize={{
+            base: galleryImages.length === 1 ? "100%" : "62%",
+            sm: "40%",
+            lg: "21%",
+          }}
+          slideGap={{ base: "sm", sm: "md" }}
+          getEmblaApi={setEmbla}
+          align="start"
+          dragFree
+          withControls={false}
+        >
+          {galleryImages.map((img, index) => (
+            <Carousel.Slide key={`${img}-${index}`} mt={"sm"}>
+              <Box
+                className={classes.adsImages}
+                onClick={() => openModal(index)}
+              >
+                <KiwiImage
+                  objectFit="cover"
+                  url={img}
+                  width={300}
+                  height={300}
+                  img={img}
+                  alt={product.title}
+                />
+              </Box>
+            </Carousel.Slide>
+          ))}
+        </Carousel>
+      )}
 
       <Grid gutter={"xl"} mt={{ base: "lg", md: "60px" }} mb={"xl"}>
         <Grid.Col span={{ base: 12, lg: 8 }}>

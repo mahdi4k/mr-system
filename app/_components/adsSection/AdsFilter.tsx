@@ -1,21 +1,17 @@
 "use client";
 
-import type { AdsCategory } from "../../(routes)/ads/page";
 import {
-  Accordion,
   ActionIcon,
   Box,
   Button,
   Divider,
   Group,
   MultiSelect,
-  NavLink,
   Stack,
   Text,
   TextInput,
 } from "@mantine/core";
 import { IconSearch, IconX } from "@tabler/icons-react";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
   convertToEnglishNumber,
@@ -31,8 +27,6 @@ export interface AdsFilterUpdate {
 }
 
 interface AdsFilterProps {
-  categories: AdsCategory[];
-  currentCategory: string | null;
   currentProvinces: string[];
   currentSearch: string;
   currentPriceFrom: string;
@@ -48,8 +42,6 @@ function formatPriceInput(value: string): string {
 }
 
 export default function AdsFilter({
-  categories,
-  currentCategory,
   currentPriceFrom,
   currentPriceTo,
   currentProvinces,
@@ -93,34 +85,6 @@ export default function AdsFilter({
 
   return (
     <Stack gap="lg">
-      <Accordion defaultValue="categories" variant="separated">
-        <Accordion.Item value="categories">
-          <Accordion.Control>
-            <Text fw={700}>دسته‌بندی</Text>
-          </Accordion.Control>
-          <Accordion.Panel>
-            <Stack gap={2}>
-              <NavLink
-                active={!currentCategory}
-                label="همه قطعات"
-                onClick={() => apply({ category: null })}
-              />
-              {categories.map((category) => (
-                <NavLink
-                  active={currentCategory === category.value}
-                  key={category.id}
-                  label={category.name}
-                  leftSection={
-                    <Image alt="" height={18} src={category.icon} width={18} />
-                  }
-                  onClick={() => apply({ category: category.value })}
-                />
-              ))}
-            </Stack>
-          </Accordion.Panel>
-        </Accordion.Item>
-      </Accordion>
-
       <Box>
         <MultiSelect
           clearable

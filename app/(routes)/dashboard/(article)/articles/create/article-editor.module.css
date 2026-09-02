@@ -17,6 +17,14 @@
   :global(.ProseMirror) {
     min-height: 320px;
     padding: var(--mantine-spacing-md);
+
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin-inline: auto;
+      border-radius: var(--mantine-radius-md);
+    }
   }
 
   :global(.ProseMirror p.is-editor-empty:first-child::before) {

@@ -41,10 +41,8 @@
   gap: var(--mantine-spacing-sm);
   min-width: rem(140px);
   padding: rem(8px) rem(12px);
-  border: rem(1px) solid light-dark(
-    var(--mantine-color-gray-3),
-    var(--mantine-color-dark-4)
-  );
+  border: rem(1px) solid
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
   border-radius: var(--mantine-radius-md);
 }
 
@@ -65,7 +63,7 @@
 
 .imageSection {
   position: relative;
-  height: rem(190px);
+  height: rem(125px);
   overflow: hidden;
   background-color: light-dark(
     var(--mantine-color-gray-0),
@@ -73,12 +71,29 @@
   );
 }
 
+@media (min-width: $mantine-breakpoint-sm) {
+  .imageSection {
+    height: rem(150px);
+  }
+}
+
+.adCardSkeleton {
+  height: rem(215px);
+
+  @media (min-width: $mantine-breakpoint-sm) {
+    height: rem(290px);
+  }
+}
+
 .refreshOverlay {
   position: absolute;
   z-index: 2;
   inset: 0;
   border-radius: var(--mantine-radius-lg);
-  background-color: light-dark(rgba(255, 255, 255, 0.55), rgba(26, 27, 30, 0.55));
+  background-color: light-dark(
+    rgba(255, 255, 255, 0.55),
+    rgba(26, 27, 30, 0.55)
+  );
   pointer-events: none;
 }
 
@@ -114,4 +129,65 @@
     overflow-x: auto;
     flex-wrap: nowrap;
   }
+}
+
+/* Divar-style mobile category grid */
+.categoryCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: rem(6px);
+  padding: rem(8px) rem(4px);
+  border: rem(1px) solid transparent;
+  border-radius: var(--mantine-radius-md);
+  background-color: light-dark(
+    var(--mantine-color-gray-0),
+    var(--mantine-color-dark-7)
+  );
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    transform 140ms ease;
+
+  @mixin hover {
+    border-color: var(--mantine-color-teal-4);
+    transform: translateY(rem(-2px));
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &[data-active] {
+    border-color: var(--mantine-color-teal-6);
+    background-color: light-dark(
+      var(--mantine-color-teal-0),
+      rgba(56, 158, 138, 0.15)
+    );
+  }
+}
+
+.categoryCellIcon {
+  position: relative;
+  display: flex;
+  width: rem(50px);
+  height: rem(50px);
+  align-items: center;
+  justify-content: center;
+  color: var(--mantine-color-teal-7);
+
+  img {
+    object-fit: contain;
+  }
+}
+
+.categoryCellText {
+  max-width: 100%;
+  overflow: hidden;
+  color: light-dark(var(--mantine-color-dark-7), var(--mantine-color-dark-1));
+  font-size: rem(11px);
+  font-weight: 600;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

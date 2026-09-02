@@ -41,6 +41,7 @@ import {
   IconAlertCircle,
   IconChevronDown,
   IconFlag3,
+  IconLayoutGrid,
   IconRefresh,
   IconSearchOff,
   IconX,
@@ -187,8 +188,6 @@ export default function PageClient({ categories }: PageClientProps) {
 
   const filterPanel = (
     <AdsFilter
-      categories={categories}
-      currentCategory={filters.category ?? null}
       currentPriceFrom={filters.price_from ?? ""}
       currentPriceTo={filters.price_to ?? ""}
       currentProvinces={provinceFilters}
@@ -198,6 +197,8 @@ export default function PageClient({ categories }: PageClientProps) {
       provinces={ostan}
     />
   );
+
+  const currentCategory = filters.category ?? null;
 
   return (
     <Container className={classes.page} size="lg">
@@ -235,6 +236,14 @@ export default function PageClient({ categories }: PageClientProps) {
           )}
         </Button>
       </Flex>
+
+      <Box hiddenFrom="sm" mb="lg">
+        <CategoryGrid
+          categories={categories}
+          currentCategory={currentCategory}
+          onApply={updateFilters}
+        />
+      </Box>
 
       <div className={classes.layout}>
         <Paper className={classes.sidebar} p="md" radius="lg" withBorder>
@@ -320,7 +329,11 @@ export default function PageClient({ categories }: PageClientProps) {
           ) : data && data.data.length > 0 ? (
             <>
               <Box pos="relative">
-                <SimpleGrid cols={{ base: 1, xs: 2, md: 3 }} spacing="md">
+                <SimpleGrid
+                  cols={{ base: 2, xs: 2, md: 3 }}
+                  spacing={{ base: "xs", md: "md" }}
+                  verticalSpacing={{ base: "xs", md: "md" }}
+                >
                   {data.data.map((product) => (
                     <AdCard
                       city={city}
@@ -378,11 +391,59 @@ export default function PageClient({ categories }: PageClientProps) {
   );
 }
 
+interface CategoryGridProps {
+  categories: AdsCategory[];
+  currentCategory: string | null;
+  onApply: (update: AdsFilterUpdate) => void;
+}
+
+function CategoryGrid({
+  categories,
+  currentCategory,
+  onApply,
+}: CategoryGridProps) {
+  return (
+    <SimpleGrid cols={4} spacing="xs" verticalSpacing="xs">
+      <UnstyledButton
+        className={classes.categoryCell}
+        data-active={!currentCategory || undefined}
+        onClick={() => onApply({ category: null })}
+      >
+        <Box className={classes.categoryCellIcon}>
+          <IconLayoutGrid size={30} stroke={1.6} />
+        </Box>
+        <Text className={classes.categoryCellText} component="span">
+          همه قطعات
+        </Text>
+      </UnstyledButton>
+      {categories.map((category) => (
+        <UnstyledButton
+          className={classes.categoryCell}
+          data-active={currentCategory === category.value || undefined}
+          key={category.id}
+          onClick={() => onApply({ category: category.value })}
+        >
+          <Box className={classes.categoryCellIcon}>
+            <Image fill alt={category.name} sizes="50px" src={category.icon} />
+          </Box>
+          <Text className={classes.categoryCellText} component="span">
+            {category.name}
+          </Text>
+        </UnstyledButton>
+      ))}
+    </SimpleGrid>
+  );
+}
+
 function AdsGridSkeleton() {
   return (
-    <SimpleGrid cols={{ base: 1, xs: 2, md: 3 }} spacing="md">
+    <SimpleGrid
+      cols={{ base: 2, xs: 2, md: 3 }}
+      spacing={{ base: "xs", md: "md" }}
+      verticalSpacing={{ base: "xs", md: "md" }}
+    >
       {Array.from({ length: 6 }).map((_, index) => (
-        <Skeleton height={330} key={index} radius="lg" />
+        <Skeleton className={classes.adCardSkeleton} key={index} radius="lg" />
       ))}
     </SimpleGrid>
   );
@@ -410,15 +471,25 @@ function AdCard({ city, locationStatus, product, provinces }: AdCardProps) {
         <Image
           alt={product.title}
           fill
-          sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, 33vw"
+          sizes="(max-width: 576px) 50vw, (max-width: 992px) 50vw, 33vw"
           src={image || ImgNoProduct}
           style={{ objectFit: image ? "cover" : "contain" }}
         />
       </Card.Section>
-      <Text fw={600} lineClamp={2} mih={48} mt="sm">
+      <Text
+        fw={600}
+        fz={{ base: "sm", md: "md" }}
+        lineClamp={2}
+        mih={{ base: 40, md: 48 }}
+        mt={{ base: "xs", md: "sm" }}
+      >
         {product.title}
       </Text>
-      <Flex align="center" justify="space-between" mt="md">
+      <Flex
+        align="center"
+        justify="space-between"
+        mt={{ base: "xs", md: "md" }}
+      >
         {product.price ? (
           <CardPartPrice
             isAds
@@ -428,7 +499,7 @@ function AdCard({ city, locationStatus, product, provinces }: AdCardProps) {
             tomanWidth={17}
           />
         ) : (
-          <Text c="teal" fw={600} fz="sm">
+          <Text c="teal" fw={600} fz={{ base: "xs", md: "sm" }}>
             توافقی
           </Text>
         )}
@@ -436,7 +507,7 @@ function AdCard({ city, locationStatus, product, provinces }: AdCardProps) {
           {formatJalaliTimeAgo(product.created_at)}
         </Text>
       </Flex>
-      <Group c="dimmed" gap={4} mt="sm" wrap="nowrap">
+      <Group c="dimmed" gap={4} mt={{ base: "xs", md: "sm" }} wrap="nowrap">
         <IconFlag3 size={15} />
         <Text fz="xs" truncate>
           {provinceTitleHandler(locationStatus, product.ostan, provinces)}،{" "}
