@@ -13,9 +13,11 @@ import {
 import {
   BUILD_PART_TYPES,
   BuildCatalog,
+  BuildIntent,
   BuildPartType,
   BuildRecommendation,
-  findMinimumPriceBuild,
+  findBuildRecommendation,
+  parseBudgetFromMessage,
   parseBuildIntent,
 } from "@/_utils/pcAssistant";
 import {
@@ -58,9 +60,10 @@ const formatPrice = (price: number): string =>
   new Intl.NumberFormat("fa-IR").format(price);
 
 const quickPrompts = [
-  "ارزان‌ترین سیستم کامل و سازگار را از قطعات موجود پیدا کن",
-  "یک سیستم اقتصادی زیر ۵۰ میلیون پیدا کن",
-  "یک سیستم ارزان زیر ۸۰ میلیون پیشنهاد بده",
+  "یک سیستم تا قیمت ۶۰ میلیون تومان می‌خوام",
+  "یک سیستم گیمینگ تا ۸۰ میلیون با کارت گرافیک انویدیا",
+  "ارزان‌ترین سیستم کامل و سازگار را پیدا کن",
+  "یه سیستم با رم ۱۶ گیگ و پردازنده اینتل بساز",
 ];
 
 const BuildAssistant = () => {
@@ -77,12 +80,13 @@ const BuildAssistant = () => {
   const [input, setInput] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
+  const pendingIntent = useRef<BuildIntent | null>(null);
   const messagesViewport = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 1,
       role: "assistant",
-      text: "سلام! بودجه‌تان را بگویید تا ارزان‌ترین سیستم کامل و سازگار را از میان قطعات موجود پیدا کنم.",
+      text: "سلام! بگو چه سیستمی می‌خواهی — مثلا «یک سیستم گیمینگ تا ۶۰ میلیون با رم ۱۶ گیگ» یا «ارزان‌ترین سیستم ممکن» — تا کامل و سازگار از قطعات موجود برات بسازم.",
     },
   ]);
 
@@ -136,12 +140,41 @@ const BuildAssistant = () => {
 
     setInput("");
     addMessage({ role: "user", text: message });
-    const intent = parseBuildIntent(message);
+
+    let intent = parseBuildIntent(message);
+
+    // Follow-up: the assistant previously asked for a budget.
+    if (!intent && pendingIntent.current) {
+      const budget = parseBudgetFromMessage(message);
+      if (budget) {
+        intent = { ...pendingIntent.current, maxBudget: budget };
+      } else {
+        const prefIntent = parseBuildIntent(`${message} سیستم`);
+        if (prefIntent) {
+          intent = {
+            ...pendingIntent.current,
+            ...prefIntent,
+            maxBudget: prefIntent.maxBudget,
+          };
+        }
+      }
+    }
+    pendingIntent.current = null;
 
     if (!intent) {
       addMessage({
         role: "assistant",
-        text: "در نسخه فعلی درخواست‌هایی مثل «ارزان‌ترین سیستم کامل را بساز» یا «یک سیستم ارزان زیر ۵۰ میلیون» را پشتیبانی می‌کنم.",
+        text: "می‌تونم یک سیستم کامل و سازگار از قطعات موجود برات بسازم. مثلا بگو: «یک سیستم گیمینگ تا ۸۰ میلیون با رم ۱۶ گیگ» یا «ارزان‌ترین سیستم ممکن».",
+      });
+      return;
+    }
+
+    // A value-focused request needs a budget to maximize within.
+    if (intent.objective === "best_value" && intent.maxBudget == null) {
+      pendingIntent.current = intent;
+      addMessage({
+        role: "assistant",
+        text: "چه بودجه‌ای داری؟ مثلا بگو «۶۰ میلیون» تا قوی‌ترین سیستمی که در بودجه‌ات جا می‌شود را پیدا کنم.",
       });
       return;
     }
@@ -150,21 +183,42 @@ const BuildAssistant = () => {
 
     try {
       const catalog = await loadCatalog();
-      const recommendation = findMinimumPriceBuild(catalog, intent.maxBudget);
+      const recommendation = findBuildRecommendation(catalog, intent);
 
       if (!recommendation) {
+        const missingPrices = BUILD_PART_TYPES.filter(
+          (partType) =>
+            !catalog[partType].some((product) => {
+              const price = Number(product.price);
+              return Number.isFinite(price) && price > 0;
+            }),
+        );
+        if (missingPrices.length > 0) {
+          addMessage({
+            role: "assistant",
+            text: `قیمت برخی قطعات (${missingPrices
+              .map((partType) => partLabels[partType])
+              .join("، ")}) دریافت نشد. لطفا دوباره تلاش کنید.`,
+          });
+          return;
+        }
         addMessage({
           role: "assistant",
           text: intent.maxBudget
-            ? `سیستم کامل و سازگاری زیر ${formatPrice(intent.maxBudget)} تومان پیدا نشد. بودجه را افزایش دهید یا دوباره تلاش کنید.`
-            : "برای همه دسته‌ها قیمت معتبر دریافت نشد یا ترکیب سازگاری وجود ندارد. کمی بعد دوباره تلاش کنید.",
+            ? `سیستم کامل و سازگاری با این شرایط زیر ${formatPrice(intent.maxBudget)} تومان پیدا نشد. بودجه را بیشتر کن یا شرایط (برند، رم و…) را آزادتر کن.`
+            : "ترکیب کامل و سازگاری از قطعات موجود پیدا نشد. کمی بعد دوباره تلاش کنید.",
         });
         return;
       }
 
       addMessage({
         role: "assistant",
-        text: "ارزان‌ترین ترکیب کامل و سازگار موجود را پیدا کردم. قبل از اعمال، قطعات را بررسی کنید.",
+        text:
+          intent.objective === "maximum_price"
+            ? "گران‌ترین ترکیب کامل و سازگار از قطعات موجود را پیدا کردم. قبل از اعمال، قطعات را بررسی کن."
+            : intent.objective === "best_value"
+              ? "قوی‌ترین ترکیب کامل و سازگاری که در بودجه‌ات جا می‌شود را پیدا کردم. قبل از اعمال، قطعات را بررسی کن."
+              : "ارزان‌ترین ترکیب کامل و سازگار موجود را پیدا کردم. قبل از اعمال، قطعات را بررسی کن.",
         recommendation,
       });
     } catch {
@@ -339,7 +393,7 @@ const BuildAssistant = () => {
               className={classes.input}
               disabled={isThinking}
               onChange={(event) => setInput(event.currentTarget.value)}
-              placeholder="مثلا: یک سیستم ارزان زیر ۵۰ میلیون پیدا کن"
+              placeholder="مثلا: یک سیستم تا قیمت ۶۰ میلیون تومان می‌خوام"
               radius="md"
               size="md"
               value={input}
@@ -357,7 +411,7 @@ const BuildAssistant = () => {
             </ActionIcon>
           </form>
           <Text className={classes.scopeNote} c="dimmed" size="xs">
-            در نسخه فعلی، پیشنهاد سیستم کامل اقتصادی با بودجه دلخواه پشتیبانی
+            پیشنهاد سیستم کامل با بودجه، برند، رم و کاربرد دلخواه پشتیبانی
             می‌شود.
           </Text>
         </div>

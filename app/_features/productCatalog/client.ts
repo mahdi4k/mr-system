@@ -17,24 +17,43 @@ export interface MergedCatalogProduct {
   };
 }
 
+const MERGED_CATALOG_TIMEOUT_MS = 10_000;
+const MERGED_CATALOG_MAX_ATTEMPTS = 3;
+
+const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
 /**
  * Load the merged catalog (static + Supabase overlay) for a part type.
  * Used in place of the old per-product /api/torob-product scrape.
  *
- * The timeout keeps RTK Query queryFn promises from hanging forever when
- * the dev server or Supabase stalls — callers fall back to static data.
+ * Retries transient failures with a small backoff and a per-attempt timeout
+ * so RTK Query queryFn promises neither hang forever nor silently lose the
+ * price overlay (a missing overlay means the part cannot be priced, which
+ * silently removes it from build recommendations).
  */
 export async function fetchMergedCatalog(
   partType: CatalogPartType,
 ): Promise<MergedCatalogProduct[]> {
-  const response = await fetch(`/api/catalog/${partType}`, {
-    cache: "no-store",
-    signal: AbortSignal.timeout(5000),
-  });
-  if (!response.ok) {
-    throw new Error(`Failed to load catalog for ${partType}`);
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= MERGED_CATALOG_MAX_ATTEMPTS; attempt += 1) {
+    try {
+      const response = await fetch(`/api/catalog/${partType}`, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(MERGED_CATALOG_TIMEOUT_MS),
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to load catalog for ${partType}`);
+      }
+      return (await response.json()) as MergedCatalogProduct[];
+    } catch (error) {
+      lastError = error;
+      if (attempt < MERGED_CATALOG_MAX_ATTEMPTS) {
+        await sleep(attempt * 500);
+      }
+    }
   }
-  return (await response.json()) as MergedCatalogProduct[];
+  throw lastError;
 }
 
 /**

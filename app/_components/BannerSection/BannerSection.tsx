@@ -20,7 +20,7 @@ const BannerSection = () => {
           </Text>
 
           <div className={bannerClasses.controls}>
-            <Link target="_blank" href={"https://t.me/kiwi_part"}>
+            <Link target="_blank" href={"https://t.me/rigora_official"}>
               <button className={bannerClasses.bannerBtn}>
                 <Flex align={"center"} justify={"center"}>
                   <Text ml={"5px"}>ورود به کانال تلگرام</Text>

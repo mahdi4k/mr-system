@@ -120,7 +120,7 @@ const FanCategory = () => {
                         style={{ cursor: "pointer" }}
                       >
                         <Image
-                          alt="kiwipart cpu"
+                          alt="rigora cpu"
                           width={20}
                           height={20}
                           src={"/svg/cpu.svg"}

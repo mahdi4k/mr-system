@@ -1,6 +1,7 @@
 import {
   BuildCatalog,
   calculatePsuRequirement,
+  findBuildRecommendation,
   findMinimumPriceBuild,
   isBuildCompatible,
   isPartialBuildCompatible,
@@ -104,6 +105,78 @@ describe("parseBuildIntent", () => {
     expect(parseBuildIntent("یک سیستم ارزان زیر ۵۰ میلیون می‌خواهم")).toEqual({
       objective: "minimum_price",
       maxBudget: 50_000_000,
+      cpuBrand: undefined,
+      graphicBrand: undefined,
+      minRamGb: undefined,
+      preferNew: false,
+      needsStrongGraphic: false,
+    });
+  });
+
+  it("parses a budget-only request without a cheapness keyword", () => {
+    expect(parseBuildIntent("یک سیستم تا قیمت ۶۰ میلیون تومان میخوام")).toEqual(
+      {
+        objective: "best_value",
+        maxBudget: 60_000_000,
+        cpuBrand: undefined,
+        graphicBrand: undefined,
+        minRamGb: undefined,
+        preferNew: false,
+        needsStrongGraphic: false,
+      },
+    );
+  });
+
+  it("parses a budget-only request with budget before the keyword", () => {
+    expect(parseBuildIntent("بودجه‌ام ۳۵ میلیونه، یک سیستم بساز")).toEqual({
+      objective: "best_value",
+      maxBudget: 35_000_000,
+      cpuBrand: undefined,
+      graphicBrand: undefined,
+      minRamGb: undefined,
+      preferNew: false,
+      needsStrongGraphic: false,
+    });
+  });
+
+  it("parses gaming intent with graphic brand and ram requirement", () => {
+    expect(
+      parseBuildIntent("یک سیستم گیمینگ تا ۸۰ میلیون با رم ۱۶ گیگ انویدیا"),
+    ).toEqual({
+      objective: "best_value",
+      maxBudget: 80_000_000,
+      cpuBrand: undefined,
+      graphicBrand: "nvidia",
+      minRamGb: 16,
+      preferNew: false,
+      needsStrongGraphic: true,
+    });
+  });
+
+  it("parses cpu brand preference without budget", () => {
+    const intent = parseBuildIntent("یه سیستم با پردازنده اینتل بساز");
+    expect(intent?.cpuBrand).toBe("intel");
+    expect(intent?.objective).toBe("minimum_price");
+  });
+
+  it("parses a most-expensive request", () => {
+    expect(parseBuildIntent("گران‌ترین سیستم ممکن را بساز")).toEqual({
+      objective: "maximum_price",
+      maxBudget: undefined,
+      cpuBrand: undefined,
+      graphicBrand: undefined,
+      minRamGb: undefined,
+      preferNew: false,
+      needsStrongGraphic: false,
+    });
+    expect(parseBuildIntent("گرونترین سیستم ممکن")).toEqual({
+      objective: "maximum_price",
+      maxBudget: undefined,
+      cpuBrand: undefined,
+      graphicBrand: undefined,
+      minRamGb: undefined,
+      preferNew: false,
+      needsStrongGraphic: false,
     });
   });
 
@@ -133,6 +206,136 @@ describe("findMinimumPriceBuild", () => {
     ) as BuildCatalog;
 
     expect(findMinimumPriceBuild(expandedCatalog)?.totalPrice).toBe(800);
+  });
+});
+
+describe("findBuildRecommendation", () => {
+  it("picks the strongest build within budget for best_value", () => {
+    const richerCatalog: BuildCatalog = {
+      ...catalog,
+      cpu: catalog.cpu.map((item) => ({ ...item, graphics: [1, 3] })),
+      graphic: [
+        ...catalog.graphic,
+        {
+          id: 3,
+          name: "Strong GPU",
+          price: "150",
+          cpus: [1],
+          powers: [1],
+          psu: "550",
+          boardPowerW: 150,
+          minimumCaseForm: "Micro Tower",
+          ram: 16,
+        },
+      ],
+      power: [
+        {
+          id: 1,
+          name: "Power 1",
+          price: "100",
+          graphics: [1, 2, 3],
+          psu: "650",
+        },
+      ],
+    };
+
+    const cheapest = findMinimumPriceBuild(richerCatalog, 1000);
+    expect(cheapest?.selection.graphic).toBe(1);
+
+    const best = findBuildRecommendation(richerCatalog, {
+      objective: "best_value",
+      maxBudget: 1000,
+      needsStrongGraphic: true,
+    });
+    expect(best?.selection.graphic).toBe(3);
+    expect(best?.totalPrice).toBe(850);
+  });
+
+  it("picks the priciest compatible build for maximum_price", () => {
+    const richerCatalog: BuildCatalog = {
+      ...catalog,
+      cpu: catalog.cpu.map((item) => ({
+        ...item,
+        graphics: [1, 3],
+        fans: [1, 2],
+      })),
+      graphic: [
+        ...catalog.graphic,
+        {
+          id: 3,
+          name: "Strong GPU",
+          price: "150",
+          cpus: [1],
+          powers: [1],
+          psu: "550",
+          boardPowerW: 150,
+          minimumCaseForm: "Micro Tower",
+          ram: 16,
+        },
+      ],
+      fan: [
+        ...catalog.fan,
+        { ...catalog.fan[0], id: 2, name: "Fancy Fan", price: "300" },
+      ],
+      power: [
+        {
+          id: 1,
+          name: "Power 1",
+          price: "100",
+          graphics: [1, 2, 3],
+          psu: "650",
+        },
+      ],
+    };
+
+    const priciest = findBuildRecommendation(richerCatalog, {
+      objective: "maximum_price",
+    });
+    expect(priciest?.selection.graphic).toBe(3);
+    expect(priciest?.selection.fan).toBe(2);
+    expect(priciest?.totalPrice).toBe(1050);
+  });
+
+  it("filters by cpu brand preference", () => {
+    const amdCpu: BuildCatalog["cpu"][number] = {
+      ...catalog.cpu[0],
+      id: 2,
+      name: "AMD CPU",
+      manufacturer: "AMD",
+      price: "90",
+    };
+    const branded: BuildCatalog = {
+      ...catalog,
+      cpu: [...catalog.cpu, amdCpu],
+      motherboard: catalog.motherboard.map((item) => ({
+        ...item,
+        cpus: [...(item.cpus ?? []), 2],
+      })),
+      ram: catalog.ram.map((item) => ({
+        ...item,
+        cpus: [...(item.cpus ?? []), 2],
+      })),
+      graphic: catalog.graphic.map((item) => ({
+        ...item,
+        cpus: [...(item.cpus ?? []), 2],
+      })),
+      fan: catalog.fan.map((item) => ({
+        ...item,
+        cpus: [...(item.cpus ?? []), 2],
+      })),
+    };
+
+    const intel = findBuildRecommendation(branded, {
+      objective: "minimum_price",
+      cpuBrand: "intel",
+    });
+    expect(intel?.selection.cpu).toBe(1);
+
+    const amd = findBuildRecommendation(branded, {
+      objective: "minimum_price",
+      cpuBrand: "amd",
+    });
+    expect(amd?.selection.cpu).toBe(2);
   });
 });
 

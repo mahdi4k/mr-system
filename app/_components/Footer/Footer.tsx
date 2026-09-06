@@ -161,7 +161,7 @@ export function Footer() {
               <a
                 aria-label="پشتیبانی ریگورا در تلگرام"
                 className={classes.telegramLink}
-                href="https://t.me/kiwi_part"
+                href="https://t.me/rigora_official"
                 rel="noopener noreferrer"
                 target="_blank"
               >

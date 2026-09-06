@@ -46,15 +46,27 @@ export interface BuildProduct {
   powerDrawW?: number;
   quantity?: number;
   total_slot_ram?: number;
+  condition?: string;
+  ram?: number;
+  manufacturer?: string;
+  brand?: string;
 }
 
 export type BuildCatalog = Record<BuildPartType, BuildProduct[]>;
 export type CompleteBuild = Record<BuildPartType, BuildProduct>;
 export type BuildSelection = Record<BuildPartType, number>;
 
+export type BuildObjective = "minimum_price" | "best_value" | "maximum_price";
+export type BrandPreference = "intel" | "amd" | "nvidia";
+
 export interface BuildIntent {
-  objective: "minimum_price";
+  objective: BuildObjective;
   maxBudget?: number;
+  cpuBrand?: BrandPreference;
+  graphicBrand?: BrandPreference;
+  minRamGb?: number;
+  preferNew?: boolean;
+  needsStrongGraphic?: boolean;
 }
 
 export interface BuildRecommendation {
@@ -82,10 +94,10 @@ const normalizeDigits = (value: string): string =>
 const parseBudget = (message: string): number | undefined => {
   const normalized = normalizeDigits(message.toLowerCase()).replace(/,/g, "");
   const millionMatch = normalized.match(
-    /(?:under|below|تا|زیر|بودجه)?\s*(\d+(?:\.\d+)?)\s*(?:million|میلیون|m\b)/,
+    /(?:under|below|تا|زیر|بودجه|تا\s*قیمت)\s*(\d+(?:\.\d+)?)\s*(?:million|میلیون|m\b)|(\d+(?:\.\d+)?)\s*(?:million|میلیون|m\b)/,
   );
-
-  if (millionMatch) return Math.round(Number(millionMatch[1]) * 1_000_000);
+  const millionValue = millionMatch?.[1] ?? millionMatch?.[2];
+  if (millionValue) return Math.round(Number(millionValue) * 1_000_000);
 
   const tomanMatch = normalized.match(
     /(?:under|below|تا|زیر|بودجه)\s*(\d{6,})|(?:\d{6,})\s*(?:تومان|toman)/,
@@ -95,8 +107,62 @@ const parseBudget = (message: string): number | undefined => {
   return rawBudget ? Number(rawBudget) : undefined;
 };
 
+export const parseBudgetFromMessage = parseBudget;
+
+const parseRamRequirement = (message: string): number | undefined => {
+  const patterns = [
+    /رم[^.]*?(\d+)\s*(?:گیگابایت|گیگ|gb|g\b)/,
+    /(\d+)\s*(?:گیگابایت|گیگ|gb)\s*رم/,
+  ];
+  for (const pattern of patterns) {
+    const match = message.match(pattern);
+    if (match) return Number(match[1]);
+  }
+  return undefined;
+};
+
+const CPU_BRAND_KEYWORDS: [BrandPreference, RegExp][] = [
+  ["intel", /اینتی?ل|intel/],
+  ["amd", /ای‌?ام‌?دی|amd|ریزن|ryzen/],
+];
+
+const GRAPHIC_BRAND_KEYWORDS: [BrandPreference, RegExp][] = [
+  ["nvidia", /انویدیا|nvidia|جی‌?فورس|geforce|\brtx\b|\bgtx\b/],
+  ["amd", /ای‌?ام‌?دی|amd|رادئون|رادیون|radeon|\brx ?\d/],
+];
+
+const detectBrand = (
+  message: string,
+  keywords: [BrandPreference, RegExp][],
+): BrandPreference | undefined =>
+  keywords.find(([, pattern]) => pattern.test(message))?.[0];
+
+const STRONG_GRAPHIC_KEYWORDS = [
+  "گیمینگ",
+  "بازی",
+  "gaming",
+  "رندر",
+  "طراحی",
+  "ادیت",
+  "قوی",
+  "بهترین",
+];
+
 export const parseBuildIntent = (message: string): BuildIntent | undefined => {
   const normalized = normalizeDigits(message).toLowerCase();
+  const asksForBuild = [
+    "system",
+    "build",
+    "pc",
+    "computer",
+    "سیستم",
+    "کامپیوتر",
+    "ست",
+  ].some((keyword) => normalized.includes(keyword));
+
+  if (!asksForBuild) return undefined;
+
+  const maxBudget = parseBudget(normalized);
   const asksForLowPrice = [
     "minimum",
     "cheapest",
@@ -107,21 +173,49 @@ export const parseBuildIntent = (message: string): BuildIntent | undefined => {
     "کمترین",
     "حداقل قیمت",
     "اقتصادی",
+    "کم‌هزینه",
   ].some((keyword) => normalized.includes(keyword));
-  const asksForBuild = [
-    "system",
-    "build",
-    "pc",
-    "computer",
-    "سیستم",
-    "کامپیوتر",
+  const asksForHighPrice = [
+    "most expensive",
+    "گران‌ترین",
+    "گران ترین",
+    "گرانترین",
+    "گرون‌ترین",
+    "گرون ترین",
+    "گرونترین",
+    "لاکچری",
+    "لاکژری",
+    "luxury",
   ].some((keyword) => normalized.includes(keyword));
+  const needsStrongGraphic = STRONG_GRAPHIC_KEYWORDS.some((keyword) =>
+    normalized.includes(keyword),
+  );
 
-  if (!asksForLowPrice || !asksForBuild) return undefined;
+  let objective: BuildObjective;
+  if (asksForLowPrice) {
+    objective = "minimum_price";
+  } else if (asksForHighPrice) {
+    objective = "maximum_price";
+  } else if (needsStrongGraphic || maxBudget != null) {
+    objective = "best_value";
+  } else {
+    objective = "minimum_price";
+  }
+
+  const ramMatch = parseRamRequirement(normalized);
+  const preferNew =
+    /(^|[\s،.])نو([\s،.]|$)/.test(normalized) ||
+    normalized.includes("آکبند") ||
+    normalized.includes("در حد نو");
 
   return {
-    objective: "minimum_price",
-    maxBudget: parseBudget(normalized),
+    objective,
+    maxBudget,
+    cpuBrand: detectBrand(normalized, CPU_BRAND_KEYWORDS),
+    graphicBrand: detectBrand(normalized, GRAPHIC_BRAND_KEYWORDS),
+    minRamGb: ramMatch,
+    preferNew,
+    needsStrongGraphic,
   };
 };
 
@@ -318,24 +412,125 @@ export const isPartialBuildCompatible = (
 export const isBuildCompatible = (build: CompleteBuild): boolean =>
   isPartialBuildCompatible(build);
 
-export const findMinimumPriceBuild = (
+const detectProductBrand = (
+  product: BuildProduct,
+): BrandPreference | undefined => {
+  const haystack =
+    `${product.manufacturer ?? ""} ${product.brand ?? ""} ${product.name ?? ""}`.toLowerCase();
+  if (/intel|اینتی?ل/.test(haystack)) return "intel";
+  if (/amd|ای‌?ام‌?دی|ریزن|ryzen|radeon|رادئون/.test(haystack)) return "amd";
+  if (/nvidia|انویدیا|جی‌?فورس|geforce/.test(haystack)) return "nvidia";
+  return undefined;
+};
+
+const matchesBrand = (
+  product: BuildProduct,
+  brand: BrandPreference,
+): boolean => {
+  const detected = detectProductBrand(product);
+  // Products with no detectable brand stay available for every preference.
+  return detected == null || detected === brand;
+};
+
+const preferFreshProducts = <T extends BuildProduct>(products: T[]): T[] => {
+  const fresh = products.filter((product) => product.condition !== "used");
+  return fresh.length > 0 ? fresh : products;
+};
+
+const applyIntentPreferences = (
   catalog: BuildCatalog,
-  maxBudget?: number,
+  intent: BuildIntent,
+): BuildCatalog => {
+  const filterBy = <T extends BuildProduct>(
+    products: T[],
+    predicate: (product: T) => boolean,
+  ): T[] => {
+    const filtered = products.filter(predicate);
+    return filtered.length > 0 ? filtered : products;
+  };
+
+  let result = catalog;
+  if (intent.cpuBrand) {
+    const brand = intent.cpuBrand;
+    result = {
+      ...result,
+      cpu: filterBy(result.cpu, (product) => matchesBrand(product, brand)),
+    };
+  }
+  if (intent.graphicBrand) {
+    const brand = intent.graphicBrand;
+    result = {
+      ...result,
+      graphic: filterBy(result.graphic, (product) =>
+        matchesBrand(product, brand),
+      ),
+    };
+  }
+  if (intent.minRamGb != null) {
+    const minRamGb = intent.minRamGb;
+    result = {
+      ...result,
+      ram: filterBy(
+        result.ram,
+        (product) => (product.capacityGb ?? 0) >= minRamGb,
+      ),
+    };
+  }
+  if (intent.preferNew) {
+    result = {
+      ...result,
+      cpu: preferFreshProducts(result.cpu),
+      motherboard: preferFreshProducts(result.motherboard),
+      ram: preferFreshProducts(result.ram),
+      graphic: preferFreshProducts(result.graphic),
+      power: preferFreshProducts(result.power),
+      ssd: preferFreshProducts(result.ssd),
+      case: preferFreshProducts(result.case),
+      fan: preferFreshProducts(result.fan),
+    };
+  }
+  return result;
+};
+
+const buildPerformanceScore = (
+  build: CompleteBuild,
+  intent: BuildIntent,
+): number => {
+  const graphicVramWeight = intent.needsStrongGraphic ? 10 : 4;
+  return (
+    (build.graphic.ram ?? 0) * graphicVramWeight +
+    (build.cpu.maxTurboPowerW ?? 0) / 25 +
+    (build.ram.capacityGb ?? 0) / 16 +
+    (build.ssd.capacityGb ?? 0) / 1024
+  );
+};
+
+export const findBuildRecommendation = (
+  catalog: BuildCatalog,
+  intent: BuildIntent,
 ): BuildRecommendation | undefined => {
+  const preferredCatalog = applyIntentPreferences(catalog, intent);
   const pricedCatalog = Object.fromEntries(
     BUILD_PART_TYPES.map((partType) => [
       partType,
-      catalog[partType]
+      preferredCatalog[partType]
         .filter(hasPrice)
         .sort((first, second) => Number(first.price) - Number(second.price)),
     ]),
   ) as Record<BuildPartType, (BuildProduct & { price: string })[]>;
 
+  const maximizeValue = intent.objective === "best_value";
+  const maximizePrice = intent.objective === "maximum_price";
+  const maxBudget = intent.maxBudget ?? Number.POSITIVE_INFINITY;
+
   let bestBuild: CompleteBuild | undefined;
-  let bestPrice = Number.POSITIVE_INFINITY;
+  let bestPrice = maximizePrice
+    ? Number.NEGATIVE_INFINITY
+    : Number.POSITIVE_INFINITY;
+  let bestScore = Number.NEGATIVE_INFINITY;
 
   for (const cpu of pricedCatalog.cpu) {
-    const fan = pricedCatalog.fan.find(
+    const fanCandidates = pricedCatalog.fan.filter(
       (candidate) =>
         includesProduct(cpu.fans, candidate) &&
         includesProduct(candidate.cpus, cpu) &&
@@ -344,103 +539,133 @@ export const findMinimumPriceBuild = (
         cpu.maxTurboPowerW != null &&
         candidate.coolingCapacityW >= cpu.maxTurboPowerW,
     );
-    if (!fan) continue;
+    if (fanCandidates.length === 0) continue;
+    const fan = maximizePrice
+      ? fanCandidates[fanCandidates.length - 1]
+      : fanCandidates[0];
 
-    let graphic: BuildProduct | undefined;
-    let power: BuildProduct | undefined;
-    let graphicAndPowerPrice = Number.POSITIVE_INFINITY;
-
-    for (const graphicCandidate of pricedCatalog.graphic) {
+    for (const selectedGraphic of pricedCatalog.graphic) {
       if (
-        !includesProduct(cpu.graphics, graphicCandidate) ||
-        !includesProduct(graphicCandidate.cpus, cpu)
+        !includesProduct(cpu.graphics, selectedGraphic) ||
+        !includesProduct(selectedGraphic.cpus, cpu)
       ) {
         continue;
       }
 
-      const powerCandidate = pricedCatalog.power.find((candidate) => {
+      const powerCandidates = pricedCatalog.power.filter((candidate) => {
         const calculation = calculatePsuRequirement({
           cpu,
-          graphic: graphicCandidate,
+          graphic: selectedGraphic,
           fan,
         });
         return (
           calculation != null &&
-          includesProduct(graphicCandidate.powers, candidate) &&
-          includesProduct(candidate.graphics, graphicCandidate) &&
+          includesProduct(selectedGraphic.powers, candidate) &&
+          includesProduct(candidate.graphics, selectedGraphic) &&
           Number(candidate.psu) >= calculation.recommendedPsuW
         );
       });
-      if (!powerCandidate) continue;
+      if (powerCandidates.length === 0) continue;
+      const power = maximizePrice
+        ? powerCandidates[powerCandidates.length - 1]
+        : powerCandidates[0];
 
-      const pairPrice =
-        Number(graphicCandidate.price) + Number(powerCandidate.price);
-      if (pairPrice < graphicAndPowerPrice) {
-        graphic = graphicCandidate;
-        power = powerCandidate;
-        graphicAndPowerPrice = pairPrice;
+      for (const motherboard of pricedCatalog.motherboard) {
+        if (
+          cpu.cpu_socket !== motherboard.cpu_socket ||
+          !includesProduct(cpu.motherboards, motherboard) ||
+          !includesProduct(motherboard.cpus, cpu)
+        ) {
+          continue;
+        }
+
+        const ramCandidates = pricedCatalog.ram.filter(
+          (candidate) =>
+            includesProduct(cpu.rams, candidate) &&
+            includesProduct(motherboard.rams, candidate) &&
+            includesProduct(candidate.cpus, cpu) &&
+            includesProduct(candidate.motherboards, motherboard) &&
+            candidate.capacityGb != null &&
+            cpu.minimumRamGb != null &&
+            candidate.capacityGb >= cpu.minimumRamGb,
+        );
+        if (ramCandidates.length === 0) continue;
+        const ram = maximizePrice
+          ? ramCandidates[ramCandidates.length - 1]
+          : maximizeValue
+            ? [...ramCandidates].sort(
+                (first, second) =>
+                  (second.capacityGb ?? 0) - (first.capacityGb ?? 0) ||
+                  Number(first.price) - Number(second.price),
+              )[0]
+            : ramCandidates[0];
+
+        const ssdCandidates = pricedCatalog.ssd.filter(
+          (candidate) =>
+            Boolean(candidate.form) &&
+            motherboard.storageForms?.includes(candidate.form!) === true,
+        );
+        if (ssdCandidates.length === 0) continue;
+        const ssd = maximizePrice
+          ? ssdCandidates[ssdCandidates.length - 1]
+          : maximizeValue
+            ? [...ssdCandidates].sort(
+                (first, second) =>
+                  (second.capacityGb ?? 0) - (first.capacityGb ?? 0) ||
+                  Number(first.price) - Number(second.price),
+              )[0]
+            : ssdCandidates[0];
+
+        const caseCandidates = pricedCatalog.case.filter(
+          (candidate) =>
+            Boolean(motherboard.size) &&
+            candidate.motherboardSizes?.includes(motherboard.size!) === true &&
+            graphicFitsCase(selectedGraphic, candidate),
+        );
+        if (caseCandidates.length === 0) continue;
+        const caseItem = maximizePrice
+          ? caseCandidates[caseCandidates.length - 1]
+          : caseCandidates[0];
+
+        const candidate: CompleteBuild = {
+          cpu,
+          motherboard,
+          ram,
+          graphic: selectedGraphic,
+          power,
+          ssd,
+          case: caseItem,
+          fan,
+        };
+        if (!isBuildCompatible(candidate)) continue;
+
+        const totalPrice = BUILD_PART_TYPES.reduce(
+          (total, partType) => total + Number(candidate[partType].price),
+          0,
+        );
+
+        if (totalPrice > maxBudget) continue;
+
+        if (maximizeValue) {
+          const score = buildPerformanceScore(candidate, intent);
+          if (
+            score > bestScore ||
+            (score === bestScore && totalPrice < bestPrice)
+          ) {
+            bestBuild = candidate;
+            bestPrice = totalPrice;
+            bestScore = score;
+          }
+        } else if (maximizePrice) {
+          if (totalPrice > bestPrice) {
+            bestBuild = candidate;
+            bestPrice = totalPrice;
+          }
+        } else if (totalPrice < bestPrice) {
+          bestBuild = candidate;
+          bestPrice = totalPrice;
+        }
       }
-    }
-
-    if (!graphic || !power) continue;
-    const selectedGraphic = graphic;
-
-    for (const motherboard of pricedCatalog.motherboard) {
-      if (
-        cpu.cpu_socket !== motherboard.cpu_socket ||
-        !includesProduct(cpu.motherboards, motherboard) ||
-        !includesProduct(motherboard.cpus, cpu)
-      ) {
-        continue;
-      }
-
-      const ram = pricedCatalog.ram.find(
-        (candidate) =>
-          includesProduct(cpu.rams, candidate) &&
-          includesProduct(motherboard.rams, candidate) &&
-          includesProduct(candidate.cpus, cpu) &&
-          includesProduct(candidate.motherboards, motherboard) &&
-          candidate.capacityGb != null &&
-          cpu.minimumRamGb != null &&
-          candidate.capacityGb >= cpu.minimumRamGb,
-      );
-      if (!ram) continue;
-
-      const ssd = pricedCatalog.ssd.find(
-        (candidate) =>
-          Boolean(candidate.form) &&
-          motherboard.storageForms?.includes(candidate.form!) === true,
-      );
-      const caseItem = pricedCatalog.case.find(
-        (candidate) =>
-          Boolean(motherboard.size) &&
-          candidate.motherboardSizes?.includes(motherboard.size!) === true &&
-          graphicFitsCase(selectedGraphic, candidate),
-      );
-      if (!ssd || !caseItem) continue;
-
-      const candidate: CompleteBuild = {
-        cpu,
-        motherboard,
-        ram,
-        graphic: selectedGraphic,
-        power,
-        ssd,
-        case: caseItem,
-        fan,
-      };
-      if (!isBuildCompatible(candidate)) continue;
-
-      const totalPrice = BUILD_PART_TYPES.reduce(
-        (total, partType) => total + Number(candidate[partType].price),
-        0,
-      );
-
-      if (totalPrice > (maxBudget ?? Number.POSITIVE_INFINITY)) continue;
-      if (totalPrice >= bestPrice) continue;
-
-      bestBuild = candidate;
-      bestPrice = totalPrice;
     }
   }
 
@@ -458,3 +683,12 @@ export const findMinimumPriceBuild = (
     totalPrice: bestPrice,
   };
 };
+
+export const findMinimumPriceBuild = (
+  catalog: BuildCatalog,
+  maxBudget?: number,
+): BuildRecommendation | undefined =>
+  findBuildRecommendation(catalog, {
+    objective: "minimum_price",
+    maxBudget,
+  });
