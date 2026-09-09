@@ -110,14 +110,6 @@ export function Header({
     };
   }, []);
 
-  const handleAccountPage = () => {
-    if (isAuthenticated) {
-      router.push("/profile", { scroll: true });
-    } else {
-      router.push("/login", { scroll: true });
-    }
-  };
-
   const handleLogout = async () => {
     await createClient().auth.signOut();
     window.location.href = "/";
@@ -392,18 +384,19 @@ export function Header({
               </Menu.Dropdown>
             </Menu>
           ) : (
-            <Button
-              aria-label="ورود یا ثبت نام"
-              leftSection={<IconLogin size={18} />}
-              onClick={handleAccountPage}
-              radius="xl"
-              size="xs"
-              variant="light"
-            >
-              <Text visibleFrom="sm" inherit>
-                ورود / ثبت نام
-              </Text>
-            </Button>
+            <Link href="/login">
+              <Button
+                aria-label="ورود یا ثبت نام"
+                leftSection={<IconLogin size={18} />}
+                radius="xl"
+                size="xs"
+                variant="light"
+              >
+                <Text visibleFrom="sm" inherit>
+                  ورود / ثبت نام
+                </Text>
+              </Button>
+            </Link>
           )}
         </Group>
       </Container>
