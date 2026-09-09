@@ -5,8 +5,6 @@ const torobUrls = {
     "https://torob.com/p/88c61612-a603-4d68-8f8b-6459287ab00f/%D9%85%D9%86%D8%A8%D8%B9-%D8%AA%D8%BA%D8%B0%DB%8C%D9%87-%DA%A9%D8%A7%D9%85%D9%BE%DB%8C%D9%88%D8%AA%D8%B1-%D8%AF%DB%8C%D9%BE-%DA%A9%D9%88%D9%84-%D9%85%D8%AF%D9%84-pl650d-80-plus-bronze-%D8%AA%D9%88%D8%A7%D9%86-650-%D9%88%D8%A7%D8%AA/",
   pq750g:
     "https://torob.com/p/09359498-16de-42ae-a3e5-3baf88c2a0df/%D9%BE%D8%A7%D9%88%D8%B1-%DA%A9%D8%A7%D9%85%D9%BE%DB%8C%D9%88%D8%AA%D8%B1-%D8%AF%DB%8C%D9%BE-%DA%A9%D9%88%D9%84-pq750g-%D8%B8%D8%B1%D9%81%DB%8C%D8%AA-750-%D9%88%D8%A7%D8%AA-%D8%AA%D9%85%D8%A7%D9%85-%D9%85%D8%A7%DA%98%D9%88%D9%84%D8%A7%D8%B1-80-%D9%BE%D9%84%D8%A7%D8%B3-%DA%AF%D9%84%D8%AF/",
-  magA650bn:
-    "https://torob.com/p/eb3534e3-fb0c-4735-9338-0025df07b32a/%D9%85%D9%86%D8%A8%D8%B9-%D8%AA%D8%BA%D8%B0%DB%8C%D9%87-%DA%A9%D8%A7%D9%85%D9%BE%DB%8C%D9%88%D8%AA%D8%B1-%D8%A7%D9%85-%D8%A7%D8%B3-%D8%A7%DB%8C-%D9%85%D8%AF%D9%84-mag-a650bn/",
   gp500aEco:
     "https://torob.com/p/f5751444-92d3-4a2c-b89d-23e2d3c564de/%D9%85%D9%86%D8%A8%D8%B9-%D8%AA%D8%BA%D8%B0%DB%8C%D9%87-%DA%A9%D8%A7%D9%85%D9%BE%DB%8C%D9%88%D8%AA%D8%B1-%DA%AF%D8%B1%DB%8C%D9%86-gp500a-eco-rev-31-80-plus-white-%D8%AA%D9%88%D8%A7%D9%86-500-%D9%88%D8%A7%D8%AA/",
   gp330a:
@@ -73,16 +71,6 @@ export const powers: POWER[] = [
     brand: "DeepCool",
     psu: "750",
     modular: 3,
-  }),
-  createPower({
-    id: 3,
-    name: "MSI MAG A650BN 650W",
-    torobUrl: torobUrls.magA650bn,
-    attributes: ["80 Plus Bronze", "Non-Modular", "120mm Fan"],
-    graphics: [1, 2, 3, 4, 6, 7, 9, 10],
-    brand: "MSI",
-    psu: "650",
-    modular: 1,
   }),
   createPower({
     id: 4,

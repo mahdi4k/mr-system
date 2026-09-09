@@ -16,12 +16,12 @@ import {
   Divider,
   Badge,
   rem,
-  Modal,
 } from "@mantine/core";
 import React, { FC, useEffect, useState } from "react";
 import { Product } from "@/_redux/services/adsApi";
 import classes from "./adsSingle.module.css";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   IconDiscountCheckFilled,
   IconMessages,
@@ -44,8 +44,6 @@ import "@mantine/carousel/styles.css";
 import AdsRelated from "@/_components/adsSection/AdsRelated";
 import AdsGalleryModal from "@/_components/adsSection/AdsGalleryModal";
 import { useChat } from "@/_utils/customHook/useChat";
-import { useDisclosure } from "@mantine/hooks";
-import LoginModal from "@/_components/loginModal/LoginModal";
 import { getAdStatusDisplay } from "../../../_features/ads/status";
 
 type props = {
@@ -68,8 +66,7 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
   const [embla, setEmbla] = useState<Embla | null>(null);
   const [openedImageModal, setOpenedImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
-  const [openedModal, { open: openModalLogin, close: closeModal }] =
-    useDisclosure(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (embla) {
@@ -117,7 +114,7 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
     if (currentUserId) {
       createConversation(`${product.id}`);
     } else {
-      openModalLogin();
+      router.push("/login");
     }
   };
 
@@ -304,9 +301,6 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
         selectedImage={selectedImage}
         setOpenedImageModal={setOpenedImageModal}
       />
-      <Modal opened={openedModal} onClose={closeModal} title="ورود / ثبت نام">
-        <LoginModal close={closeModal} />
-      </Modal>
     </Container>
   );
 };

@@ -438,6 +438,27 @@ export interface Database {
         };
         Relationships: [];
       };
+      catalog_product_exclusions: {
+        Row: {
+          deleted_at: string;
+          deleted_by: string | null;
+          part_type: CatalogPartType;
+          product_id: number;
+        };
+        Insert: {
+          deleted_at?: string;
+          deleted_by?: string | null;
+          part_type: CatalogPartType;
+          product_id: number;
+        };
+        Update: {
+          deleted_at?: string;
+          deleted_by?: string | null;
+          part_type?: CatalogPartType;
+          product_id?: number;
+        };
+        Relationships: [];
+      };
       price_history: {
         Row: {
           id: number;

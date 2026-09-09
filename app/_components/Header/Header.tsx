@@ -37,7 +37,6 @@ import Link from "next/link";
 import UseLoading from "@/_utils/customHook/useLoading";
 import Image from "next/image";
 import DrawerHeader from "./Drawer";
-import LoginModal from "../loginModal/LoginModal";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "../../_lib/supabase/client";
@@ -56,8 +55,6 @@ export function Header({
   );
   const [userLabel, setUserLabel] = useState(initialUserLabel);
   const [opened, { open, close }] = useDisclosure(false);
-  const [openedModal, { open: openModal, close: closeModal }] =
-    useDisclosure(false);
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
@@ -65,13 +62,17 @@ export function Header({
   const isLoading = UseLoading();
   const router = useRouter();
   const pathname = usePathname();
-  const hideHeaderFooter = pathname === "/login";
+  const hideHeaderFooter = pathname.startsWith("/dashboard");
 
   useEffect(() => {
-    let active = true;
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!active) return;
+
+    const applyUser = (
+      user: {
+        user_metadata: Record<string, unknown>;
+        email?: string;
+      } | null,
+    ) => {
       if (!user) {
         setIsAuthenticated(false);
         setUserLabel(undefined);
@@ -87,9 +88,25 @@ export function Header({
           metadata?.name ||
           user.email?.split("@")[0],
       );
+    };
+
+    // Reactively update the header whenever the auth session changes
+    // (sign-in, sign-out, profile update) so a full page refresh is never
+    // needed after logging in.
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      applyUser(session?.user ?? null);
     });
+
+    // Ensure the initial session is picked up even if no event fires.
+    supabase.auth
+      .getUser()
+      .then(({ data: { user } }) => applyUser(user))
+      .catch(() => applyUser(null));
+
     return () => {
-      active = false;
+      subscription.unsubscribe();
     };
   }, []);
 
@@ -110,7 +127,7 @@ export function Header({
     if (isAuthenticated) {
       router.push("/chat", { scroll: true });
     } else {
-      openModal();
+      router.push("/login", { scroll: true });
     }
   };
   return (
@@ -386,18 +403,11 @@ export function Header({
               <Text visibleFrom="sm" inherit>
                 ورود / ثبت نام
               </Text>
-              <Text hiddenFrom="sm" inherit>
-                ورود
-              </Text>
             </Button>
           )}
         </Group>
       </Container>
       <DrawerHeader opened={opened} close={close} />
-
-      <Modal opened={openedModal} onClose={closeModal} title="ورود / ثبت نام">
-        <LoginModal close={closeModal} />
-      </Modal>
     </header>
   );
 }

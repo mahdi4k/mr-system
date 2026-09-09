@@ -99,13 +99,20 @@ export async function enrichCatalogParts<
   if (items.length === 0) return items;
   try {
     const merged = await fetchMergedCatalog(partType);
-    return items.map((item) => ({
-      ...item,
-      // Keep the reliable static image around so the UI can fall back to it
-      // when the overlay image (e.g. torob CDN) fails to load.
-      staticImage: item.image,
-      ...catalogOverridesFor(item.id, merged),
-    }));
+    const mergedIds = new Set(merged.map((m) => m.id));
+    return (
+      items
+        // Drop admin-deleted (excluded) products: they are absent from the
+        // merged catalog, so filter them out of every client-side listing.
+        .filter((item) => mergedIds.has(item.id))
+        .map((item) => ({
+          ...item,
+          // Keep the reliable static image around so the UI can fall back to it
+          // when the overlay image (e.g. torob CDN) fails to load.
+          staticImage: item.image,
+          ...catalogOverridesFor(item.id, merged),
+        }))
+    );
   } catch {
     return items;
   }

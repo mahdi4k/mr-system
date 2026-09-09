@@ -137,6 +137,53 @@ export function toOverlay(row: {
   };
 }
 
+/**
+ * Product ids excluded (admin-deleted) for a part type. The static catalog is
+ * code-defined, so a "delete" records an exclusion instead of removing a row.
+ */
+export async function getExcludedProductIds(
+  client: SupabaseClient<Database>,
+  partType: CatalogPartType,
+): Promise<Set<number>> {
+  const { data, error } = await client
+    .from("catalog_product_exclusions")
+    .select("product_id")
+    .eq("part_type", partType);
+
+  if (error) throw new Error(error.message);
+  return new Set((data ?? []).map((row) => row.product_id));
+}
+
+/**
+ * Record an admin deletion for a static catalog product. `count: "exact"` is
+ * required so an RLS-blocked insert surfaces as an error instead of silence.
+ */
+export async function deleteCatalogProduct(
+  client: SupabaseClient<Database>,
+  partType: CatalogPartType,
+  productId: number,
+): Promise<void> {
+  const changedBy = (await client.auth.getUser()).data.user?.id ?? null;
+
+  const { count, error } = await client
+    .from("catalog_product_exclusions")
+    .upsert(
+      { part_type: partType, product_id: productId, deleted_by: changedBy },
+      {
+        onConflict: "part_type,product_id",
+        count: "exact",
+        ignoreDuplicates: true,
+      },
+    );
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  if (count === 0) {
+    throw new Error("حذف انجام نشد: دسترسی مدیر لازم است");
+  }
+}
+
 export async function getMergedCatalog(
   client: SupabaseClient<Database>,
   partType: CatalogPartType,
@@ -157,10 +204,14 @@ export async function getMergedCatalog(
     byId.set(row.product_id, toOverlay(row));
   }
 
-  return (STATIC_CATALOG_BY_TYPE[partType] ?? []).map((product) => {
-    const overlay = byId.get(product.id) ?? EMPTY_OVERLAY;
-    return mergeCatalogProduct(partType, product as StaticProduct, overlay);
-  });
+  const excluded = await getExcludedProductIds(client, partType);
+
+  return (STATIC_CATALOG_BY_TYPE[partType] ?? [])
+    .filter((product) => !excluded.has(product.id))
+    .map((product) => {
+      const overlay = byId.get(product.id) ?? EMPTY_OVERLAY;
+      return mergeCatalogProduct(partType, product as StaticProduct, overlay);
+    });
 }
 
 export async function getMergedCatalogProduct(
@@ -170,6 +221,9 @@ export async function getMergedCatalogProduct(
 ): Promise<MergedCatalogProduct | null> {
   const product = getStaticProduct(partType, productId);
   if (!product) return null;
+
+  const excluded = await getExcludedProductIds(client, partType);
+  if (excluded.has(productId)) return null;
 
   const { data, error } = await client
     .from("catalog_product_content")

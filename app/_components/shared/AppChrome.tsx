@@ -13,11 +13,7 @@ export default function AppChrome({
   homeOnly = false,
 }: AppChromeProps) {
   const pathname = usePathname();
-  if (
-    pathname === "/login" ||
-    pathname.startsWith("/dashboard") ||
-    (homeOnly && pathname !== "/")
-  ) {
+  if (pathname.startsWith("/dashboard") || (homeOnly && pathname !== "/")) {
     return null;
   }
 

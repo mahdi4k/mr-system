@@ -25,10 +25,12 @@ import {
 import {
   IconCloudDownload,
   IconEdit,
+  IconExternalLink,
   IconPlayerPlay,
   IconRefresh,
   IconSearch,
 } from "@tabler/icons-react";
+import ConfirmDeletePopover from "@/_components/adsSection/ConfirmDeletePopover";
 import { CATALOG_PART_TYPES } from "../../../_features/productCatalog/types";
 
 interface CatalogProduct {
@@ -39,6 +41,7 @@ interface CatalogProduct {
   priceSource: "automatic" | "manual" | null;
   image: string;
   torobProductId: string | null;
+  torobUrl: string | null;
   overlay: {
     syncStatus: "active" | "failed" | "retrying" | "never";
     fetchedAt: string | null;
@@ -71,6 +74,13 @@ async function postJson(url: string, body?: unknown) {
 const TOROB_DIRECT_BATCH_DELAY_MS = 1500;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** Direct link to the product page on torob.com (opens in a new tab). */
+function torobProductLink(p: CatalogProduct): string | null {
+  if (p.torobUrl) return p.torobUrl;
+  if (p.torobProductId) return `https://torob.com/p/${p.torobProductId}/`;
+  return null;
+}
 
 export default function CatalogAdmin() {
   const [tab, setTab] = useState<string | null>("sync");
@@ -225,6 +235,30 @@ export default function CatalogAdmin() {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Delete (exclude) a catalog product via the trash icon
+  const deleteProduct = async (productId: string) => {
+    const id = Number(productId);
+    setError("");
+    try {
+      const res = await fetch(`/api/catalog/${partType}/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error ?? "حذف محصول ناموفق بود");
+      }
+      setSelectedIds((current) => {
+        const next = new Set(current);
+        next.delete(id);
+        return next;
+      });
+      setProducts((current) => current.filter((p) => p.id !== id));
+      loadCatalog(partType);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
     }
   };
 
@@ -574,6 +608,7 @@ export default function CatalogAdmin() {
                     <Table.Th>عملیات</Table.Th>
                     <Table.Th>قیمت</Table.Th>
                     <Table.Th>مرجع تورب</Table.Th>
+                    <Table.Th>لینک تورب</Table.Th>
                     <Table.Th>وضعیت</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
@@ -610,6 +645,10 @@ export default function CatalogAdmin() {
                             >
                               <IconEdit size={16} />
                             </ActionIcon>
+                            <ConfirmDeletePopover
+                              productId={String(p.id)}
+                              onDelete={(id) => deleteProduct(id)}
+                            />
                             {hasTorob && (
                               <>
                                 <Tooltip label="دریافت از تورب (Parse.bot)">
@@ -651,6 +690,27 @@ export default function CatalogAdmin() {
                               ندارد
                             </Badge>
                           )}
+                        </Table.Td>
+                        <Table.Td>
+                          {(() => {
+                            const link = torobProductLink(p);
+                            if (!link) return null;
+                            return (
+                              <Tooltip label="مشاهده در تورب">
+                                <ActionIcon
+                                  component="a"
+                                  href={link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  variant="light"
+                                  color="orange"
+                                  aria-label={`مشاهده ${p.title} در تورب`}
+                                >
+                                  <IconExternalLink size={16} />
+                                </ActionIcon>
+                              </Tooltip>
+                            );
+                          })()}
                         </Table.Td>
                         <Table.Td>
                           <Badge

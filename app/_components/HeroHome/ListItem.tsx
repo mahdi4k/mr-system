@@ -1,21 +1,18 @@
 "use client";
-import { Box, Group, List, Modal, Text, ThemeIcon } from "@mantine/core";
+import { Box, Group, List, Text, ThemeIcon } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import Link from "next/link";
 import React from "react";
 import { useRouter } from "next/navigation";
-import { useDisclosure } from "@mantine/hooks";
-import LoginModal from "../loginModal/LoginModal";
 
 const ListItem = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const router = useRouter();
-  const [opened, { open, close }] = useDisclosure(false);
 
   const handleAddAdsPage = () => {
     if (isAuthenticated) {
       router.push("/ads/create", { scroll: true });
     } else {
-      open();
+      router.push("/login", { scroll: true });
     }
   };
 
@@ -88,9 +85,6 @@ const ListItem = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
           </Group>
         </List.Item>
       </List>
-      <Modal opened={opened} onClose={close} title="ورود / ثبت نام">
-        <LoginModal close={close} />
-      </Modal>
     </>
   );
 };

@@ -1,9 +1,54 @@
 import { NextResponse } from "next/server";
 import { createClient } from "../../../../_lib/supabase/server";
-import { getMergedCatalogProduct } from "../../../../_features/productCatalog/data";
+import {
+  getMergedCatalogProduct,
+  deleteCatalogProduct,
+} from "../../../../_features/productCatalog/data";
 import { CATALOG_PART_TYPES } from "../../../../_features/productCatalog/types";
 
 export const dynamic = "force-dynamic";
+
+export async function DELETE(
+  _request: Request,
+  context: { params: Promise<{ partType: string; productId: string }> },
+) {
+  const { partType, productId: productIdStr } = await context.params;
+
+  if (
+    !CATALOG_PART_TYPES.includes(
+      partType as (typeof CATALOG_PART_TYPES)[number],
+    )
+  ) {
+    return NextResponse.json({ error: "نوع قطعه معتبر نیست" }, { status: 400 });
+  }
+
+  const productId = parseInt(productIdStr, 10);
+  if (!Number.isInteger(productId) || productId <= 0) {
+    return NextResponse.json(
+      { error: "شناسه محصول معتبر نیست" },
+      { status: 400 },
+    );
+  }
+
+  const supabase = await createClient();
+
+  try {
+    await deleteCatalogProduct(
+      supabase,
+      partType as (typeof CATALOG_PART_TYPES)[number],
+      productId,
+    );
+    return NextResponse.json({ message: "محصول با موفقیت حذف شد" });
+  } catch (error) {
+    console.error("DELETE catalog error:", error);
+    return NextResponse.json(
+      {
+        error: error instanceof Error ? error.message : "حذف محصول ناموفق بود",
+      },
+      { status: 403 },
+    );
+  }
+}
 
 export async function PATCH(
   request: Request,
@@ -111,9 +156,12 @@ export async function PATCH(
     }
 
     // 3. Update the row
-    const { error: updateError } = await supabase
+    // count: "exact" is critical — under RLS a non-admin session matches zero
+    // rows and supabase-js reports NO error. Without the count check this
+    // would silently return 200 with unchanged data.
+    const { count, error: updateError } = await supabase
       .from("catalog_product_content")
-      .update(updatePayload)
+      .update(updatePayload, { count: "exact" })
       .eq("part_type", pt)
       .eq("product_id", productId);
 
@@ -122,6 +170,19 @@ export async function PATCH(
       return NextResponse.json(
         { error: "بروزرسانی محصول ناموفق بود" },
         { status: 500 },
+      );
+    }
+
+    if (count === 0) {
+      console.error(
+        "PATCH catalog: update matched 0 rows — likely blocked by RLS " +
+          "(session is not admin) for",
+        pt,
+        productId,
+      );
+      return NextResponse.json(
+        { error: "بروزرسانی انجام نشد: دسترسی مدیر لازم است" },
+        { status: 403 },
       );
     }
 
