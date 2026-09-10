@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { getSiteUrl } from "./_utils/siteUrl";
 import "@mantine/core/styles.css";
 import React, { Suspense } from "react";
 import {
@@ -30,9 +32,27 @@ const iranyekan = localFont({
   preload: true,
 });
 
-export const metadata = {
-  title: "ریگورا",
-  description: "Rigora PC hardware platform",
+export const metadata: Metadata = {
+  title: {
+    default: "ریگورا | اسمبل آنلاین سیستم و بازارچه قطعات کامپیوتر",
+    template: "%s | ریگورا",
+  },
+  description:
+    "ریگورا؛ ابزار اسمبل آنلاین سیستم گیمینگ و بازارچه تخصصی خرید و فروش قطعات کامپیوتر.",
+  metadataBase: new URL(getSiteUrl()),
+  openGraph: {
+    type: "website",
+    url: getSiteUrl(),
+    siteName: "ریگورا",
+    title: "ریگورا | اسمبل آنلاین سیستم و بازارچه قطعات کامپیوتر",
+    description:
+      "ریگورا؛ ابزار اسمبل آنلاین سیستم گیمینگ و بازارچه تخصصی خرید و فروش قطعات کامپیوتر.",
+    images: [{ url: `${getSiteUrl()}/logo.png` }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: [`${getSiteUrl()}/logo.png`],
+  },
 };
 
 export default function RootLayout({

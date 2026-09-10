@@ -15,10 +15,11 @@ import { postsMO } from "./ArticleSection";
 import Link from "next/link";
 import { Notification } from "@mantine/core";
 import { usePathname } from "next/navigation";
+import { getSiteUrl } from "@/_utils/siteUrl";
 
 export function ArticleCard({ post }: { post: postsMO }) {
   const theme = useMantineTheme();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "";
+  const siteUrl = getSiteUrl();
 
   const gregorianDate = new Date(post.date);
   const options: Intl.DateTimeFormatOptions = {

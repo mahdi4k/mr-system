@@ -1,4 +1,5 @@
 import { MetadataRoute } from "next";
+import { getSiteUrl } from "./_utils/siteUrl";
 import {
   getArticleSitemapRows,
   getPublishedArticleCategories,
@@ -6,7 +7,7 @@ import {
 import { createClient } from "./_lib/supabase/server";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = getSiteUrl();
   const client = await createClient();
   const [articles, categories] = await Promise.all([
     getArticleSitemapRows(client),

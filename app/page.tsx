@@ -7,6 +7,7 @@ import GraphicPower from "./_components/graphicPower/GraphicPower";
 import CardParts from "./_components/cardParts/CardParts";
 import ArticleSection from "./_components/articleSection/ArticleSection";
 import BannerSection from "./_components/BannerSection/BannerSection";
+import { getSiteUrl } from "@/_utils/siteUrl";
 import { Metadata, Viewport } from "next";
 import SuggestSection from "./_components/suggestSection/SuggestSection";
 import LazyAdsSection from "./_components/adsSection/LazyAdsSection";
@@ -47,7 +48,7 @@ export const viewport: Viewport = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = getSiteUrl();
   return {
     metadataBase: new URL(siteUrl),
     title: "ریگورا | انتخاب هوشمند",

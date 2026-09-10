@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { getSiteUrl } from "@/_utils/siteUrl";
 import { getPublishedArticles } from "../../../_features/articles/data";
 import { createClient } from "../../../_lib/supabase/server";
 import ClientPage from "./clientPage";
@@ -11,7 +12,7 @@ export async function generateMetadata(props: {
   const [article] = await getPublishedArticles(await createClient(), { slug });
   if (!article) return { title: "مقاله یافت نشد" };
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = getSiteUrl();
   const url = new URL(`/blog/${article.slug}`, siteUrl).toString();
   const image = article._embedded["wp:featuredmedia"][0]?.link;
 
