@@ -427,7 +427,10 @@ const ModalPart: FC<Props> = ({
                     پیشنهاد ویژه
                   </Badge>
                 )}
-                <ProductConditionBadge condition={item.condition} />
+                <ProductConditionBadge
+                  condition={item.condition}
+                  className={classes.conditionBadge}
+                />
                 <Card.Section
                   className={classes.categoryImage}
                   mt={"0"}

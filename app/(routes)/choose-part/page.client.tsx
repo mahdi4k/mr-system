@@ -2,13 +2,14 @@
 
 import ChoosePartItem from "@/_components/chooseParts/ChoosePartItem";
 import {
+  ActionIcon,
   Box,
-  Button,
   Container,
   Flex,
   LoadingOverlay,
   SimpleGrid,
   Text,
+  Tooltip,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useDisclosure } from "@mantine/hooks";
@@ -40,7 +41,7 @@ import {
 import SearchParamsHandler from "@/_components/chooseParts/SearchParamHandler";
 import TotalPriceCalculator from "@/_components/chooseParts/TotalPriceCalculator";
 import BuildAssistant from "@/_components/chooseParts/BuildAssistant";
-import { IconRotate } from "@tabler/icons-react";
+import { IconTrash } from "@tabler/icons-react";
 
 interface PageClientProps {
   showAssistant?: boolean;
@@ -171,21 +172,27 @@ const PageClient: React.FC<PageClientProps> = ({ showAssistant = false }) => {
             pos="relative"
             px={"sm"}
           >
-            <Text fw={"bold"} fz={"xl"} ta={"center"}>
+            <Text
+              fw={"bold"}
+              fz={"xl"}
+              ta={"center"}
+            >
               هوشمندانه انتخاب کنید{" "}
             </Text>
             {Object.values(isPartEmpty).every((isEmpty) => !isEmpty) && (
-              <Button
-                color="red"
-                leftSection={<IconRotate size={18} />}
-                onClick={() => router.push("/choose-part")}
-                pos="absolute"
-                size="xs"
-                styles={{ root: { insetInlineStart: 0 } }}
-                variant="light"
-              >
-                حذف همه
-              </Button>
+              <Tooltip label="حذف همه" position="top">
+                <ActionIcon
+                  aria-label="حذف همه"
+                  color="red"
+                  onClick={() => router.push("/choose-part")}
+                  pos="absolute"
+                  size="lg"
+                  styles={{ root: { insetInlineStart: 0 } }}
+                  variant="light"
+                >
+                  <IconTrash size={18} />
+                </ActionIcon>
+              </Tooltip>
             )}
           </Flex>
           <SimpleGrid

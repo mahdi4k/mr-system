@@ -16,7 +16,7 @@ const ProductConditionBadge = ({
     <Badge
       color="orange"
       radius="sm"
-      size="sm"
+      size="xs"
       variant="filled"
       className={className}
     >
