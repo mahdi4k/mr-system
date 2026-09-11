@@ -67,12 +67,39 @@ figure {
 }
 
 .contentPost{
+    // prevent any inner element from overflowing the container
+    overflow-wrap: break-word;
+    word-break: break-word;
+
     a{
         color: #7ea300;
         text-decoration: underline !important;
     }
     P{
         line-height: 30px;
+    }
+
+    // make all post images responsive and follow container width
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+        width: 100%;
+        display: block;
+        margin: 1.5rem auto;
+        object-fit: contain;
+    }
+
+    figure {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 1.5rem auto;
+    }
+
+    // WordPress block wrappers
+    .wp-block-image,
+    .wp-block-gallery {
+        max-width: 100%;
+        width: 100%;
     }
 }
 
