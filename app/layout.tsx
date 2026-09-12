@@ -79,6 +79,19 @@ export default function RootLayout({
         />
       </head>
       <body style={{ height: "100%" }}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "ریگورا",
+              alternateName: "Rigora",
+              url: getSiteUrl(),
+              inLanguage: "fa-IR",
+            }),
+          }}
+        />
         <NextTopLoader showSpinner={false} height={5} color="#87A10C" />
 
         <DirectionProvider>
