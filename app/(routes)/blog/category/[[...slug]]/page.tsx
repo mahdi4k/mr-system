@@ -1,8 +1,20 @@
 import { notFound, permanentRedirect } from "next/navigation";
+import type { Metadata } from "next";
+import { getSiteUrl } from "@/_utils/siteUrl";
 import ArticleListing from "../../ArticleListing";
 
-export async function generateMetadata() {
-  return { title: "مقالات ریگورا" };
+export async function generateMetadata(props: {
+  params: Promise<{ slug?: string[] }>;
+}): Promise<Metadata> {
+  const { slug } = await props.params;
+  const path =
+    slug?.[0] != null ? `/blog/category/${slug[0]}` : "/blog/category";
+  const url = new URL(path, getSiteUrl()).toString();
+  return {
+    title: "مقالات ریگورا",
+    alternates: { canonical: url },
+    openGraph: { url, siteName: "ریگورا" },
+  };
 }
 
 export default async function Page(props: {

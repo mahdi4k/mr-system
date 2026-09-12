@@ -25,6 +25,7 @@ export async function generateMetadata(props: {
       title: article.title.rendered,
       description: article.excerpt.rendered.replace(/<[^>]*>/g, ""),
       url,
+      siteName: "ریگورا",
       images: image ? [{ url: new URL(image, siteUrl).toString() }] : undefined,
     },
   };
