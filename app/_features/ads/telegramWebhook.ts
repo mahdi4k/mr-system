@@ -154,8 +154,12 @@ export async function getTelegramFileInfo(
     description?: string;
   };
   if (!response.ok || !data.ok || !data.result?.file_path) {
+    // Never log botToken or fileId in full; only safe diagnostics
+    const status = response.status;
+    const contentType = response.headers.get("content-type");
+    const desc = data.description || `Telegram getFile failed`;
     throw new Error(
-      data.description || `Telegram getFile failed: ${response.status}`,
+      `${desc} (status=${status} content-type=${contentType ?? "unknown"})`,
     );
   }
   const filePath = data.result.file_path;
@@ -163,15 +167,35 @@ export async function getTelegramFileInfo(
   return { filePath, fileUrl };
 }
 
-export async function downloadTelegramFile(fileUrl: string): Promise<Buffer> {
+export interface TelegramDownloadResult {
+  buffer: Buffer;
+  contentType: string | null;
+  status: number;
+  byteLength: number;
+}
+
+export async function downloadTelegramFile(
+  fileUrl: string,
+): Promise<TelegramDownloadResult> {
   const response = await fetch(fileUrl, {
     signal: AbortSignal.timeout(15_000),
   });
+  const contentType = response.headers.get("content-type");
+  const status = response.status;
   if (!response.ok) {
-    throw new Error(`Failed to download Telegram file: ${response.status}`);
+    // Do not log fileUrl (contains bot token)
+    throw new Error(
+      `Failed to download Telegram file (status=${status} content-type=${contentType ?? "unknown"})`,
+    );
   }
   const arrayBuffer = await response.arrayBuffer();
-  return Buffer.from(arrayBuffer);
+  const buffer = Buffer.from(arrayBuffer);
+  return {
+    buffer,
+    contentType,
+    status,
+    byteLength: buffer.length,
+  };
 }
 
 export function getTelegramWebhookConfig(): {

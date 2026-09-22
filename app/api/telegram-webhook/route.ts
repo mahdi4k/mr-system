@@ -31,8 +31,9 @@ interface TelegramMessage {
 interface TelegramUpdate {
   update_id: number;
   message?: TelegramMessage;
-  edited_message?: TelegramMessage;
-  channel_post?: TelegramMessage;
+  // Note: we intentionally handle ONLY `message` for the forward workflow.
+  // `edited_message` and `channel_post` are ignored to avoid empty/duplicate ads.
+  // Webhook should be configured with allowed_updates: ["message"].
 }
 
 async function sendTelegramReply(
@@ -65,10 +66,9 @@ async function sendTelegramReply(
   }
 }
 
-function getMessageFromUpdate(
-  update: TelegramUpdate,
-): TelegramMessage | undefined {
-  return update.message ?? update.edited_message ?? update.channel_post;
+function isBotCommand(text: string): boolean {
+  const trimmed = text.trim();
+  return trimmed.startsWith("/") && /^\/\w+/.test(trimmed);
 }
 
 export async function POST(req: Request) {
@@ -95,7 +95,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  const msg = getMessageFromUpdate(update);
+  // Only handle normal messages; ignore edited_message/channel_post/callback_query/etc.
+  const msg = update.message;
   if (!msg) return NextResponse.json({ ok: true });
 
   // Only allow your own Telegram account
@@ -104,17 +105,47 @@ export async function POST(req: Request) {
   }
 
   const rawText = (msg.caption ?? msg.text ?? "").trim();
-  // Biggest photo size is last element
-  const photoFileId = msg.photo?.at(-1)?.file_id ?? msg.document?.file_id;
+  // Biggest photo size is last element (Telegram sorts by size ascending)
+  const photoFileId =
+    (msg.photo?.length
+      ? msg.photo[msg.photo.length - 1]?.file_id
+      : undefined) ?? msg.document?.file_id;
 
-  if (!rawText && !photoFileId) {
-    await sendTelegramReply(
-      msg.chat.id,
-      "⚠️ پیام خالی است — متن یا عکس بفرستید.",
-      config.botToken,
-    );
+  // Ignore bot commands like /start, /help, etc. — must NOT create an ad
+  if (rawText && isBotCommand(rawText)) {
+    console.log("Telegram webhook: ignoring bot command", {
+      update_id: update.update_id,
+      message_id: msg.message_id,
+      command: rawText.slice(0, 32),
+    });
     return NextResponse.json({ ok: true });
   }
+
+  // Ignore empty messages without meaningful text and without image/document
+  const hasMeaningfulText = rawText.length >= 3;
+  if (!hasMeaningfulText && !photoFileId) {
+    console.log("Telegram webhook: ignoring empty/irrelevant update", {
+      update_id: update.update_id,
+      message_id: msg.message_id,
+      hasText: !!rawText,
+      textLength: rawText.length,
+      hasPhoto: !!msg.photo?.length,
+      hasDocument: !!msg.document,
+    });
+    return NextResponse.json({ ok: true });
+  }
+
+  console.log("Telegram webhook: received message", {
+    update_id: update.update_id,
+    message_id: msg.message_id,
+    chat_id: msg.chat.id,
+    hasPhoto: !!msg.photo?.length,
+    photoCount: msg.photo?.length ?? 0,
+    hasDocument: !!msg.document,
+    hasText: !!rawText,
+    textLength: rawText.length,
+    photoFileIdPrefix: photoFileId ? photoFileId.slice(0, 8) + "..." : null,
+  });
 
   const effectiveText = rawText || "آگهی تلگرام";
   const parsed = parseTelegramAdContent(effectiveText);
@@ -191,22 +222,61 @@ export async function POST(req: Request) {
   }
 
   // Handle photo: getFile → download → upload to Supabase storage → insert ad_images
+  // Flow: Telegram photo[] (highest res) → getFile → file URL → download → Supabase Storage ad-images → ad_images
   if (photoFileId) {
     try {
-      const { fileUrl } = await getTelegramFileInfo(
+      console.log("Telegram webhook: processing photo - step getFile", {
+        adId,
+        update_id: update.update_id,
+        message_id: msg.message_id,
+        fileIdPrefix: photoFileId.slice(0, 8) + "...",
+        photoCount: msg.photo?.length ?? 0,
+      });
+      const { filePath, fileUrl } = await getTelegramFileInfo(
         photoFileId,
         config.botToken,
       );
-      const buffer = await downloadTelegramFile(fileUrl);
+      console.log("Telegram webhook: getFile success", {
+        adId,
+        filePath,
+        byteHint: msg.photo?.at?.(-1) ? null : undefined,
+      });
 
-      // Determine extension from fileUrl or default to jpg
-      const ext =
-        fileUrl.split(".").pop()?.split("?")[0]?.toLowerCase() || "jpg";
-      const safeExt = ["jpg", "jpeg", "png", "webp", "gif"].includes(ext)
-        ? ext
+      const downloadResult = await downloadTelegramFile(fileUrl);
+      const { buffer, contentType, status, byteLength } = downloadResult;
+      console.log("Telegram webhook: download success", {
+        adId,
+        status,
+        contentType,
+        byteLength,
+        filePath,
+      });
+
+      if (byteLength === 0) {
+        throw new Error(
+          `Downloaded file is empty (status=${status} content-type=${contentType ?? "unknown"} byteLength=0)`,
+        );
+      }
+      if (contentType && !contentType.startsWith("image/")) {
+        console.warn("Telegram webhook: downloaded content-type is not image", {
+          adId,
+          contentType,
+          byteLength,
+        });
+        // Still attempt upload as image; Telegram usually returns image/jpeg
+      }
+
+      // Determine extension from Telegram filePath (not from token-containing URL for safety)
+      const extFromPath =
+        filePath.split(".").pop()?.split("?")[0]?.toLowerCase() || "jpg";
+      const safeExt = ["jpg", "jpeg", "png", "webp", "gif"].includes(
+        extFromPath,
+      )
+        ? extFromPath
         : "jpg";
       const storagePath = `${config.ownerUserId}/${adId}/${crypto.randomUUID()}.${safeExt}`;
 
+      // Supabase Storage expects Blob/Buffer; use Buffer directly (Node) with explicit contentType
       const { error: uploadError } = await admin.storage
         .from("ad-images")
         .upload(storagePath, buffer, {
@@ -215,7 +285,22 @@ export async function POST(req: Request) {
           upsert: false,
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error("Telegram webhook: Supabase Storage upload failed", {
+          adId,
+          storagePath,
+          byteLength,
+          contentType,
+          errorCode: (uploadError as { statusCode?: string })?.statusCode,
+          errorMessage: uploadError.message,
+        });
+        throw new Error(`Storage upload failed: ${uploadError.message}`);
+      }
+      console.log("Telegram webhook: Storage upload success", {
+        adId,
+        storagePath,
+        byteLength,
+      });
 
       const { data: publicUrl } = admin.storage
         .from("ad-images")
@@ -229,19 +314,42 @@ export async function POST(req: Request) {
       });
 
       if (imageError) {
+        console.error("Telegram webhook: ad_images insert failed", {
+          adId,
+          storagePath,
+          errorCode: (imageError as { code?: string })?.code,
+          errorMessage: imageError.message,
+        });
         // Cleanup storage if DB insert fails
         await admin.storage.from("ad-images").remove([storagePath]);
-        throw imageError;
+        throw new Error(`ad_images insert failed: ${imageError.message}`);
       }
+      console.log("Telegram webhook: ad_images insert success", {
+        adId,
+        storagePath,
+      });
     } catch (error) {
-      console.error("Failed to import Telegram photo:", error);
-      // Don't fail the whole ad — notify user but keep ad without image
+      const safeMessage = error instanceof Error ? error.message : "خطای عکس";
+      // Never log botToken/fileUrl; only safe diagnostics already logged above
+      console.error("Telegram webhook: image processing failed (ad kept)", {
+        adId,
+        update_id: update.update_id,
+        message_id: msg.message_id,
+        fileIdPrefix: photoFileId.slice(0, 8) + "...",
+        error: safeMessage,
+      });
+      // Keep the ad, but make Telegram response clearly indicate failure
       await sendTelegramReply(
         msg.chat.id,
-        `⚠️ آگهی ثبت شد اما دریافت عکس ناموفق بود: ${error instanceof Error ? error.message : "خطای عکس"}`,
+        `⚠️ آگهی ثبت شد اما دریافت عکس ناموفق بود`,
         config.botToken,
       );
     }
+  } else {
+    console.log("Telegram webhook: no photo to process", {
+      adId,
+      update_id: update.update_id,
+    });
   }
 
   const siteUrl =
