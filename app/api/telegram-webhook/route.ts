@@ -163,6 +163,26 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
+  // Debug: persist safe payload diagnostics for image troubleshooting (no secrets)
+  try {
+    await admin.from("telegram_webhook_debug").insert({
+      update_id: update.update_id,
+      message_id: msg.message_id,
+      chat_id: msg.chat.id,
+      has_photo: !!msg.photo?.length,
+      photo_count: msg.photo?.length ?? 0,
+      has_document: !!msg.document,
+      has_text: !!msg.text,
+      has_caption: !!msg.caption,
+      text_length: msg.text?.length ?? 0,
+      caption_length: msg.caption?.length ?? 0,
+      file_id_prefix: photoFileId ? photoFileId.slice(0, 8) : null,
+      raw_has_photo_key: "photo" in msg,
+    });
+  } catch (e) {
+    console.error("Telegram webhook: debug insert failed (non-blocking)", e);
+  }
+
   // Idempotency: deduplicate by Telegram update_id (prevents double ads on retries)
   if (typeof update.update_id === "number") {
     const { error: dedupError } = await admin
@@ -239,8 +259,13 @@ export async function POST(req: Request) {
       console.log("Telegram webhook: getFile success", {
         adId,
         filePath,
-        byteHint: msg.photo?.at?.(-1) ? null : undefined,
       });
+      try {
+        await admin
+          .from("telegram_webhook_debug")
+          .update({ file_path: filePath })
+          .eq("update_id", update.update_id);
+      } catch {}
 
       const downloadResult = await downloadTelegramFile(fileUrl);
       const { buffer, contentType, status, byteLength } = downloadResult;
@@ -251,6 +276,16 @@ export async function POST(req: Request) {
         byteLength,
         filePath,
       });
+      try {
+        await admin
+          .from("telegram_webhook_debug")
+          .update({
+            download_status: status,
+            download_content_type: contentType,
+            download_bytes: byteLength,
+          })
+          .eq("update_id", update.update_id);
+      } catch {}
 
       if (byteLength === 0) {
         throw new Error(
@@ -294,6 +329,12 @@ export async function POST(req: Request) {
           errorCode: (uploadError as { statusCode?: string })?.statusCode,
           errorMessage: uploadError.message,
         });
+        try {
+          await admin
+            .from("telegram_webhook_debug")
+            .update({ storage_error: uploadError.message.slice(0, 500) })
+            .eq("update_id", update.update_id);
+        } catch {}
         throw new Error(`Storage upload failed: ${uploadError.message}`);
       }
       console.log("Telegram webhook: Storage upload success", {
@@ -320,6 +361,12 @@ export async function POST(req: Request) {
           errorCode: (imageError as { code?: string })?.code,
           errorMessage: imageError.message,
         });
+        try {
+          await admin
+            .from("telegram_webhook_debug")
+            .update({ image_error: imageError.message.slice(0, 500) })
+            .eq("update_id", update.update_id);
+        } catch {}
         // Cleanup storage if DB insert fails
         await admin.storage.from("ad-images").remove([storagePath]);
         throw new Error(`ad_images insert failed: ${imageError.message}`);
@@ -328,6 +375,12 @@ export async function POST(req: Request) {
         adId,
         storagePath,
       });
+      try {
+        await admin
+          .from("telegram_webhook_debug")
+          .update({ image_error: null, storage_error: null })
+          .eq("update_id", update.update_id);
+      } catch {}
     } catch (error) {
       const safeMessage = error instanceof Error ? error.message : "خطای عکس";
       // Never log botToken/fileUrl; only safe diagnostics already logged above
@@ -338,6 +391,12 @@ export async function POST(req: Request) {
         fileIdPrefix: photoFileId.slice(0, 8) + "...",
         error: safeMessage,
       });
+      try {
+        await admin
+          .from("telegram_webhook_debug")
+          .update({ image_error: safeMessage.slice(0, 500) })
+          .eq("update_id", update.update_id);
+      } catch {}
       // Keep the ad, but make Telegram response clearly indicate failure
       await sendTelegramReply(
         msg.chat.id,

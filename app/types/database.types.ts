@@ -569,6 +569,72 @@ export interface Database {
           },
         ];
       };
+      telegram_webhook_debug: {
+        Row: {
+          caption_length: number | null;
+          chat_id: number | null;
+          created_at: string;
+          download_bytes: number | null;
+          download_content_type: string | null;
+          download_status: number | null;
+          file_id_prefix: string | null;
+          file_path: string | null;
+          has_caption: boolean | null;
+          has_document: boolean | null;
+          has_photo: boolean | null;
+          has_text: boolean | null;
+          image_error: string | null;
+          message_id: number | null;
+          photo_count: number | null;
+          raw_has_photo_key: boolean | null;
+          storage_error: string | null;
+          text_length: number | null;
+          update_id: number;
+        };
+        Insert: {
+          caption_length?: number | null;
+          chat_id?: number | null;
+          created_at?: string;
+          download_bytes?: number | null;
+          download_content_type?: string | null;
+          download_status?: number | null;
+          file_id_prefix?: string | null;
+          file_path?: string | null;
+          has_caption?: boolean | null;
+          has_document?: boolean | null;
+          has_photo?: boolean | null;
+          has_text?: boolean | null;
+          image_error?: string | null;
+          message_id?: number | null;
+          photo_count?: number | null;
+          raw_has_photo_key?: boolean | null;
+          storage_error?: string | null;
+          text_length?: number | null;
+          update_id: number;
+        };
+        Update: {
+          caption_length?: number | null;
+          chat_id?: number | null;
+          created_at?: string;
+          download_bytes?: number | null;
+          download_content_type?: string | null;
+          download_status?: number | null;
+          file_id_prefix?: string | null;
+          file_path?: string | null;
+          has_caption?: boolean | null;
+          has_document?: boolean | null;
+          has_photo?: boolean | null;
+          has_text?: boolean | null;
+          image_error?: string | null;
+          message_id?: number | null;
+          photo_count?: number | null;
+          raw_has_photo_key?: boolean | null;
+          storage_error?: string | null;
+          text_length?: number | null;
+          update_id?: number;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
