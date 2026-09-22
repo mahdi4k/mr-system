@@ -172,11 +172,7 @@ const PageClient: React.FC<PageClientProps> = ({ showAssistant = false }) => {
             pos="relative"
             px={"sm"}
           >
-            <Text
-              fw={"bold"}
-              fz={"xl"}
-              ta={"center"}
-            >
+            <Text fw={"bold"} fz={"xl"} ta={"center"}>
               هوشمندانه انتخاب کنید{" "}
             </Text>
             {Object.values(isPartEmpty).every((isEmpty) => !isEmpty) && (

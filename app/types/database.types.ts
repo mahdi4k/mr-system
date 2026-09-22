@@ -105,6 +105,7 @@ export interface Database {
           id: string;
           price: number | null;
           province_id: number;
+          source: string | null;
           status: AdStatus;
           telegram_notification_claimed_at: string | null;
           telegram_notified_at: string | null;
@@ -120,6 +121,7 @@ export interface Database {
           id?: string;
           price?: number | null;
           province_id: number;
+          source?: string | null;
           status?: AdStatus;
           telegram_notification_claimed_at?: string | null;
           telegram_notified_at?: string | null;
@@ -135,6 +137,7 @@ export interface Database {
           id?: string;
           price?: number | null;
           province_id?: number;
+          source?: string | null;
           status?: AdStatus;
           telegram_notification_claimed_at?: string | null;
           telegram_notified_at?: string | null;
@@ -533,6 +536,38 @@ export interface Database {
           status?: MatchStatus;
         };
         Relationships: [];
+      };
+      telegram_webhook_events: {
+        Row: {
+          ad_id: string | null;
+          chat_id: number | null;
+          created_at: string;
+          message_id: number | null;
+          update_id: number;
+        };
+        Insert: {
+          ad_id?: string | null;
+          chat_id?: number | null;
+          created_at?: string;
+          message_id?: number | null;
+          update_id: number;
+        };
+        Update: {
+          ad_id?: string | null;
+          chat_id?: number | null;
+          created_at?: string;
+          message_id?: number | null;
+          update_id?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "telegram_webhook_events_ad_id_fkey";
+            columns: ["ad_id"];
+            isOneToOne: false;
+            referencedRelation: "ads";
+            referencedColumns: ["id"];
+          },
+        ];
       };
     };
     Views: Record<string, never>;
