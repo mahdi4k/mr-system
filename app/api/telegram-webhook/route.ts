@@ -245,7 +245,8 @@ export async function POST(req: Request) {
   }
 
   const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://rigora.ir";
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+    "https://www.rigora.ir";
   const adLink = `${siteUrl}/ads/${adId}`;
   const dashboardLink = `${siteUrl}/dashboard/ads`;
 

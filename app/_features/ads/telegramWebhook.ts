@@ -1,3 +1,8 @@
+// Explicit fallbacks — these IDs are guaranteed to exist:
+// category 1 = cpu (supabase/migrations/20260809000000_initial_rigora.sql:47),
+// province 1 = آذربایجان شرقی (public/provinces.json:2), city 1 = اسکو (public/cities.json:1, province 1).
+// Telegram forwards rarely contain structured category/location; we deliberately create as pending
+// for moderation at /dashboard/ads rather than inventing IDs.
 const DEFAULT_CATEGORY_ID = 1;
 const DEFAULT_PROVINCE_ID = 1;
 const DEFAULT_CITY_ID = 1;
@@ -11,25 +16,88 @@ export interface ParsedTelegramAd {
   cityId: number;
 }
 
-export function extractPrice(text: string): number | null {
-  // Matches numbers like 12,500,000 or 12500000 or ۱۲٬۵۰۰٬۰۰۰
-  // Normalize Persian/Arabic digits to ASCII
-  const normalized = text
+function normalizeDigits(input: string): string {
+  return input
     .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)))
-    .replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)))
-    .replace(/[،٬,]/g, "")
-    .replace(/[^0-9]/g, " ");
+    .replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));
+}
 
-  const numbers = normalized
-    .split(/\s+/)
-    .map((n) => Number(n))
-    .filter((n) => Number.isFinite(n) && n > 0);
+function parsePriceNumber(
+  raw: string,
+  keyword: string | undefined,
+): number | null {
+  // raw like "12,500,000" or "12.5" or "۱۲٬۵۰۰٬۰۰۰"
+  // Keep decimal point, strip thousand separators (comma, Persian comma, Arabic thousands, space)
+  const cleaned = raw.replace(/[,\s،٬]/g, "").trim();
+  if (!cleaned) return null;
+  const value = Number(cleaned);
+  if (!Number.isFinite(value) || value <= 0) return null;
 
-  if (!numbers.length) return null;
-  // Heuristic: pick the largest number that looks like a price (>= 1000)
-  const candidates = numbers.filter((n) => n >= 1000);
-  if (!candidates.length) return null;
-  return Math.max(...candidates);
+  const kw = (keyword || "").toLowerCase();
+  if (kw.includes("میلیون")) {
+    // "12 میلیون" or "12.5 میلیون" → 12 * 1_000_000
+    return Math.round(value * 1_000_000);
+  }
+  return Math.round(value);
+}
+
+export function extractPrice(text: string): number | null {
+  // Safer strategy: only extract numbers that are explicitly linked to price keywords.
+  // This avoids misclassifying model numbers (12100), specs (16GB, 2400MHz, 550W, 75Hz) as price.
+  const normalized = normalizeDigits(text).toLowerCase();
+  const candidates: number[] = [];
+
+  // Keyword before number: "قیمت: 12,500,000" , "price 120" , "12 میلیون" is captured via number-before-keyword but also via keyword-before
+  const beforeRegex =
+    /(?:قیمت|تومان|تومن|میلیون|price)\s*[:：\-–—]?\s*(\d+(?:[.,،٬\s]\d+)*)/gi;
+  // Number before keyword: "12,500,000 تومان" , "12 میلیون تومان"
+  const afterRegex =
+    /(\d+(?:[.,،٬\s]\d+)*)\s*(?:قیمت|تومان|تومن|میلیون|price)/gi;
+
+  let match: RegExpExecArray | null;
+
+  // Collect numbers that appear after a price keyword
+  beforeRegex.lastIndex = 0;
+  while ((match = beforeRegex.exec(normalized)) !== null) {
+    const rawNumber = match[1];
+    // The keyword that preceded the number is inside the non-capturing group; re-extract it
+    const full = match[0];
+    const keywordMatch = /(قیمت|تومان|تومن|میلیون|price)/i.exec(full);
+    const keyword = keywordMatch?.[1];
+    const value = parsePriceNumber(rawNumber, keyword);
+    if (value !== null) candidates.push(value);
+    // Avoid infinite loop on zero-length
+    if (match[0].length === 0) beforeRegex.lastIndex += 1;
+  }
+
+  // Collect numbers that appear before a price keyword
+  afterRegex.lastIndex = 0;
+  while ((match = afterRegex.exec(normalized)) !== null) {
+    const rawNumber = match[1];
+    const keywordMatch = /(قیمت|تومان|تومن|میلیون|price)/i.exec(match[0]);
+    const keyword = keywordMatch?.[1];
+    // For patterns like "12 میلیون" the keyword is میلیون → multiply
+    // For "12,500,000 تومان" keyword is تومان → direct
+    // Need to detect if the number was followed by میلیون specifically
+    const afterNumberSegment = match[0].slice(
+      match[0].indexOf(rawNumber) + rawNumber.length,
+    );
+    const keywordAfter =
+      /(قیمت|تومان|تومن|میلیون|price)/i.exec(afterNumberSegment)?.[1] ||
+      keyword;
+    const value = parsePriceNumber(rawNumber, keywordAfter);
+    if (value !== null) candidates.push(value);
+    if (match[0].length === 0) afterRegex.lastIndex += 1;
+  }
+
+  if (candidates.length) {
+    // Prioritize explicit price mentions. If multiple, choose the last (most likely intentional price)
+    // which also handles "12 میلیون تومان" where both regexes may capture 12.
+    return candidates[candidates.length - 1];
+  }
+
+  // No price keyword found → do not guess (prevents 12100, 2400, 550 etc. from being used as price)
+  return null;
 }
 
 export function parseTelegramAdContent(rawText: string): ParsedTelegramAd {
