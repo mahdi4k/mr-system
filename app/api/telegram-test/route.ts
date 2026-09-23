@@ -94,6 +94,8 @@ export async function GET(req: Request) {
   let telegramStatus: number | null = null;
   let telegramContentType: string | null = null;
   let telegramError: string | null = null;
+  let botInfo: { id?: number; username?: string; first_name?: string } | null =
+    null;
 
   if (!botToken) {
     telegramError = "Missing TELEGRAM_BOT_TOKEN env";
@@ -106,9 +108,11 @@ export async function GET(req: Request) {
       telegramContentType = res.headers.get("content-type");
       const data = (await res.json().catch(() => null)) as {
         ok?: boolean;
+        result?: { id: number; username: string; first_name: string };
         description?: string;
       } | null;
       telegramReachable = res.ok && !!data?.ok;
+      if (data?.result) botInfo = data.result;
       if (!telegramReachable) {
         telegramError = data?.description || `HTTP ${res.status}`;
       }
@@ -145,6 +149,7 @@ export async function GET(req: Request) {
   return NextResponse.json({
     ok: telegramReachable && supabaseReachable && envCheck.hasBotToken,
     envCheck,
+    botInfo,
     telegram: {
       reachable: telegramReachable,
       status: telegramStatus,
