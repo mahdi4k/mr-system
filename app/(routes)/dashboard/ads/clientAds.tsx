@@ -8,6 +8,7 @@ import {
   useRejectAdsItem,
   useRemoveAds,
 } from "../../../_redux/services/adsApi";
+import AdsImageForm from "@/_components/adsSection/AdsImageForm";
 import {
   ActionIcon,
   Alert,
@@ -23,10 +24,12 @@ import {
   Pagination,
   Paper,
   SegmentedControl,
+  Select,
   SimpleGrid,
   Skeleton,
   Stack,
   Text,
+  Textarea,
   TextInput,
   Title,
 } from "@mantine/core";
@@ -36,6 +39,7 @@ import {
   IconAlertCircle,
   IconCheck,
   IconDotsVertical,
+  IconEdit,
   IconEye,
   IconPhoto,
   IconRefresh,
@@ -43,6 +47,7 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
+import NextImage from "next/image";
 import Link from "next/link";
 import { useDeferredValue, useEffect, useState } from "react";
 import classes from "./moderation.module.css";
@@ -87,7 +92,9 @@ export default function ClientAds() {
   const deferredSearch = useDeferredValue(search.trim());
   const [selectedAd, setSelectedAd] = useState<Product>();
   const [deleteTarget, setDeleteTarget] = useState<Product>();
+  const [editTarget, setEditTarget] = useState<Product>();
   const [detailsOpened, details] = useDisclosure(false);
+  const [editOpened, editHandlers] = useDisclosure(false);
 
   const query = useGetAdsListQuery({
     page,
@@ -128,6 +135,11 @@ export default function ClientAds() {
   const openDetails = (ad: Product) => {
     setSelectedAd(ad);
     details.open();
+  };
+
+  const openEdit = (ad: Product) => {
+    setEditTarget(ad);
+    editHandlers.open();
   };
 
   return (
@@ -210,6 +222,7 @@ export default function ClientAds() {
                 key={ad.id}
                 onApprove={() => void runAction("approve", ad)}
                 onDelete={() => setDeleteTarget(ad)}
+                onEdit={() => openEdit(ad)}
                 onOpen={() => openDetails(ad)}
                 onReject={() => void runAction("reject", ad)}
               />
@@ -276,6 +289,33 @@ export default function ClientAds() {
           </Button>
         </Group>
       </Modal>
+
+      <Modal
+        centered
+        onClose={() => {
+          editHandlers.close();
+          setEditTarget(undefined);
+        }}
+        opened={editOpened}
+        size="xl"
+        title={editTarget ? `ویرایش: ${editTarget.title}` : "ویرایش آگهی"}
+        scrollAreaComponent={Box}
+      >
+        {editTarget && (
+          <AdminEditForm
+            ad={editTarget}
+            onCancel={() => {
+              editHandlers.close();
+              setEditTarget(undefined);
+            }}
+            onSuccess={() => {
+              editHandlers.close();
+              setEditTarget(undefined);
+              void query.refetch();
+            }}
+          />
+        )}
+      </Modal>
     </Stack>
   );
 }
@@ -285,6 +325,7 @@ interface ModerationCardProps {
   ad: Product;
   onApprove: () => void;
   onDelete: () => void;
+  onEdit: () => void;
   onOpen: () => void;
   onReject: () => void;
 }
@@ -294,6 +335,7 @@ function ModerationCard({
   ad,
   onApprove,
   onDelete,
+  onEdit,
   onOpen,
   onReject,
 }: ModerationCardProps) {
@@ -341,6 +383,9 @@ function ModerationCard({
             >
               مشاهده صفحه عمومی
             </Menu.Item>
+            <Menu.Item leftSection={<IconEdit size={16} />} onClick={onEdit}>
+              ویرایش کامل
+            </Menu.Item>
             <Menu.Item
               color="red"
               leftSection={<IconTrash size={16} />}
@@ -386,10 +431,18 @@ function ModerationCard({
         >
           رد کردن
         </Button>
-        <Button onClick={onOpen} size="xs" variant="default">
-          جزئیات
+        <Button
+          leftSection={<IconEdit size={16} />}
+          onClick={onEdit}
+          size="xs"
+          variant="light"
+        >
+          ویرایش
         </Button>
       </Group>
+      <Button fullWidth mt="sm" onClick={onOpen} size="xs" variant="default">
+        جزئیات
+      </Button>
     </Card>
   );
 }
@@ -432,6 +485,307 @@ function AdDetails({ ad }: { ad: Product }) {
           </Text>
           <Text fz="sm">{ad.user.phone || "ثبت نشده"}</Text>
         </div>
+      </Group>
+    </Stack>
+  );
+}
+
+function AdminEditForm({
+  ad,
+  onCancel,
+  onSuccess,
+}: {
+  ad: Product;
+  onCancel: () => void;
+  onSuccess: () => void;
+}) {
+  const initialImages = parseImages(ad.image);
+  const [provinces, setProvinces] = useState<
+    Array<{ id: number; name: string }>
+  >([]);
+  const [cities, setCities] = useState<
+    Array<{ id: number; name: string; province_id: number }>
+  >([]);
+  const [categories, setCategories] = useState<
+    Array<{ id: number; name: string }>
+  >([]);
+  const [retainedImages, setRetainedImages] = useState<string[]>(initialImages);
+  const [newImages, setNewImages] = useState<File[]>([]);
+  const [processingImages, setProcessingImages] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [fetchingMeta, setFetchingMeta] = useState(true);
+
+  const [title, setTitle] = useState(ad.title);
+  const [description, setDescription] = useState(ad.description);
+  const [price, setPrice] = useState(ad.price);
+  const [categoryId, setCategoryId] = useState(ad.category.id.toString());
+  const [provinceId, setProvinceId] = useState(ad.ostan);
+  const [cityId, setCityId] = useState(ad.city);
+
+  useEffect(() => {
+    const loadMeta = async () => {
+      try {
+        const [provRes, cityRes, catRes] = await Promise.all([
+          fetch("/provinces.json"),
+          fetch("/cities.json"),
+          fetch("/api/catalog/cpu")
+            .then(() => null)
+            .catch(() => null),
+        ]);
+        // Fallback to direct supabase for categories if API fails
+        let cats: Array<{ id: number; name: string }> = [];
+        try {
+          const { createClient } = await import(
+            "../../../_lib/supabase/client"
+          );
+          const supabase = createClient();
+          const { data } = await supabase
+            .from("ad_categories")
+            .select("id, name")
+            .eq("is_active", true)
+            .order("sort_order");
+          if (data) cats = data;
+        } catch {}
+        // Also try to fetch via supabase directly as fallback
+        if (cats.length === 0) {
+          cats = [
+            { id: 1, name: "پردازنده (CPU)" },
+            { id: 2, name: "کارت گرافیک (GPU)" },
+            { id: 3, name: "مادربرد" },
+            { id: 4, name: "حافظه رم (RAM)" },
+            { id: 5, name: "منبع تغذیه (Power)" },
+            { id: 6, name: "کیس (Case)" },
+            { id: 7, name: "خنک‌کننده (Cooler)" },
+            { id: 8, name: "حافظه SSD" },
+          ];
+        }
+        setCategories(cats);
+        if (provRes?.ok)
+          setProvinces(
+            (await provRes.json()) as Array<{ id: number; name: string }>,
+          );
+        if (cityRes?.ok)
+          setCities(
+            (await cityRes.json()) as Array<{
+              id: number;
+              name: string;
+              province_id: number;
+            }>,
+          );
+      } catch {
+        // ignore
+      } finally {
+        setFetchingMeta(false);
+      }
+    };
+    void loadMeta();
+  }, []);
+
+  const availableCities = cities.filter(
+    (c) => c.province_id.toString() === provinceId,
+  );
+
+  const handleSubmit = async () => {
+    if (processingImages) {
+      notifications.show({
+        color: "orange",
+        message: "لطفاً تا پایان آماده‌سازی تصاویر صبر کنید.",
+      });
+      return;
+    }
+    if (title.trim().length < 3 || title.trim().length > 120) {
+      notifications.show({
+        color: "red",
+        message: "عنوان باید بین ۳ تا ۱۲۰ نویسه باشد",
+      });
+      return;
+    }
+    if (description.trim().length < 10 || description.trim().length > 5000) {
+      notifications.show({
+        color: "red",
+        message: "توضیحات باید بین ۱۰ تا ۵۰۰۰ نویسه باشد",
+      });
+      return;
+    }
+    if (price && !/^\d+$/.test(price)) {
+      notifications.show({ color: "red", message: "قیمت معتبر نیست" });
+      return;
+    }
+    if (!categoryId || !provinceId || !cityId) {
+      notifications.show({
+        color: "red",
+        message: "دسته‌بندی، استان و شهر الزامی است",
+      });
+      return;
+    }
+    if (retainedImages.length + newImages.length > 3) {
+      notifications.show({ color: "red", message: "حداکثر ۳ تصویر مجاز است" });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("title", title.trim());
+      formData.append("description", description.trim());
+      formData.append("price", price);
+      formData.append("category_id", categoryId);
+      formData.append("province_id", provinceId);
+      formData.append("city_id", cityId);
+      formData.append("retainedUrls", JSON.stringify(retainedImages));
+      newImages.forEach((file) => formData.append("newImages", file));
+
+      const res = await fetch(`/api/dashboard/ads/${ad.id}`, {
+        method: "PATCH",
+        body: formData,
+      });
+      const body = (await res.json().catch(() => null)) as {
+        message?: string;
+      } | null;
+      if (!res.ok) throw new Error(body?.message || "ویرایش ناموفق بود");
+
+      notifications.show({
+        color: "green",
+        message: "آگهی با موفقیت ویرایش شد",
+      });
+      onSuccess();
+    } catch (e) {
+      notifications.show({
+        color: "red",
+        message: e instanceof Error ? e.message : "ویرایش ناموفق بود",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (fetchingMeta) {
+    return (
+      <Stack>
+        <Skeleton height={40} />
+        <Skeleton height={200} />
+      </Stack>
+    );
+  }
+
+  return (
+    <Stack gap="md">
+      <TextInput
+        label="عنوان"
+        value={title}
+        onChange={(e) => setTitle(e.currentTarget.value)}
+        maxLength={120}
+      />
+      <Select
+        label="دسته‌بندی"
+        data={categories.map((c) => ({
+          value: c.id.toString(),
+          label: c.name,
+        }))}
+        value={categoryId}
+        onChange={(v) => v && setCategoryId(v)}
+        searchable
+      />
+      <SimpleGrid cols={{ base: 1, sm: 2 }}>
+        <Select
+          label="استان"
+          data={provinces.map((p) => ({
+            value: p.id.toString(),
+            label: p.name,
+          }))}
+          value={provinceId}
+          onChange={(v) => {
+            setProvinceId(v ?? "");
+            setCityId("");
+          }}
+          searchable
+        />
+        <Select
+          label="شهر"
+          data={availableCities.map((c) => ({
+            value: c.id.toString(),
+            label: c.name,
+          }))}
+          value={cityId}
+          onChange={(v) => v && setCityId(v)}
+          searchable
+          disabled={!provinceId}
+        />
+      </SimpleGrid>
+      <TextInput
+        label="قیمت (تومان) - خالی برای توافقی"
+        value={price}
+        onChange={(e) => setPrice(e.currentTarget.value)}
+        inputMode="numeric"
+      />
+      <Textarea
+        label="توضیحات"
+        value={description}
+        onChange={(e) => setDescription(e.currentTarget.value)}
+        minRows={5}
+        autosize
+      />
+
+      <Box>
+        <Text fw={600} fz="sm" mb="xs">
+          تصاویر فعلی ({retainedImages.length}/3)
+        </Text>
+        {retainedImages.length ? (
+          <Group gap="sm">
+            {retainedImages.map((url) => (
+              <Box key={url} pos="relative" h={100} w={100}>
+                <NextImage
+                  alt="تصویر آگهی"
+                  src={url}
+                  fill
+                  sizes="100px"
+                  style={{ borderRadius: 8, objectFit: "cover" }}
+                  unoptimized
+                />
+                <ActionIcon
+                  aria-label="حذف تصویر"
+                  color="red"
+                  onClick={() =>
+                    setRetainedImages((cur) => cur.filter((u) => u !== url))
+                  }
+                  pos="absolute"
+                  size="sm"
+                  style={{ left: 6, top: 6, zIndex: 1 }}
+                  variant="filled"
+                >
+                  <IconTrash size={14} />
+                </ActionIcon>
+              </Box>
+            ))}
+          </Group>
+        ) : (
+          <Text c="dimmed" fz="sm">
+            تصویری باقی نمانده است.
+          </Text>
+        )}
+      </Box>
+
+      {retainedImages.length < 3 && (
+        <AdsImageForm
+          images={newImages}
+          maxImages={3 - retainedImages.length}
+          onProcessingChange={setProcessingImages}
+          setImages={setNewImages}
+        />
+      )}
+
+      <Group justify="flex-end" mt="md">
+        <Button
+          variant="subtle"
+          color="gray"
+          onClick={onCancel}
+          disabled={loading}
+        >
+          انصراف
+        </Button>
+        <Button loading={loading} onClick={handleSubmit}>
+          ذخیره تغییرات
+        </Button>
       </Group>
     </Stack>
   );
