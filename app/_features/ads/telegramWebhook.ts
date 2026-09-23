@@ -1,11 +1,11 @@
 // Explicit fallbacks — these IDs are guaranteed to exist:
 // category 1 = cpu (supabase/migrations/20260809000000_initial_rigora.sql:47),
-// province 1 = آذربایجان شرقی (public/provinces.json:2), city 1 = اسکو (public/cities.json:1, province 1).
+// province 8 = تهران (public/provinces.json:8), city 301 = تهران (public/cities.json:301, province 8).
 // Telegram forwards rarely contain structured category/location; we deliberately create as pending
 // for moderation at /dashboard/ads rather than inventing IDs.
 const DEFAULT_CATEGORY_ID = 1;
-const DEFAULT_PROVINCE_ID = 1;
-const DEFAULT_CITY_ID = 1;
+const DEFAULT_PROVINCE_ID = 8;
+const DEFAULT_CITY_ID = 301;
 
 export interface ParsedTelegramAd {
   title: string;
