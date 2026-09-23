@@ -26,6 +26,7 @@ interface TelegramMessage {
   caption?: string;
   photo?: TelegramPhotoSize[];
   document?: { file_id: string; mime_type?: string };
+  media_group_id?: string;
 }
 
 interface TelegramUpdate {
@@ -110,6 +111,7 @@ export async function POST(req: Request) {
     (msg.photo?.length
       ? msg.photo[msg.photo.length - 1]?.file_id
       : undefined) ?? msg.document?.file_id;
+  const mediaGroupId = msg.media_group_id;
 
   // Ignore bot commands like /start, /help, etc. — must NOT create an ad
   if (rawText && isBotCommand(rawText)) {
@@ -131,24 +133,10 @@ export async function POST(req: Request) {
       textLength: rawText.length,
       hasPhoto: !!msg.photo?.length,
       hasDocument: !!msg.document,
+      mediaGroupId: mediaGroupId ?? null,
     });
     return NextResponse.json({ ok: true });
   }
-
-  console.log("Telegram webhook: received message", {
-    update_id: update.update_id,
-    message_id: msg.message_id,
-    chat_id: msg.chat.id,
-    hasPhoto: !!msg.photo?.length,
-    photoCount: msg.photo?.length ?? 0,
-    hasDocument: !!msg.document,
-    hasText: !!rawText,
-    textLength: rawText.length,
-    photoFileIdPrefix: photoFileId ? photoFileId.slice(0, 8) + "..." : null,
-  });
-
-  const effectiveText = rawText || "آگهی تلگرام";
-  const parsed = parseTelegramAdContent(effectiveText);
 
   let admin: ReturnType<typeof createAdminClient>;
   try {
@@ -162,6 +150,164 @@ export async function POST(req: Request) {
     );
     return NextResponse.json({ ok: true });
   }
+
+  // Media group handling: Telegram sends grouped photos as separate messages with same media_group_id.
+  // The first has caption, the rest have no caption. Don't create an empty ad for the rest;
+  // instead, attach their photo to the ad created for the first in the group.
+  if (mediaGroupId && !hasMeaningfulText && photoFileId) {
+    console.log(
+      "Telegram webhook: media_group without caption — trying to attach to existing ad",
+      {
+        update_id: update.update_id,
+        message_id: msg.message_id,
+        mediaGroupId,
+        fileIdPrefix: photoFileId.slice(0, 8) + "...",
+      },
+    );
+    try {
+      // Find the most recent telegram ad from same owner/media group (within 2 minutes) that has <3 images
+      const { data: recentAds } = await admin
+        .from("ads")
+        .select("id, created_at")
+        .eq("user_id", config.ownerUserId)
+        .eq("source", "telegram:pcrazor_ad")
+        .order("created_at", { ascending: false })
+        .limit(5);
+      let targetAdId: string | null = null;
+      if (recentAds) {
+        for (const candidate of recentAds) {
+          const ageMs = Date.now() - new Date(candidate.created_at).getTime();
+          if (ageMs > 120_000) continue; // older than 2 minutes, ignore
+          const { data: existingImages } = await admin
+            .from("ad_images")
+            .select("id")
+            .eq("ad_id", candidate.id);
+          if ((existingImages?.length ?? 0) < 3) {
+            targetAdId = candidate.id;
+            break;
+          }
+        }
+      }
+      if (targetAdId) {
+        // Attach this photo to that ad
+        try {
+          const { filePath, fileUrl } = await getTelegramFileInfo(
+            photoFileId,
+            config.botToken,
+          );
+          const { buffer, contentType, byteLength } =
+            await downloadTelegramFile(fileUrl);
+          if (byteLength === 0) throw new Error("Empty download");
+          const extFromPath =
+            filePath.split(".").pop()?.split("?")[0]?.toLowerCase() || "jpg";
+          const safeExt = ["jpg", "jpeg", "png", "webp", "gif"].includes(
+            extFromPath,
+          )
+            ? extFromPath
+            : "jpg";
+          const { data: existing } = await admin
+            .from("ad_images")
+            .select("sort_order")
+            .eq("ad_id", targetAdId)
+            .order("sort_order");
+          const nextOrder = existing?.length ?? 0;
+          if (nextOrder >= 3) {
+            console.log(
+              "Telegram webhook: target ad already has 3 images, ignoring extra",
+              { targetAdId },
+            );
+            return NextResponse.json({ ok: true });
+          }
+          const storagePath = `${config.ownerUserId}/${targetAdId}/${crypto.randomUUID()}.${safeExt}`;
+          const { error: uploadError } = await admin.storage
+            .from("ad-images")
+            .upload(storagePath, buffer, {
+              cacheControl: "31536000",
+              contentType: `image/${safeExt === "jpg" ? "jpeg" : safeExt}`,
+              upsert: false,
+            });
+          if (uploadError)
+            throw new Error(`Storage upload failed: ${uploadError.message}`);
+          const { data: publicUrl } = admin.storage
+            .from("ad-images")
+            .getPublicUrl(storagePath);
+          const { error: imageError } = await admin.from("ad_images").insert({
+            ad_id: targetAdId,
+            storage_path: storagePath,
+            url: publicUrl.publicUrl,
+            sort_order: nextOrder,
+          });
+          if (imageError) {
+            await admin.storage.from("ad-images").remove([storagePath]);
+            throw new Error(`ad_images insert failed: ${imageError.message}`);
+          }
+          console.log(
+            "Telegram webhook: attached media_group photo to existing ad",
+            {
+              targetAdId,
+              update_id: update.update_id,
+              byteLength,
+              contentType,
+            },
+          );
+          // Also update debug if exists
+          try {
+            await admin.from("telegram_webhook_debug").insert({
+              update_id: update.update_id,
+              message_id: msg.message_id,
+              chat_id: msg.chat.id,
+              has_photo: true,
+              photo_count: msg.photo?.length ?? 0,
+              file_id_prefix: photoFileId.slice(0, 8),
+              file_path: filePath,
+              download_bytes: byteLength,
+              download_content_type: contentType,
+              media_group_id: mediaGroupId,
+            });
+          } catch {}
+          return NextResponse.json({ ok: true });
+        } catch (e) {
+          console.error(
+            "Telegram webhook: failed to attach media_group photo",
+            {
+              targetAdId,
+              error: e instanceof Error ? e.message : String(e),
+            },
+          );
+          // Fall through to ignore empty ad (don't create new)
+          return NextResponse.json({ ok: true });
+        }
+      } else {
+        console.log(
+          "Telegram webhook: no recent ad found for media_group, ignoring empty",
+          {
+            mediaGroupId,
+            update_id: update.update_id,
+          },
+        );
+        return NextResponse.json({ ok: true });
+      }
+    } catch (e) {
+      console.error("Telegram webhook: media_group handling failed", e);
+      return NextResponse.json({ ok: true });
+    }
+  }
+
+  console.log("Telegram webhook: received message", {
+    update_id: update.update_id,
+    message_id: msg.message_id,
+    chat_id: msg.chat.id,
+    hasPhoto: !!msg.photo?.length,
+    photoCount: msg.photo?.length ?? 0,
+    hasDocument: !!msg.document,
+    hasText: !!rawText,
+    textLength: rawText.length,
+    photoFileIdPrefix: photoFileId ? photoFileId.slice(0, 8) + "..." : null,
+    mediaGroupId: mediaGroupId ?? null,
+  });
+
+  const effectiveText = rawText || "آگهی تلگرام";
+  const parsed = parseTelegramAdContent(effectiveText);
 
   // Debug: persist safe payload diagnostics for image troubleshooting (no secrets)
   try {
@@ -178,6 +324,7 @@ export async function POST(req: Request) {
       caption_length: msg.caption?.length ?? 0,
       file_id_prefix: photoFileId ? photoFileId.slice(0, 8) : null,
       raw_has_photo_key: "photo" in msg,
+      media_group_id: mediaGroupId ?? null,
     });
   } catch (e) {
     console.error("Telegram webhook: debug insert failed (non-blocking)", e);

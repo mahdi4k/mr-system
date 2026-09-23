@@ -18,8 +18,19 @@ create table if not exists public.telegram_webhook_debug (
   storage_error text,
   image_error text,
   raw_has_photo_key boolean,
+  media_group_id text,
   created_at timestamptz not null default now()
 );
+
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema='public' and table_name='telegram_webhook_debug' and column_name='media_group_id'
+  ) then
+    alter table public.telegram_webhook_debug add column media_group_id text;
+  end if;
+end $$;
 
 alter table public.telegram_webhook_debug enable row level security;
 

@@ -584,6 +584,7 @@ export interface Database {
           has_photo: boolean | null;
           has_text: boolean | null;
           image_error: string | null;
+          media_group_id: string | null;
           message_id: number | null;
           photo_count: number | null;
           raw_has_photo_key: boolean | null;
@@ -605,6 +606,7 @@ export interface Database {
           has_photo?: boolean | null;
           has_text?: boolean | null;
           image_error?: string | null;
+          media_group_id?: string | null;
           message_id?: number | null;
           photo_count?: number | null;
           raw_has_photo_key?: boolean | null;
@@ -626,6 +628,7 @@ export interface Database {
           has_photo?: boolean | null;
           has_text?: boolean | null;
           image_error?: string | null;
+          media_group_id?: string | null;
           message_id?: number | null;
           photo_count?: number | null;
           raw_has_photo_key?: boolean | null;
