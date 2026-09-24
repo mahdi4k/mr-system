@@ -370,16 +370,14 @@ export async function PATCH(
     }
 
     if (imageRows.length > 0) {
-      const { error: insertError } = await admin
-        .from("ad_images")
-        .insert(
-          imageRows.map((r) => ({
-            ad_id: id,
-            storage_path: r.storage_path,
-            url: r.url,
-            sort_order: r.sort_order,
-          })),
-        );
+      const { error: insertError } = await admin.from("ad_images").insert(
+        imageRows.map((r) => ({
+          ad_id: id,
+          storage_path: r.storage_path,
+          url: r.url,
+          sort_order: r.sort_order,
+        })),
+      );
       if (insertError) {
         if (uploadedPaths.length)
           await admin.storage.from("ad-images").remove(uploadedPaths);

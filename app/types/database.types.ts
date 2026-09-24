@@ -107,8 +107,10 @@ export interface Database {
           province_id: number;
           source: string | null;
           status: AdStatus;
+          telegram_channel: string | null;
           telegram_notification_claimed_at: string | null;
           telegram_notified_at: string | null;
+          telegram_username: string | null;
           title: string;
           updated_at: string;
           user_id: string;
@@ -123,8 +125,10 @@ export interface Database {
           province_id: number;
           source?: string | null;
           status?: AdStatus;
+          telegram_channel?: string | null;
           telegram_notification_claimed_at?: string | null;
           telegram_notified_at?: string | null;
+          telegram_username?: string | null;
           title: string;
           updated_at?: string;
           user_id: string;
@@ -139,8 +143,10 @@ export interface Database {
           province_id?: number;
           source?: string | null;
           status?: AdStatus;
+          telegram_channel?: string | null;
           telegram_notification_claimed_at?: string | null;
           telegram_notified_at?: string | null;
+          telegram_username?: string | null;
           title?: string;
           updated_at?: string;
           user_id?: string;

@@ -27,6 +27,25 @@ interface TelegramMessage {
   photo?: TelegramPhotoSize[];
   document?: { file_id: string; mime_type?: string };
   media_group_id?: string;
+  forward_origin?: {
+    type: string;
+    chat?: { id: number; title?: string; username?: string; type?: string };
+    sender_chat?: {
+      id: number;
+      title?: string;
+      username?: string;
+      type?: string;
+    };
+    sender_user_name?: string;
+  };
+  forward_from_chat?: {
+    id: number;
+    title?: string;
+    username?: string;
+    type?: string;
+  };
+  forward_sender_name?: string;
+  forward_from?: { id: number; username?: string; first_name?: string };
 }
 
 interface TelegramUpdate {
@@ -70,6 +89,30 @@ async function sendTelegramReply(
 function isBotCommand(text: string): boolean {
   const trimmed = text.trim();
   return trimmed.startsWith("/") && /^\/\w+/.test(trimmed);
+}
+
+function extractTelegramUsername(text: string): string | null {
+  // Find first @username (5-32 chars, letters, numbers, underscore) — common in channel ads like @MEPO_EF7_021
+  const match = text.match(/@([A-Za-z0-9_]{5,32})/);
+  return match ? match[1] : null;
+}
+
+function extractTelegramChannel(msg: TelegramMessage): string | null {
+  // Try forward_origin (Bot API 7+), then legacy forward_from_chat / forward_sender_name
+  const origin = msg.forward_origin;
+  if (origin) {
+    if (origin.chat?.title) return origin.chat.title;
+    if (origin.chat?.username) return origin.chat.username;
+    if (origin.sender_chat?.title) return origin.sender_chat.title;
+    if (origin.sender_chat?.username) return origin.sender_chat.username;
+    if (origin.sender_user_name) return origin.sender_user_name;
+  }
+  if (msg.forward_from_chat?.title) return msg.forward_from_chat.title;
+  if (msg.forward_from_chat?.username) return msg.forward_from_chat.username;
+  if (msg.forward_sender_name) return msg.forward_sender_name;
+  if (msg.forward_from?.username) return msg.forward_from.username;
+  if (msg.forward_from?.first_name) return msg.forward_from.first_name;
+  return null;
 }
 
 export async function POST(req: Request) {
@@ -308,6 +351,14 @@ export async function POST(req: Request) {
 
   const effectiveText = rawText || "آگهی تلگرام";
   const parsed = parseTelegramAdContent(effectiveText);
+  const telegramChannel = extractTelegramChannel(msg);
+  const telegramUsername = extractTelegramUsername(rawText);
+
+  console.log("Telegram webhook: extracted channel info", {
+    telegramChannel,
+    telegramUsername,
+    hasAtMention: !!telegramUsername,
+  });
 
   // Debug: persist safe payload diagnostics for image troubleshooting (no secrets)
   try {
@@ -351,9 +402,11 @@ export async function POST(req: Request) {
   // Create ad as pending (matches RLS with check status=pending, admin bypasses it but we keep pending for moderation)
   let adId: string;
   try {
-    const { data: ad, error } = await admin
-      .from("ads")
-      .insert({
+    let insertError: unknown = null;
+    let ad: { id: string } | null = null;
+    // Try with new telegram columns, fallback to without them if migration not yet applied
+    const tryInsert = async (withTelegramFields: boolean) => {
+      const payload: Record<string, unknown> = {
         user_id: config.ownerUserId,
         category_id: parsed.categoryId,
         city_id: parsed.cityId,
@@ -363,12 +416,37 @@ export async function POST(req: Request) {
         title: parsed.title,
         status: "pending",
         source: "telegram:pcrazor_ad",
-      })
-      .select("id")
-      .single();
+      };
+      if (withTelegramFields) {
+        payload.telegram_channel = telegramChannel;
+        payload.telegram_username = telegramUsername;
+      }
+      const res = await admin
+        .from("ads")
+        .insert(payload as never)
+        .select("id")
+        .single();
+      return res;
+    };
 
-    if (error || !ad) throw error || new Error("Insert returned no id");
-    adId = ad.id;
+    let res = await tryInsert(true);
+    if (res.error && String(res.error.message).includes("column")) {
+      console.warn(
+        "Telegram webhook: telegram_channel columns missing, retrying without them",
+        res.error.message,
+      );
+      res = await tryInsert(false);
+    }
+    const data = res.data as { id: string } | null;
+    const error = res.error as unknown as { message: string } | null;
+    ad = data;
+    insertError = error;
+
+    if (insertError || !ad)
+      throw (
+        (insertError as unknown as Error) || new Error("Insert returned no id")
+      );
+    adId = (ad as { id: string }).id;
     // Link ad to webhook event for audit
     if (typeof update.update_id === "number") {
       const { error: linkError } = await admin

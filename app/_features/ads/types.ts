@@ -26,6 +26,9 @@ export interface Product {
   status: AdStatus;
   city: string;
   ostan: string;
+  source?: string | null;
+  telegram_channel?: string | null;
+  telegram_username?: string | null;
 }
 
 export interface AdsResponse {

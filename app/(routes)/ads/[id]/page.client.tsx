@@ -23,6 +23,7 @@ import classes from "./adsSingle.module.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
+  IconBrandTelegram,
   IconDiscountCheckFilled,
   IconMessages,
   IconPhone,
@@ -109,6 +110,18 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
   const { createConversation, creatingConversation } = useChat();
   const isOwnAd = currentUserId === product.user_id;
   const statusDisplay = getAdStatusDisplay(product.status);
+
+  const isFromTelegram = !!product.source?.startsWith("telegram");
+  const telegramChannel = product.telegram_channel || null;
+  const telegramUsername =
+    product.telegram_username ||
+    (() => {
+      const m = product.description.match(/@([A-Za-z0-9_]{5,32})/);
+      return m ? m[1] : null;
+    })();
+  const telegramLink = telegramUsername
+    ? `https://t.me/${telegramUsername}`
+    : null;
 
   const handleStartChat = () => {
     if (currentUserId) {
@@ -248,46 +261,127 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
           <Card mt={"xl"} shadow=" rgba(0, 0, 0, 0.1) -4px 9px 25px -6px ">
             <Text fz={"sm"}>اطلاعات تماس</Text>
 
-            <Flex direction={"column"} align={"center"} justify={"center"}>
-              <ThemeIcon
-                mt={"lg"}
-                color="gray"
-                variant="light"
-                radius="xl"
-                size="4rem"
-              >
-                <IconUser style={{ width: "70%", height: "70%" }} />
-              </ThemeIcon>
-              <Text mt={"md"} fz={"sm"}>
-                {product.user.name}
-              </Text>
-              <Button
-                mt={"lg"}
-                size="md"
-                color="green"
-                radius={"lg"}
-                variant="light"
-                w={"100%"}
-                leftSection={<IconPhone size={20} />}
-              >
-                {product.user.phone || "شماره تماس ثبت نشده"}
-              </Button>
-            </Flex>
-            <Button
-              disabled={isOwnAd}
-              loading={creatingConversation}
-              radius={"lg"}
-              variant="outline"
-              leftSection={<IconMessages />}
-              onClick={handleStartChat}
-              mt="md"
-            >
-              <Text>
-                {isOwnAd
-                  ? "این آگهی متعلق به شماست"
-                  : `چت با ${product.user.name}`}
-              </Text>
-            </Button>
+            {isFromTelegram ? (
+              <Flex direction={"column"} align={"center"} justify={"center"}>
+                <ThemeIcon
+                  mt={"lg"}
+                  color="blue"
+                  variant="light"
+                  radius="xl"
+                  size="4rem"
+                >
+                  <IconBrandTelegram style={{ width: "70%", height: "70%" }} />
+                </ThemeIcon>
+                <Badge
+                  mt="md"
+                  color="blue"
+                  variant="light"
+                  leftSection={<IconBrandTelegram size={14} />}
+                >
+                  آگهی از کانال تلگرام
+                </Badge>
+                {telegramChannel && (
+                  <Text mt={"xs"} fz={"sm"} fw={600} ta="center">
+                    {telegramChannel}
+                  </Text>
+                )}
+                {telegramUsername && (
+                  <Text fz="xs" c="dimmed" dir="ltr">
+                    @{telegramUsername}
+                  </Text>
+                )}
+                <Text fz="xs" c="dimmed" mt="xs" ta="center">
+                  این آگهی از تلگرام به ریگورا ارسال شده — برای ارتباط مستقیم به
+                  تلگرام مراجعه کنید
+                </Text>
+                {telegramLink ? (
+                  <Button
+                    mt={"lg"}
+                    size="md"
+                    color="blue"
+                    radius={"lg"}
+                    w={"100%"}
+                    leftSection={<IconBrandTelegram size={20} />}
+                    component="a"
+                    href={telegramLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    پیام در تلگرام @{telegramUsername}
+                  </Button>
+                ) : (
+                  <Button
+                    mt={"lg"}
+                    size="md"
+                    color="gray"
+                    radius={"lg"}
+                    variant="light"
+                    w={"100%"}
+                    disabled
+                  >
+                    شناسه تلگرام ثبت نشده
+                  </Button>
+                )}
+                <Button
+                  disabled={isOwnAd}
+                  loading={creatingConversation}
+                  radius={"lg"}
+                  variant="outline"
+                  leftSection={<IconMessages />}
+                  onClick={handleStartChat}
+                  mt="md"
+                  w="100%"
+                >
+                  <Text>
+                    {isOwnAd
+                      ? "این آگهی متعلق به شماست"
+                      : `چت داخلی با ${product.user.name}`}
+                  </Text>
+                </Button>
+              </Flex>
+            ) : (
+              <Flex direction={"column"} align={"center"} justify={"center"}>
+                <ThemeIcon
+                  mt={"lg"}
+                  color="gray"
+                  variant="light"
+                  radius="xl"
+                  size="4rem"
+                >
+                  <IconUser style={{ width: "70%", height: "70%" }} />
+                </ThemeIcon>
+                <Text mt={"md"} fz={"sm"}>
+                  {product.user.name}
+                </Text>
+                <Button
+                  mt={"lg"}
+                  size="md"
+                  color="green"
+                  radius={"lg"}
+                  variant="light"
+                  w={"100%"}
+                  leftSection={<IconPhone size={20} />}
+                >
+                  {product.user.phone || "شماره تماس ثبت نشده"}
+                </Button>
+                <Button
+                  disabled={isOwnAd}
+                  loading={creatingConversation}
+                  radius={"lg"}
+                  variant="outline"
+                  leftSection={<IconMessages />}
+                  onClick={handleStartChat}
+                  mt="md"
+                  w="100%"
+                >
+                  <Text>
+                    {isOwnAd
+                      ? "این آگهی متعلق به شماست"
+                      : `چت با ${product.user.name}`}
+                  </Text>
+                </Button>
+              </Flex>
+            )}
           </Card>
         </Grid.Col>
       </Grid>

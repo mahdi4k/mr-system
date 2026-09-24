@@ -22,6 +22,9 @@ const AD_SELECT = `
   city_id,
   status,
   created_at,
+  source,
+  telegram_channel,
+  telegram_username,
   category:ad_categories!inner(id, name, value, icon),
   user:profiles!inner(id, display_name, phone),
   images:ad_images(url, sort_order)
@@ -36,7 +39,10 @@ interface AdQueryRow {
   images: Array<{ sort_order: number; url: string }>;
   price: number | null;
   province_id: number;
+  source: string | null;
   status: Product["status"];
+  telegram_channel: string | null;
+  telegram_username: string | null;
   title: string;
   user: { display_name: string | null; id: string; phone: string | null };
   user_id: string;
@@ -64,6 +70,9 @@ function toProduct(row: AdQueryRow): Product {
     status: row.status,
     city: row.city_id.toString(),
     ostan: row.province_id.toString(),
+    source: row.source,
+    telegram_channel: row.telegram_channel,
+    telegram_username: row.telegram_username,
   };
 }
 
