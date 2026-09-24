@@ -322,22 +322,6 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
                     شناسه تلگرام ثبت نشده
                   </Button>
                 )}
-                <Button
-                  disabled={isOwnAd}
-                  loading={creatingConversation}
-                  radius={"lg"}
-                  variant="outline"
-                  leftSection={<IconMessages />}
-                  onClick={handleStartChat}
-                  mt="md"
-                  w="100%"
-                >
-                  <Text>
-                    {isOwnAd
-                      ? "این آگهی متعلق به شماست"
-                      : `چت داخلی با ${product.user.name}`}
-                  </Text>
-                </Button>
               </Flex>
             ) : (
               <Flex direction={"column"} align={"center"} justify={"center"}>
