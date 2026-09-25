@@ -24,6 +24,7 @@ const AD_SELECT = `
   created_at,
   source,
   telegram_channel,
+  telegram_channel_username,
   telegram_username,
   category:ad_categories!inner(id, name, value, icon),
   user:profiles!inner(id, display_name, phone),
@@ -42,6 +43,7 @@ interface AdQueryRow {
   source: string | null;
   status: Product["status"];
   telegram_channel: string | null;
+  telegram_channel_username: string | null;
   telegram_username: string | null;
   title: string;
   user: { display_name: string | null; id: string; phone: string | null };
@@ -72,6 +74,7 @@ function toProduct(row: AdQueryRow): Product {
     ostan: row.province_id.toString(),
     source: row.source,
     telegram_channel: row.telegram_channel,
+    telegram_channel_username: row.telegram_channel_username,
     telegram_username: row.telegram_username,
   };
 }

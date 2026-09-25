@@ -108,6 +108,7 @@ export interface Database {
           source: string | null;
           status: AdStatus;
           telegram_channel: string | null;
+          telegram_channel_username: string | null;
           telegram_notification_claimed_at: string | null;
           telegram_notified_at: string | null;
           telegram_username: string | null;
@@ -126,6 +127,7 @@ export interface Database {
           source?: string | null;
           status?: AdStatus;
           telegram_channel?: string | null;
+          telegram_channel_username?: string | null;
           telegram_notification_claimed_at?: string | null;
           telegram_notified_at?: string | null;
           telegram_username?: string | null;
@@ -144,6 +146,7 @@ export interface Database {
           source?: string | null;
           status?: AdStatus;
           telegram_channel?: string | null;
+          telegram_channel_username?: string | null;
           telegram_notification_claimed_at?: string | null;
           telegram_notified_at?: string | null;
           telegram_username?: string | null;
@@ -643,6 +646,41 @@ export interface Database {
           update_id?: number;
         };
         Relationships: [];
+      };
+      saved_systems: {
+        Row: {
+          config: Json;
+          created_at: string;
+          id: string;
+          name: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          config: Json;
+          created_at?: string;
+          id?: string;
+          name: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          config?: Json;
+          created_at?: string;
+          id?: string;
+          name?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "saved_systems_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
     };
     Views: Record<string, never>;

@@ -112,16 +112,27 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
   const statusDisplay = getAdStatusDisplay(product.status);
 
   const isFromTelegram = !!product.source?.startsWith("telegram");
-  const telegramChannel = product.telegram_channel || null;
+  const rawChannel = product.telegram_channel || null;
+  const telegramChannel = rawChannel === "XX" ? "pcrazor_ad" : rawChannel;
+  const telegramChannelUsername = (product.telegram_channel_username ||
+    (rawChannel === "XX" ? "pcrazor_ad" : null) ||
+    null) as string | null;
   const telegramUsername =
     product.telegram_username ||
     (() => {
       const m = product.description.match(/@([A-Za-z0-9_]{5,32})/);
       return m ? m[1] : null;
     })();
-  const telegramLink = telegramUsername
+  const channelLink = telegramChannelUsername
+    ? `https://t.me/${telegramChannelUsername}`
+    : telegramChannel
+      ? `https://t.me/${telegramChannel}`
+      : null;
+  const sellerLink = telegramUsername
     ? `https://t.me/${telegramUsername}`
     : null;
+  const telegramLink = channelLink || sellerLink;
+  const displayUsername = telegramChannelUsername || telegramUsername;
 
   const handleStartChat = () => {
     if (currentUserId) {
@@ -281,13 +292,29 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
                   آگهی از کانال تلگرام
                 </Badge>
                 {telegramChannel && (
-                  <Text mt={"xs"} fz={"sm"} fw={600} ta="center">
-                    {telegramChannel}
+                  <Text
+                    mt={"xs"}
+                    fz={"sm"}
+                    fw={600}
+                    ta="center"
+                    component="a"
+                    href={channelLink ?? telegramLink ?? "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      color: "var(--mantine-color-blue-6)",
+                      textDecoration: "none",
+                    }}
+                  >
+                    {telegramChannel === "pcrazor_ad" ||
+                    telegramChannel === "pcrazor"
+                      ? "pcrazor_ad"
+                      : telegramChannel}
                   </Text>
                 )}
-                {telegramUsername && (
+                {displayUsername && (
                   <Text fz="xs" c="dimmed" dir="ltr">
-                    @{telegramUsername}
+                    @{displayUsername}
                   </Text>
                 )}
                 <Text fz="xs" c="dimmed" mt="xs" ta="center">
@@ -307,7 +334,9 @@ const PageClient: FC<props> = ({ product, currentUserId }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    پیام در تلگرام @{telegramUsername}
+                    {displayUsername
+                      ? `پیام در تلگرام @${displayUsername}`
+                      : "مشاهده کانال تلگرام"}
                   </Button>
                 ) : (
                   <Button

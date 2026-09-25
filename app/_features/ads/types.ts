@@ -28,6 +28,7 @@ export interface Product {
   ostan: string;
   source?: string | null;
   telegram_channel?: string | null;
+  telegram_channel_username?: string | null;
   telegram_username?: string | null;
 }
 

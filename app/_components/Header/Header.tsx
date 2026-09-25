@@ -146,6 +146,11 @@ export function Header({
           </Link>
 
           <Group mr={"xl"} h="100%" gap={0} visibleFrom="sm">
+            <Link href="/ads" className={classes.link}>
+              <Center inline>
+                <Box component="span">آگهی‌ها</Box>
+              </Center>
+            </Link>
             <HoverCard
               width={750}
               position="bottom"

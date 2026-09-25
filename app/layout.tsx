@@ -2,11 +2,7 @@ import type { Metadata } from "next";
 import { getSiteUrl } from "./_utils/siteUrl";
 import "@mantine/core/styles.css";
 import React, { Suspense } from "react";
-import {
-  ColorSchemeScript,
-  DirectionProvider,
-  MantineProvider,
-} from "@mantine/core";
+import { DirectionProvider, MantineProvider } from "@mantine/core";
 import { theme } from "../theme";
 import localFont from "next/font/local";
 import "@mantine/notifications/styles.css";
@@ -71,14 +67,17 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <ColorSchemeScript defaultColorScheme="dark" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <meta
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no"
         />
-      </head>
-      <body style={{ height: "100%" }}>
+        <script
+          data-mantine-script
+          dangerouslySetInnerHTML={{
+            __html: `try{var a=localStorage.getItem("mantine-color-scheme-value"),b=a==="light"||a==="dark"||a==="auto"?a:"dark",c=b!=="auto"?b:window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-mantine-color-scheme",c)}catch(e){}`,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -92,6 +91,8 @@ export default function RootLayout({
             }),
           }}
         />
+      </head>
+      <body style={{ height: "100%" }}>
         <NextTopLoader showSpinner={false} height={5} color="#87A10C" />
 
         <DirectionProvider>

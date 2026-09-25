@@ -102,16 +102,26 @@ function extractTelegramChannel(msg: TelegramMessage): string | null {
   const origin = msg.forward_origin;
   if (origin) {
     if (origin.chat?.title) return origin.chat.title;
-    if (origin.chat?.username) return origin.chat.username;
     if (origin.sender_chat?.title) return origin.sender_chat.title;
-    if (origin.sender_chat?.username) return origin.sender_chat.username;
     if (origin.sender_user_name) return origin.sender_user_name;
   }
   if (msg.forward_from_chat?.title) return msg.forward_from_chat.title;
-  if (msg.forward_from_chat?.username) return msg.forward_from_chat.username;
   if (msg.forward_sender_name) return msg.forward_sender_name;
-  if (msg.forward_from?.username) return msg.forward_from.username;
   if (msg.forward_from?.first_name) return msg.forward_from.first_name;
+  // Fallback to username if no title
+  if (origin?.chat?.username) return origin.chat.username;
+  if (origin?.sender_chat?.username) return origin.sender_chat.username;
+  if (msg.forward_from_chat?.username) return msg.forward_from_chat.username;
+  if (msg.forward_from?.username) return msg.forward_from.username;
+  return null;
+}
+
+function extractTelegramChannelUsername(msg: TelegramMessage): string | null {
+  const origin = msg.forward_origin;
+  if (origin?.chat?.username) return origin.chat.username;
+  if (origin?.sender_chat?.username) return origin.sender_chat.username;
+  if (msg.forward_from_chat?.username) return msg.forward_from_chat.username;
+  if (msg.forward_from?.username) return msg.forward_from.username;
   return null;
 }
 
@@ -352,12 +362,23 @@ export async function POST(req: Request) {
   const effectiveText = rawText || "آگهی تلگرام";
   const parsed = parseTelegramAdContent(effectiveText);
   const telegramChannel = extractTelegramChannel(msg);
+  const telegramChannelUsername = extractTelegramChannelUsername(msg);
   const telegramUsername = extractTelegramUsername(rawText);
+  // For pcrazor_ad channel, ensure it resolves to https://t.me/pcrazor_ad
+  // If forward is from pcrazor_ad, channel username will be pcrazor_ad; fallback to that if no @ in text
+  const resolvedChannelUsername = telegramChannelUsername || null;
+
+  // Hard fallback for your main channel if forward info is hidden (e.g. XX)
+  const finalChannelUsername =
+    resolvedChannelUsername ||
+    (telegramChannel === "XX" ? "pcrazor_ad" : resolvedChannelUsername);
 
   console.log("Telegram webhook: extracted channel info", {
     telegramChannel,
+    telegramChannelUsername,
     telegramUsername,
     hasAtMention: !!telegramUsername,
+    resolvedChannelUsername: finalChannelUsername,
   });
 
   // Debug: persist safe payload diagnostics for image troubleshooting (no secrets)
@@ -419,7 +440,15 @@ export async function POST(req: Request) {
       };
       if (withTelegramFields) {
         payload.telegram_channel = telegramChannel;
+        payload.telegram_channel_username = finalChannelUsername;
         payload.telegram_username = telegramUsername;
+        // Hard fix for XX placeholder channel -> force pcrazor_ad
+        if (telegramChannel === "XX" && !payload.telegram_channel_username) {
+          payload.telegram_channel_username = "pcrazor_ad";
+        }
+        if (telegramChannel === "XX") {
+          payload.telegram_channel = "pcrazor_ad";
+        }
       }
       const res = await admin
         .from("ads")

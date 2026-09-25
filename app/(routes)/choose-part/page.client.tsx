@@ -41,6 +41,7 @@ import {
 import SearchParamsHandler from "@/_components/chooseParts/SearchParamHandler";
 import TotalPriceCalculator from "@/_components/chooseParts/TotalPriceCalculator";
 import BuildAssistant from "@/_components/chooseParts/BuildAssistant";
+import SaveSystemButton from "@/_components/chooseParts/SaveSystemButton";
 import { IconTrash } from "@tabler/icons-react";
 
 interface PageClientProps {
@@ -402,6 +403,9 @@ const PageClient: React.FC<PageClientProps> = ({ showAssistant = false }) => {
             caseData={caseData}
             totalPrice={totalPrice}
           />
+          <Flex justify="flex-end" mt="md">
+            <SaveSystemButton />
+          </Flex>
           {showAssistant && <BuildAssistant />}
         </Container>
 

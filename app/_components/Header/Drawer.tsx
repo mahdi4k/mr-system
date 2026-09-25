@@ -29,6 +29,26 @@ const DrawerHeader: FC<Props> = ({ opened, close }) => {
           </Text>
           <IconX onClick={close} size={22} />
         </Flex>
+        <Link href="/ads" onClick={() => close()}>
+          <Flex
+            align="center"
+            gap="sm"
+            mt="xl"
+            mb="xl"
+            p="sm"
+            style={{
+              background: "var(--mantine-color-gray-light)",
+              borderRadius: 8,
+            }}
+          >
+            <ThemeIcon variant="light" size={24} radius="xl" color="green">
+              <Text fz="xs">📋</Text>
+            </ThemeIcon>
+            <Text fz="lg" fw={600}>
+              آگهی‌ها
+            </Text>
+          </Flex>
+        </Link>
         <List spacing="md" size="sm" center icon={""}>
           <List.Item
             styles={{

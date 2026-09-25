@@ -10,7 +10,12 @@ import {
   Text,
   Flex,
 } from "@mantine/core";
-import { IconUser, IconHome2, IconLogout } from "@tabler/icons-react";
+import {
+  IconUser,
+  IconHome2,
+  IconLogout,
+  IconDeviceDesktop,
+} from "@tabler/icons-react";
 import Link from "next/link";
 import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
@@ -61,6 +66,13 @@ export default function ProfileLayout({ children }: ProfileLayoutProps) {
               href="/profile/ads"
               label="آگهی‌های من"
               leftSection={<IconHome2 size="1rem" stroke={1.5} />}
+            />
+            <NavLink
+              active={isActive("/profile/systems")}
+              component={Link}
+              href="/profile/systems"
+              label="سیستم‌های من"
+              leftSection={<IconDeviceDesktop size="1rem" stroke={1.5} />}
             />
             <Button
               onClick={open}
