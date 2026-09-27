@@ -19,6 +19,7 @@ import {
   Avatar,
   Menu,
   Button,
+  Indicator,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import classes from "./Header.module.css";
@@ -37,9 +38,14 @@ import Link from "next/link";
 import UseLoading from "@/_utils/customHook/useLoading";
 import Image from "next/image";
 import DrawerHeader from "./Drawer";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "../../_lib/supabase/client";
+import {
+  fetchUnreadChatState,
+  isUnreadIncomingMessage,
+  type IncomingMessageRef,
+} from "../../_features/chat/unread";
 
 interface HeaderProps {
   isAuthenticated?: boolean;
@@ -54,6 +60,9 @@ export function Header({
     initialIsAuthenticated,
   );
   const [userLabel, setUserLabel] = useState(initialUserLabel);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const conversationIdsRef = useRef<string[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("light", {
@@ -63,18 +72,21 @@ export function Header({
   const router = useRouter();
   const pathname = usePathname();
   const hideHeaderFooter = pathname.startsWith("/dashboard");
+  const isOnChatPage = pathname.startsWith("/chat");
 
   useEffect(() => {
     const supabase = createClient();
 
     const applyUser = (
       user: {
+        id?: string;
         user_metadata: Record<string, unknown>;
         email?: string;
       } | null,
     ) => {
       if (!user) {
         setIsAuthenticated(false);
+        setUserId(null);
         setUserLabel(undefined);
         return;
       }
@@ -82,6 +94,7 @@ export function Header({
         | { display_name?: string; full_name?: string; name?: string }
         | undefined;
       setIsAuthenticated(true);
+      setUserId(user.id ?? null);
       setUserLabel(
         metadata?.display_name ||
           metadata?.full_name ||
@@ -109,6 +122,63 @@ export function Header({
       subscription.unsubscribe();
     };
   }, []);
+
+  // Unread chat badge: count the messages waiting for the signed-in user, keep
+  // it live through a realtime subscription, and hide it while the chat page is
+  // open (the page marks the open conversation as read).
+  useEffect(() => {
+    if (!isAuthenticated || !userId) {
+      conversationIdsRef.current = [];
+      setUnreadCount(0);
+      return;
+    }
+
+    const supabase = createClient();
+    let active = true;
+
+    const refresh = async () => {
+      const state = await fetchUnreadChatState(supabase, userId);
+      if (!active) return;
+      conversationIdsRef.current = state.conversationIds;
+      setUnreadCount(isOnChatPage ? 0 : state.count);
+    };
+
+    const refreshIfIdle = () => {
+      if (document.visibilityState === "visible") void refresh();
+    };
+
+    void refresh();
+    document.addEventListener("visibilitychange", refreshIfIdle);
+    window.addEventListener("focus", refreshIfIdle);
+
+    const channel = supabase
+      .channel("header:unread-chat")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "messages" },
+        (payload) => {
+          const message = payload.new as IncomingMessageRef;
+          if (
+            !isUnreadIncomingMessage(
+              message,
+              userId,
+              conversationIdsRef.current,
+            )
+          ) {
+            return;
+          }
+          setUnreadCount((current) => (isOnChatPage ? current : current + 1));
+        },
+      )
+      .subscribe();
+
+    return () => {
+      active = false;
+      document.removeEventListener("visibilitychange", refreshIfIdle);
+      window.removeEventListener("focus", refreshIfIdle);
+      void supabase.removeChannel(channel);
+    };
+  }, [isAuthenticated, userId, isOnChatPage]);
 
   const handleLogout = async () => {
     await createClient().auth.signOut();
@@ -317,15 +387,31 @@ export function Header({
         </Flex>
 
         <Group gap="md" wrap="nowrap">
-          <ActionIcon
-            onClick={handleToChatPage}
-            size={"lg"}
-            radius={"lg"}
-            variant="transparent"
-            aria-label="گفتگوها"
+          <Indicator
+            color="red"
+            disabled={unreadCount === 0}
+            label={
+              unreadCount > 99 ? "+۹۹" : unreadCount.toLocaleString("fa-IR")
+            }
+            offset={4}
+            size={18}
+            withBorder
+            zIndex={2}
           >
-            <IconBrandLine size={24} />
-          </ActionIcon>
+            <ActionIcon
+              onClick={handleToChatPage}
+              size={"lg"}
+              radius={"lg"}
+              variant="transparent"
+              aria-label={
+                unreadCount > 0
+                  ? `گفتگوها (${unreadCount.toLocaleString("fa-IR")} پیام خوانده‌نشده)`
+                  : "گفتگوها"
+              }
+            >
+              <IconBrandLine size={24} />
+            </ActionIcon>
+          </Indicator>
 
           {isLoading && (
             <ActionIcon

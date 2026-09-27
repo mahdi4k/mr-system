@@ -1,5 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
+import { clampQueryInt, sanitizeUserSearch } from "./filters";
+import { USERS_PER_PAGE } from "./types";
 
 const USER_MIGRATION =
   "supabase/migrations/20260926000000_admin_user_management.sql";
@@ -7,6 +9,38 @@ const USER_MIGRATION =
 function read(relativePath: string): string {
   return fs.readFileSync(path.join(process.cwd(), relativePath), "utf8");
 }
+
+describe("admin user query parameters", () => {
+  it("falls back to the page size when perPage is omitted", () => {
+    expect(clampQueryInt(null, USERS_PER_PAGE, 1, 50)).toBe(USERS_PER_PAGE);
+    expect(clampQueryInt("", USERS_PER_PAGE, 1, 50)).toBe(USERS_PER_PAGE);
+    expect(clampQueryInt("   ", USERS_PER_PAGE, 1, 50)).toBe(USERS_PER_PAGE);
+    expect(USERS_PER_PAGE).toBe(10);
+  });
+
+  it("never lets perPage fall back to zero clamped up to one", () => {
+    expect(clampQueryInt(null, 10, 1, 50)).not.toBe(1);
+  });
+
+  it("falls back to page one when page is omitted", () => {
+    expect(clampQueryInt(null, 1, 1, 100000)).toBe(1);
+  });
+
+  it("clamps explicit values into range", () => {
+    expect(clampQueryInt("3", 1, 1, 50)).toBe(3);
+    expect(clampQueryInt("0", 1, 1, 50)).toBe(1);
+    expect(clampQueryInt("999", 1, 1, 50)).toBe(50);
+    expect(clampQueryInt("4.9", 1, 1, 50)).toBe(4);
+    expect(clampQueryInt("abc", 1, 1, 50)).toBe(1);
+  });
+
+  it("strips PostgREST metacharacters from the search term", () => {
+    expect(sanitizeUserSearch("a,b*(c)%d")).toBe("a b c d");
+    expect(sanitizeUserSearch("  mahdi   falahati ")).toBe("mahdi falahati");
+    expect(sanitizeUserSearch(null)).toBe("");
+    expect(sanitizeUserSearch("x".repeat(200))).toHaveLength(80);
+  });
+});
 
 describe("admin user management migration", () => {
   const migration = read(USER_MIGRATION);
@@ -88,7 +122,6 @@ describe("admin user management API", () => {
 
   it("sanitizes the search term before building the PostgREST filter", () => {
     expect(searchFilters).toContain("export function sanitizeUserSearch");
-    expect(searchFilters).toContain('replace(/[,()*%\\\\]/g, " ")');
     expect(listRoute).toContain(
       'sanitizeUserSearch(searchParams.get("search"))',
     );
@@ -98,7 +131,7 @@ describe("admin user management API", () => {
   });
 
   it("bounds pagination", () => {
-    expect(listRoute).toContain("clampInt");
+    expect(listRoute).toContain("clampQueryInt");
     expect(listRoute).toContain("const MAX_PER_PAGE = 50");
   });
 
