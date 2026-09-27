@@ -9,6 +9,7 @@ import {
   IconExternalLink,
   IconMessageCircle,
   IconArticle,
+  IconUsers,
 } from "@tabler/icons-react";
 import { Badge, Box, Divider, NavLink, ScrollArea, Text } from "@mantine/core";
 import Link from "next/link";
@@ -67,6 +68,15 @@ export default function Navbar({ onNavigate, pathname }: NavbarProps) {
               فعال
             </Badge>
           }
+          variant="light"
+        />
+        <NavLink
+          active={pathname.startsWith("/dashboard/users")}
+          component={Link}
+          href="/dashboard/users"
+          label="مدیریت کاربران"
+          leftSection={<IconUsers size={19} />}
+          onClick={onNavigate}
           variant="light"
         />
         <NavLink

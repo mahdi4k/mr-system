@@ -260,7 +260,7 @@ export default function SavedSystemsClient() {
           </Stack>
         </Card>
       ) : (
-        <SimpleGrid mb={'xl'} cols={{ base: 1, md: 2 }}>
+        <SimpleGrid mb={"xl"} cols={{ base: 1, md: 2 }}>
           {systems.map((sys) => {
             const query = configToQuery(sys.config);
             const href = `/choose-part?${query}`;
@@ -339,7 +339,6 @@ export default function SavedSystemsClient() {
                             </Text>
                           </div>
                         </Group>
-                         
                       </Group>
                     ))}
                   </Stack>

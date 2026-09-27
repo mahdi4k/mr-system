@@ -31,6 +31,8 @@ export type PriceSource = "automatic" | "manual";
 
 export type MatchStatus = "pending" | "approved" | "rejected";
 
+export type UserRole = "user" | "admin";
+
 export interface Database {
   public: {
     Tables: {
@@ -324,26 +326,41 @@ export interface Database {
       profiles: {
         Row: {
           avatar_url: string | null;
+          ban_reason: string | null;
+          banned_until: string | null;
           created_at: string;
           display_name: string | null;
+          email: string | null;
           id: string;
+          last_sign_in_at: string | null;
           phone: string | null;
+          role: UserRole;
           updated_at: string;
         };
         Insert: {
           avatar_url?: string | null;
+          ban_reason?: string | null;
+          banned_until?: string | null;
           created_at?: string;
           display_name?: string | null;
+          email?: string | null;
           id: string;
+          last_sign_in_at?: string | null;
           phone?: string | null;
+          role?: UserRole;
           updated_at?: string;
         };
         Update: {
           avatar_url?: string | null;
+          ban_reason?: string | null;
+          banned_until?: string | null;
           created_at?: string;
           display_name?: string | null;
+          email?: string | null;
           id?: string;
+          last_sign_in_at?: string | null;
           phone?: string | null;
+          role?: UserRole;
           updated_at?: string;
         };
         Relationships: [];
@@ -685,6 +702,16 @@ export interface Database {
     };
     Views: Record<string, never>;
     Functions: {
+      admin_user_stats: {
+        Args: { user_ids: string[] };
+        Returns: {
+          user_id: string;
+          ads_count: number;
+          articles_count: number;
+          conversations_count: number;
+          saved_systems_count: number;
+        }[];
+      };
       get_or_create_conversation: {
         Args: { ad_uuid: string };
         Returns: string;
@@ -718,6 +745,7 @@ export interface Database {
       catalog_sync_status: CatalogSyncStatus;
       match_status: MatchStatus;
       price_source: PriceSource;
+      user_role: UserRole;
     };
     CompositeTypes: Record<string, never>;
   };
