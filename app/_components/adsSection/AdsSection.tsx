@@ -41,8 +41,14 @@ const AdsSection = () => {
   const isMobile = useMediaQuery("(max-width: 36em)", false, {
     getInitialValueInEffect: true,
   });
-  const parts = usePcparts();
-  const [activeTab, setActiveTab] = useState<string | null>("cpu");
+  const pcParts = usePcparts();
+  // Show "bundle" first and "cpu" last in this section only
+  const parts = [
+    ...pcParts.filter((part) => part.name === "bundle"),
+    ...pcParts.filter((part) => part.name !== "bundle" && part.name !== "cpu"),
+    ...pcParts.filter((part) => part.name === "cpu"),
+  ];
+  const [activeTab, setActiveTab] = useState<string | null>("bundle");
 
   const [
     adsQuery,
