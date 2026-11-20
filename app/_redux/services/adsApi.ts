@@ -72,11 +72,29 @@ export const AdsApi = api.injectEndpoints({
       providesTags: ["ads"],
     }),
 
-    approveAdsItem: builder.mutation<{ message: string }, { id: string }>({
+    approveAdsItem: builder.mutation<
+      { message: string; warning?: string },
+      { id: string }
+    >({
       queryFn: async ({ id }) => {
         try {
-          await moderateAd(id, "published");
-          return { data: { message: "آگهی با موفقیت تأیید شد" } };
+          // Publishing goes through the server so the owner is emailed once.
+          const response = await fetch(`/api/dashboard/ads/${id}/publish`, {
+            method: "POST",
+          });
+          const body = (await response.json().catch(() => null)) as {
+            message?: string;
+            warning?: string;
+          } | null;
+          if (!response.ok) {
+            throw new Error(body?.message || "تأیید آگهی ناموفق بود");
+          }
+          return {
+            data: {
+              message: "آگهی با موفقیت تأیید شد",
+              ...(body?.warning ? { warning: body.warning } : {}),
+            },
+          };
         } catch (error) {
           return {
             error: {

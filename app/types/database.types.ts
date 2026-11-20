@@ -107,6 +107,7 @@ export interface Database {
           id: string;
           price: number | null;
           province_id: number;
+          publication_notified_at: string | null;
           source: string | null;
           status: AdStatus;
           telegram_channel: string | null;
@@ -126,6 +127,7 @@ export interface Database {
           id?: string;
           price?: number | null;
           province_id: number;
+          publication_notified_at?: string | null;
           source?: string | null;
           status?: AdStatus;
           telegram_channel?: string | null;
@@ -145,6 +147,7 @@ export interface Database {
           id?: string;
           price?: number | null;
           province_id?: number;
+          publication_notified_at?: string | null;
           source?: string | null;
           status?: AdStatus;
           telegram_channel?: string | null;

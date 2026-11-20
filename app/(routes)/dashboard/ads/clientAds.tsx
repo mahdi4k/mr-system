@@ -114,18 +114,27 @@ export default function ClientAds() {
     ad: Product,
   ) => {
     try {
-      if (action === "approve") await approve({ id: ad.id }).unwrap();
+      const result =
+        action === "approve" ? await approve({ id: ad.id }).unwrap() : null;
       if (action === "reject") await reject({ id: ad.id }).unwrap();
       if (action === "delete") await remove(ad.id).unwrap();
-      notifications.show({
-        color: "green",
-        message:
-          action === "approve"
-            ? "آگهی منتشر شد."
-            : action === "reject"
-              ? "آگهی رد شد."
-              : "آگهی حذف شد.",
-      });
+      if (result?.warning) {
+        notifications.show({
+          color: "orange",
+          message: result.warning,
+          title: "آگهی منتشر شد",
+        });
+      } else {
+        notifications.show({
+          color: "green",
+          message:
+            action === "approve"
+              ? "آگهی منتشر شد."
+              : action === "reject"
+                ? "آگهی رد شد."
+                : "آگهی حذف شد.",
+        });
+      }
       if (action === "delete") setDeleteTarget(undefined);
     } catch (actionError) {
       notifications.show({ color: "red", message: errorMessage(actionError) });
