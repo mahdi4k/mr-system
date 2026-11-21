@@ -94,6 +94,7 @@ export async function generateMetadata(): Promise<Metadata> {
 const page = () => {
   return (
     <div>
+      <LazyAdsSection />
       <BuildAssistantIntro />
       <Container className={classes.builderContainer} size="lg">
         <Link
@@ -161,7 +162,6 @@ const page = () => {
       </Container>
       <SuggestSection />
 
-      <LazyAdsSection />
       {/* <Container my={"xl"} size="lg">
         <Group>
           <CpuMotherboard />

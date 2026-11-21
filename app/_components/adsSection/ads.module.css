@@ -96,16 +96,33 @@
 }
 
 .adsSkeleton {
-  flex-shrink: 0;
   height: 276px;
-  width: 210px;
+  width: 100%;
+}
 
-  @media (max-width: $mantine-breakpoint-sm) {
-    width: 160px;
+.adsTabs {
+  gap: var(--mantine-spacing-md);
+}
+
+.adsGrid {
+  /* Desktop shows ten cards in two rows. Keep the height of two rows even when
+     a category has fewer ads so switching tabs does not shift the page. */
+  @media (min-width: $mantine-breakpoint-lg) {
+    min-height: calc(2 * 276px + var(--mantine-spacing-sm));
+  }
+}
+
+.adsTabs :global(.mantine-Tabs-list) {
+  width: 160px;
+}
+
+@media (max-width: $mantine-breakpoint-xs) {
+  .adsTabs {
+    gap: var(--mantine-spacing-xs);
   }
 
-  @media (min-width: $mantine-breakpoint-xl) {
-    width: 200px;
+  .adsTabs :global(.mantine-Tabs-list) {
+    width: 130px;
   }
 }
 

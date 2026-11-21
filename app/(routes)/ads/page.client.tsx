@@ -237,7 +237,7 @@ export default function PageClient({ categories }: PageClientProps) {
         </Button>
       </Flex>
 
-      <Box hiddenFrom="sm" mb="lg">
+      <Box mb="lg">
         <CategoryGrid
           categories={categories}
           currentCategory={currentCategory}
@@ -403,7 +403,11 @@ function CategoryGrid({
   onApply,
 }: CategoryGridProps) {
   return (
-    <SimpleGrid cols={4} spacing="xs" verticalSpacing="xs">
+    <SimpleGrid
+      cols={{ base: 4, xs: 5, sm: 7, md: 9, lg: 11 }}
+      spacing="xs"
+      verticalSpacing="xs"
+    >
       <UnstyledButton
         className={classes.categoryCell}
         data-active={!currentCategory || undefined}

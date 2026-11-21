@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 const AdsSection = dynamic(() => import("./AdsSection"), {
   ssr: false,
   loading: () => (
-    <Container mt="100px" size="lg">
+    <Container my="xl" size="lg">
       <Skeleton height={460} radius="md" />
     </Container>
   ),
@@ -40,7 +40,7 @@ export default function LazyAdsSection() {
       {shouldLoad ? (
         <AdsSection />
       ) : (
-        <Container mt="100px" size="lg">
+        <Container my="xl" size="lg">
           <Skeleton height={460} radius="md" />
         </Container>
       )}

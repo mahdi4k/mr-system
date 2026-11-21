@@ -33,6 +33,7 @@ import {
   IconHome2,
   IconLogin,
   IconLogout,
+  IconPlus,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import UseLoading from "@/_utils/customHook/useLoading";
@@ -387,6 +388,21 @@ export function Header({
         </Flex>
 
         <Group gap="md" wrap="nowrap">
+          <Link href="/ads/create">
+            <Button
+              aria-label="افزودن آگهی"
+              gradient={{ deg: 120, from: "teal", to: "lime" }}
+              leftSection={<IconPlus size={16} stroke={2.5} />}
+              radius="xl"
+              size="xs"
+              variant="gradient"
+            >
+              <Text inherit visibleFrom="sm">
+                افزودن آگهی
+              </Text>
+            </Button>
+          </Link>
+
           <Indicator
             color="red"
             disabled={unreadCount === 0}
