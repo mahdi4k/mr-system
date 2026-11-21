@@ -92,7 +92,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body style={{ height: "100%" }}>
+      <body style={{ minHeight: "100vh" }}>
         <NextTopLoader showSpinner={false} height={5} color="#87A10C" />
 
         <DirectionProvider>

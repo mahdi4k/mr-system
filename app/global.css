@@ -11,6 +11,10 @@ textarea {
   text-decoration: none;
 }
 
+html {
+  scroll-padding-top: 3.5rem;
+}
+
 body {
   display: flex;
   flex-direction: column;
